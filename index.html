@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>ChamiGolf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="wrap">
+    <div class="stage">
+      <canvas id="course" aria-label="Golf course. Click or drag on the course to aim."></canvas>
+
+      <!-- top-left: hole info -->
+      <div class="hud hud-hole">
+        <div class="hole-badge"><span class="hb-label">HOLE</span><span id="hole-num">1</span></div>
+        <div class="hole-text">
+          <div id="hole-name" class="hole-name">Opening Drive</div>
+          <div class="hole-meta">PAR <b id="par">3</b> · <b id="to-pin">0</b> YDS · STROKE <b id="stroke-num">1</b></div>
+        </div>
+      </div>
+
+      <!-- top-right: score + wind -->
+      <div class="hud hud-right">
+        <div class="score-box"><span class="hb-label">TOTAL</span><span id="total">E</span></div>
+        <div class="wind-box" title="Wind">
+          <svg viewBox="-30 -30 60 60" class="compass" aria-hidden="true">
+            <circle r="27" class="compass-ring"/>
+            <text y="-17" class="compass-n">N</text>
+            <g id="wind-arrow"><path d="M -14 0 L 12 0 M 12 0 L 4 -6 M 12 0 L 4 6" class="compass-arrow"/></g>
+          </svg>
+          <div class="wind-text"><b id="wind-speed">0</b> mph</div>
+        </div>
+      </div>
+
+      <div id="toast" class="toast hidden"></div>
+      <div id="overlay" class="overlay hidden"></div>
+    </div>
+
+    <!-- control dashboard -->
+    <section class="dash">
+      <div class="dash-club">
+        <div class="dash-label">CLUB</div>
+        <div class="club-picker">
+          <button id="club-prev" class="arrow-btn" aria-label="Previous club">◀</button>
+          <div class="club-display">
+            <div id="club-name" class="club-name">Driver</div>
+            <div class="club-dist"><span id="club-yds">0</span> yds max</div>
+          </div>
+          <button id="club-next" class="arrow-btn" aria-label="Next club">▶</button>
+        </div>
+        <div class="lie">LIE: <b id="lie">Fairway</b></div>
+      </div>
+
+      <div class="dash-meter">
+        <div class="dash-label">SWING <span id="power-read" class="power-read"></span></div>
+        <div id="meter" class="meter" role="button" tabindex="0" aria-label="Swing meter">
+          <div class="meter-ticks"></div>
+          <div class="meter-snap"></div>
+          <div id="meter-power-mark" class="meter-power-mark hidden"></div>
+          <div id="meter-fill" class="meter-fill"></div>
+          <div id="meter-marker" class="meter-marker"></div>
+        </div>
+        <button id="swing-btn" class="swing-btn">SWING</button>
+        <div id="meter-hint" class="meter-hint">Click 1: start · Click 2: power · Click 3: accuracy (on the line)</div>
+      </div>
+
+      <div class="dash-spin">
+        <div class="dash-label">SPIN</div>
+        <div id="spin-ball" class="spin-ball" role="button" tabindex="0" aria-label="Set spin by clicking on the ball">
+          <div class="spin-cross"></div>
+          <div id="spin-dot" class="spin-dot"></div>
+        </div>
+        <div id="spin-text" class="spin-text">None</div>
+      </div>
+    </section>
+
+    <section class="scorecard-wrap">
+      <table class="scorecard" id="scorecard"></table>
+    </section>
+
+    <p class="keys">Keys: <kbd>Space</kbd> swing · <kbd>←</kbd><kbd>→</kbd> aim (hold <kbd>Shift</kbd> for fine) · <kbd>↑</kbd><kbd>↓</kbd> club · <kbd>R</kbd> re-aim at pin</p>
+  </main>
+
+  <script src="courses.js"></script>
+  <script src="physics.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
