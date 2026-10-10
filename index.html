@@ -30,8 +30,9 @@
   .cbtn{width:46px;height:46px;flex:none;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);color:var(--gold);
         font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
   .cbtn:active{transform:scale(.94)}
-  .club{flex:1;text-align:center;min-width:0;cursor:pointer;border-radius:12px;padding:2px 0}
-  .club:active{background:rgba(242,193,78,.12)}
+  .club{flex:1;text-align:center;min-width:0;cursor:pointer;border-radius:14px;padding:5px 6px 6px;border:2px solid var(--gold);background:linear-gradient(180deg,#9b1228,#5c0815);box-shadow:0 3px 0 #8a6416}
+  .club .chg{display:inline-block;font:800 10px Inter,sans-serif;letter-spacing:.14em;color:var(--red-dd);background:var(--gold);border-radius:999px;padding:2px 9px;margin-bottom:3px}
+  .club:active{transform:translateY(2px);box-shadow:0 1px 0 #8a6416}
   .club .n{font:700 21px/1.1 Oswald,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-l)}
   .club .n small{font-size:14px;color:#fff;margin-left:6px;letter-spacing:0}
   .club .i{font-size:12px;color:#f6dcb0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -156,7 +157,7 @@
   <div class="stat"><div class="l">PAR</div><div class="v" id="hPar">4</div></div>
   <div class="stat"><div class="l">STROKE</div><div class="v" id="hStroke">0</div></div>
   <div class="stat"><div class="l">TOTAL</div><div class="v" id="hTotal">E</div></div>
-  <div class="stat"><div class="l">WIND</div>
+  <div class="stat"><div class="l">WIND MPH</div>
     <div class="v" id="windV">
       <svg id="windArrow" viewBox="0 0 24 24"><path d="M12 2 L19 12 H14 V22 H10 V12 H5 Z" fill="#FFE08A"/></svg>
       <span id="windTxt">0</span>
@@ -169,7 +170,7 @@
 
 <div class="bottom" id="bar">
   <button class="cbtn" id="prevClub" aria-label="Previous club">◀</button>
-  <div class="club" id="clubBtn"><div class="n"><span id="clubName">Driver</span><small id="clubStock"></small></div><div class="i" id="clubInfo"></div></div>
+  <div class="club" id="clubBtn" role="button" aria-label="Change club"><div class="chg">CHANGE CLUB &#9662;</div><div class="n"><span id="clubName">Driver</span><small id="clubStock"></small></div><div class="i" id="clubInfo"></div></div>
   <button class="cbtn" id="nextClub" aria-label="Next club">▶</button>
 </div>
 
@@ -215,7 +216,8 @@
           <li>Check <b>PIN</b> at the top for yards remaining, pick a club, then pull back just enough. For example, 120 yards with a 150-yard club is about 80%.</li>
           <li><b>Swipe</b> left or right to aim. Tap the club name to open your bag, or use <b>◀ ▶</b>.</li>
           <li><b>Press the ball and pull back.</b> The needle swings across the gauge. Let go in the bright <b>gold</b> zone for a perfect strike.</li>
-          <li>Rough cuts distance 15% and sand cuts it 40% (less with the Sand Wedge). Watch the <b>wind</b> arrow.</li>
+          <li><b>Pull back and to the right</b> to slice (the ball curves right). Pull back and to the left to hook (it curves left). The further sideways you pull, the bigger the curve.</li>
+      <li>Rough cuts distance 15% and sand cuts it 40% (less with the Sand Wedge). Watch the <b>wind</b> arrow: it pushes the ball while it is in the air, and high shots get pushed more.</li>
           <li>Water and out of bounds cost a stroke. <b>MAP</b> shows the whole hole, and you can tap it to aim.</li>
           <li>Win money for par or better. Upgrade clubs in the <b>Clubs</b> tab for more yards, a slower needle and a bigger gold zone.</li>
         </ol>
@@ -256,7 +258,13 @@
 
   // ================= Rules =================
   const CUP_R = 0.35, CAPTURE = 2.4, MAX_STROKES = 12;
-  const DECEL = { green: 2.6, fringe: 6, fairway: 8, tee: 8, rough: 22, sand: 60 };
+  const DECEL = { green: 2.6, fringe: 5.5, fairway: 6.5, tee: 6.5, rough: 22, sand: 60 };
+  // Bounce: how much upward speed the ball keeps (REST) and forward speed it loses (SKID) on each landing.
+  const REST = { tee: 0.42, fairway: 0.42, fringe: 0.36, green: 0.32, rough: 0.2, sand: 0.04 };
+  const SKID = { tee: 0.1, fairway: 0.1, fringe: 0.14, green: 0.18, rough: 0.25, sand: 0.85 };
+  const GRAV = 20;
+  // Sideways pull (-1 left .. 1 right) -> yards of curve. Right = slice, left = hook.
+  const curveOf = (lat, carry) => { const a = Math.abs(lat || 0); return a < 0.08 ? 0 : Math.sign(lat) * (a - 0.08) / 0.92 * carry * 0.24; };
   const LIE_MULT = { tee: 1, fairway: 1, fringe: 0.97, green: 0.95, rough: 0.85, sand: 0.6 };
   const LIE_NAME = { tee: 'Tee box', fairway: 'Fairway', fringe: 'Fringe', green: 'Green', rough: 'Rough', sand: 'Bunker' };
   // Stock yardages (before upgrades). Pull 100% = full stock distance.
@@ -740,7 +748,7 @@
     look.set(cx, 0, cy); pos.set(cx, Y, cy + Y * 0.3);
   }
   function desiredCam(time) {
-    const h = flight ? flight.hgt : 0;
+    const h = flight ? flight.hgt : (ball.z || 0);
     if (state === 'title') {
       const b = hole.bounds, cx = b.x + b.w / 2, cy = b.y + b.h / 2, R = Math.max(b.w, b.h) * 0.7, a = time * 0.08;
       dPos.set(cx + Math.sin(a) * R, R * 0.45, cy + Math.cos(a) * R); dLook.set(cx, 0, cy); return 1.5;
@@ -777,7 +785,7 @@
   }
   const ballV = new THREE.Vector3();
   function ballScreen() {
-    ballV.set(ball.x, (flight ? flight.hgt : 0) + 0.1, ball.y).project(camera);
+    ballV.set(ball.x, (flight ? flight.hgt : (ball.z || 0)) + 0.1, ball.y).project(camera);
     return { x: (ballV.x + 1) / 2 * innerWidth, y: (1 - ballV.y) / 2 * innerHeight, behind: ballV.z > 1 };
   }
   const pullPx = () => Math.min(220, innerHeight * 0.26);
@@ -794,7 +802,7 @@
     const bs = ballScreen();
     if (!bs.behind && Math.hypot(e.clientX - bs.x, e.clientY - bs.y) < 90) {
       ptr = { mode: 'swing', x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY };
-      swing = { power: 0, phase: 0, o: -1 }; state = 'swinging';
+      swing = { power: 0, phase: 0, o: -1, lat: 0 }; state = 'swinging';
     } else {
       ptr = { mode: 'aim', x0: e.clientX, ang0: aimAng };
     }
@@ -807,13 +815,14 @@
       aimAng = ptr.ang0 + (e.clientX - ptr.x0) * fine;
     } else if (ptr.mode === 'swing') {
       ptr.x = e.clientX; ptr.y = e.clientY;
-      swing.power = clamp(Math.hypot(ptr.x - ptr.x0, ptr.y - ptr.y0) / pullPx(), 0, 1);
+      swing.power = clamp(Math.max(0, ptr.y - ptr.y0) / pullPx(), 0, 1);
+      swing.lat = CLUBS[clubIdx].putter ? 0 : clamp((ptr.x - ptr.x0) / pullPx(), -1, 1);
     }
   });
   function endPointer() {
     if (!ptr) return;
     if (ptr.mode === 'swing' && state === 'swinging') {
-      if (swing.power < 0.03) { state = 'ready'; swing = null; } else shoot(swing.power, swing.o);
+      if (swing.power < 0.03) { state = 'ready'; swing = null; } else shoot(swing.power, swing.o, swing.lat);
     }
     ptr = null;
   }
@@ -847,17 +856,19 @@
   $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
 
   // ================= Shots =================
-  function shoot(power, o) {
+  function shoot(power, o, lat) {
     const c = CLUBS[clubIdx], lie = terrainAt(ball), pz = perfectZone(c);
     const ao = Math.abs(o), oe = ao < pz ? 0 : Math.sign(o) * (ao - pz) / (1 - pz), aoe = Math.abs(oe);
+    const shape = c.putter || Math.abs(lat || 0) < 0.08 ? '' : (lat > 0 ? ' · SLICE' : ' · HOOK');
     save.stats.shots++;
-    if (oe === 0) { showRating('PERFECT!', '#FFE08A'); sfx.perfect(); save.stats.perfects++; }
-    else if (aoe < 0.35) showRating('GREAT', '#F2C14E');
-    else if (aoe < 0.7) showRating('GOOD', '#ffffff');
-    else showRating(oe < 0 ? 'MISS LEFT' : 'MISS RIGHT', '#ff6b7d');
+    if (oe === 0) { showRating('PERFECT!' + shape, '#FFE08A'); sfx.perfect(); save.stats.perfects++; }
+    else if (aoe < 0.35) showRating('GREAT' + shape, '#F2C14E');
+    else if (aoe < 0.7) showRating('GOOD' + shape, '#ffffff');
+    else showRating((oe < 0 ? 'MISS LEFT' : 'MISS RIGHT') + shape, '#ff6b7d');
 
     prev = { x: ball.x, y: ball.y };
     strokes++; firstShot = false; trailReset(); swing = null; lastClub = clubIdx;
+    ball.z = 0; ball.vz = 0; ball.spin = 0;
     const lieErr = lie === 'rough' ? 1.4 : lie === 'sand' ? 1.6 : 1;
     const full = stockNow(c);
     lastPutt = !!c.putter;
@@ -872,19 +883,33 @@
     }
     const carry = Math.max(3, full * power * (1 - 0.07 * aoe + gauss() * 0.015));
     const ang = aimAng + (oe * 8 * (c.spread / 3.2) * lieErr + gauss() * 0.35) * DEG;
-    const wm = 0.0045 * windMult();
-    const ex = ball.x + Math.cos(ang) * carry + hole.wind.x * carry * wm;
-    const ey = ball.y + Math.sin(ang) * carry + hole.wind.y * carry * wm;
+    const dir = { x: Math.cos(ang), y: Math.sin(ang) }, right = { x: -dir.y, y: dir.x };
+    // Wind pushes the ball in the air. High shots ride it more; a headwind hurts more than a tailwind helps.
+    const wm = windMult(), wx = hole.wind.x * wm, wy = hole.wind.y * wm;
+    const along = wx * dir.x + wy * dir.y, across = wx * right.x + wy * right.y;
+    const hf = clamp(c.loft / 30, 0.75, 1.35) * clamp(Math.sqrt(power), 0.5, 1);
+    const carryW = Math.max(3, carry * (1 + (along >= 0 ? 0.006 : 0.009) * along * hf));
+    // Sideways curve from the pull (slice/hook) plus crosswind drift.
+    const side = curveOf(lat, carry) * lieErr + across * carry * 0.0065 * hf;
+    const D = { x: dir.x * carryW, y: dir.y * carryW }, Q = { x: right.x * side, y: right.y * side };
+    const ex = ball.x + D.x + Q.x, ey = ball.y + D.y + Q.y;
+    const tx = D.x + 2 * Q.x, ty = D.y + 2 * Q.y, tl = Math.hypot(tx, ty) || 1;
     const ignore = new Set(hole.allTrees.filter(t => Math.hypot(t.x - ball.x, t.y - ball.y) < t.r + 2));
     const hMax = c.loft * clamp(Math.sqrt(power), 0.35, 1);
-    flight = { sx: ball.x, sy: ball.y, ex, ey, t: 0, T: 0.9 + carry / 100, h: hMax, hgt: 0, carry, club: c, ignore };
+    // Roll: tailwind, a pure strike and a hook run further; a slice and a mishit run less.
+    const shapeRoll = Math.abs(lat || 0) < 0.08 ? 1 : (lat < 0 ? 1.15 : 0.9);
+    const rollMul = clamp(1 + along * 0.012, 0.7, 1.35) * (oe === 0 ? 1.12 : 1 - 0.25 * aoe) * shapeRoll;
+    flight = { sx: ball.x, sy: ball.y, ex, ey, qx: Q.x, qy: Q.y, t: 0, T: 0.9 + carryW / 100, h: hMax, hgt: 0, carry: carryW, club: c, ignore,
+      dirEnd: { x: tx / tl, y: ty / tl }, rollMul, q: oe === 0 ? 1 : clamp(1 - aoe, 0.2, 1) };
     state = 'flying'; sfx.swing();
   }
 
   function fly(dt) {
     const f = flight; f.t += dt;
     const s = Math.min(1, f.t / f.T);
-    ball.x = f.sx + (f.ex - f.sx) * s; ball.y = f.sy + (f.ey - f.sy) * s;
+    // Curve and wind build up later in the flight (s squared), like a real ball.
+    ball.x = f.sx + (f.ex - f.sx - f.qx) * s + f.qx * s * s;
+    ball.y = f.sy + (f.ey - f.sy - f.qy) * s + f.qy * s * s;
     f.hgt = f.h * 4 * s * (1 - s);
     for (const t of hole.allTrees) {
       if (f.ignore.has(t) || f.hgt > t.top) continue;
@@ -894,8 +919,10 @@
     if (s >= 1) land();
   }
   function hitTree(dx, dy, d) {
+    const hgt = flight ? flight.hgt : 0;
     flight = null;
     ball.vx = (d ? dx / d : 0) * 4; ball.vy = (d ? dy / d : 1) * 4;
+    ball.z = Math.max(0.01, Math.min(hgt, 8)); ball.vz = 0; ball.spin = 0;
     state = 'rolling'; sfx.tree(); showRating('TIMBER!', '#ff6b7d');
   }
   function land() {
@@ -905,18 +932,42 @@
     if (t === 'oob') return penalty('Out of bounds', false);
     sfx.land();
     if (t === 'sand') { ball.vx = ball.vy = 0; return stopped(); }
-    const len = Math.hypot(f.ex - f.sx, f.ey - f.sy) || 1;
-    let v = Math.sqrt(2 * 8 * f.carry * f.club.roll);
-    if (t === 'green') v *= 0.45;
-    ball.vx = (f.ex - f.sx) / len * v; ball.vy = (f.ey - f.sy) / len * v;
+    const c = f.club, steep = clamp((c.loft - 22) / 18, 0, 1);
+    // Low clubs run out; wedges land steep with backspin and check up.
+    const rollYds = Math.max(0.3, f.carry * c.roll * 1.6 * f.rollMul * (1 - 0.45 * steep));
+    const v = Math.sqrt(2 * DECEL.fairway * rollYds);
+    ball.spin = steep * 0.35 * f.q;
+    ball.vx = f.dirEnd.x * v; ball.vy = f.dirEnd.y * v;
+    ball.z = 0; ball.vz = -(5 + f.h * 0.35);
+    touchdown(t);
     state = 'rolling';
+  }
+  // The ball meets the ground: it loses some forward speed and bounces back up depending on the surface.
+  function touchdown(t) {
+    const vin = Math.abs(ball.vz || 0);
+    const k = Math.max(0, 1 - (SKID[t] || 0.1) - (ball.spin || 0) * (t === 'green' ? 1 : 0.4));
+    ball.vx *= k; ball.vy *= k; ball.spin = (ball.spin || 0) * 0.5;
+    ball.vz = vin * (REST[t] || 0.3);
+    if (ball.vz < 1.5) { ball.vz = 0; ball.z = 0; } else ball.z = 0.001;
   }
   function roll(dt) {
     let sp = Math.hypot(ball.vx, ball.vy);
-    if (sp < 0.12) { ball.vx = ball.vy = 0; return stopped(); }
-    const n = Math.max(1, Math.ceil(sp * dt / 0.1)), h = dt / n;
+    const air = () => (ball.z || 0) > 0;
+    if (!air() && sp < 0.12) { ball.vx = ball.vy = 0; return stopped(); }
+    const n = Math.max(air() ? 4 : 1, Math.ceil(sp * dt / 0.1)), h = dt / n;
     for (let i = 0; i < n; i++) {
       ball.x += ball.vx * h; ball.y += ball.vy * h;
+      if (air()) {
+        ball.vz -= GRAV * h; ball.z += ball.vz * h;
+        if (ball.z > 0) continue;
+        ball.z = 0;
+        const tt = terrainAt(ball);
+        if (tt === 'water') return penalty('Water hazard', true);
+        if (tt === 'oob') return penalty('Out of bounds', false);
+        if (tt === 'sand') { ball.vx = ball.vy = 0; ball.vz = 0; return stopped(); }
+        touchdown(tt);
+        continue;
+      }
       const t = terrainAt(ball);
       if (t === 'water') return penalty('Water hazard', true);
       if (t === 'oob') return penalty('Out of bounds', false);
@@ -932,6 +983,7 @@
     }
   }
   function stopped() {
+    ball.z = 0; ball.vz = 0; ball.spin = 0;
     if (lastClub === 0) {
       const d = Math.round(Math.hypot(ball.x - prev.x, ball.y - prev.y));
       if (d > save.stats.longest) { save.stats.longest = d; showRating(`LONGEST DRIVE · ${d} YDS`, '#FFE08A'); }
@@ -970,7 +1022,7 @@
     if (!hole) return;
     if (introT > 0) introT -= dt;
     if (state === 'swinging' && swing) {
-      swing.phase += dt * 0.45 * (0.5 + 0.9 * swing.power) * needleMult(CLUBS[clubIdx]);
+      swing.phase += dt * 0.6 * (0.5 + 0.9 * swing.power) * needleMult(CLUBS[clubIdx]);
       const f = swing.phase % 1;
       swing.o = f < 0.5 ? -1 + 4 * f : 3 - 4 * f;
     }
@@ -992,14 +1044,14 @@
   }
 
   // ================= Render =================
-  function setArc(dist, c) {
+  function setArc(dist, c, cv = 0) {
     const p = aimGeo.attributes.position.array, dx = Math.cos(aimAng), dy = Math.sin(aimAng);
     const hMax = c.putter ? 0 : c.loft * clamp(Math.sqrt(dist / Math.max(1, stockNow(c))), 0.35, 1);
     for (let i = 0; i <= AIM_N; i++) {
-      const s = i / AIM_N;
-      p[i * 3] = ball.x + dx * dist * s;
+      const s = i / AIM_N, k = cv * s * s;
+      p[i * 3] = ball.x + dx * dist * s - dy * k;
       p[i * 3 + 1] = c.putter ? 0.05 : hMax * 4 * s * (1 - s) + 0.15;
-      p[i * 3 + 2] = ball.y + dy * dist * s;
+      p[i * 3 + 2] = ball.y + dy * dist * s + dx * k;
     }
     aimGeo.attributes.position.needsUpdate = true;
     aimMat.dashSize = c.putter ? 0.25 : 1.6; aimMat.gapSize = c.putter ? 0.18 : 1.1;
@@ -1010,7 +1062,7 @@
     camPos.lerp(dPos, a); camLook.lerp(dLook, a); placeCamera();
     scene.fog.near = 320 + camera.position.y * 1.6; scene.fog.far = scene.fog.near + 950;
 
-    const h = flight ? flight.hgt : 0;
+    const h = flight ? flight.hgt : (ball.z || 0);
     let by = h;
     if (state === 'sinking') by = -Math.min(1, sinkT / 0.4) * 0.4;
     const camD = camera.position.distanceTo(ballV.set(ball.x, h, ball.y));
@@ -1027,13 +1079,14 @@
     if (aiming) {
       const c = CLUBS[clubIdx], full = stockNow(c), dx = Math.cos(aimAng), dy = Math.sin(aimAng);
       const live = state === 'swinging' ? full * swing.power : full;
-      setArc(live, c);
+      const cv = state === 'swinging' ? curveOf(swing.lat, live) : 0;
+      setArc(live, c, cv);
       const sz = d => c.putter ? 0.4 : clamp(d * 0.028, 1.4, 7);
       fullTarget.position.set(ball.x + dx * full, 0.07, ball.y + dy * full);
       fullTarget.scale.setScalar(sz(full) * (state === 'ready' ? 1 + Math.sin(time * 4) * 0.04 : 1));
       fullTarget.userData.ring.material.opacity = state === 'swinging' ? 0.45 : 0.95;
       if (state === 'swinging') {
-        liveTarget.position.set(ball.x + dx * live, 0.08, ball.y + dy * live);
+        liveTarget.position.set(ball.x + dx * live - dy * cv, 0.08, ball.y + dy * live + dx * cv);
         liveTarget.scale.setScalar(sz(Math.max(live, 1)) * 0.85);
       }
     }
@@ -1076,7 +1129,7 @@
       const c = CLUBS[clubIdx], full = stockNow(c), yds = full * swing.power, pin = distToPin();
       fctx.strokeStyle = 'rgba(255,255,255,.55)'; fctx.lineWidth = 2; fctx.setLineDash([5, 5]);
       fctx.beginPath(); fctx.moveTo(bs.x, bs.y); fctx.lineTo(ptr.x, ptr.y); fctx.stroke(); fctx.setLineDash([]);
-      // power ring with a tick where the pin distance is
+      // power ring
       const pr = 40;
       fctx.lineWidth = 9; fctx.strokeStyle = 'rgba(69,6,15,.8)';
       fctx.beginPath(); fctx.arc(bs.x, bs.y, pr, 0, Math.PI * 2); fctx.stroke();
@@ -1084,16 +1137,16 @@
       fctx.lineCap = 'round';
       fctx.beginPath(); fctx.arc(bs.x, bs.y, pr, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * swing.power); fctx.stroke();
       fctx.lineCap = 'butt';
-      if (pin < full) {
-        const pa = -Math.PI / 2 + Math.PI * 2 * (pin / full);
-        fctx.strokeStyle = '#fff'; fctx.lineWidth = 3;
-        fctx.beginPath(); fctx.moveTo(bs.x + Math.cos(pa) * (pr - 9), bs.y + Math.sin(pa) * (pr - 9)); fctx.lineTo(bs.x + Math.cos(pa) * (pr + 9), bs.y + Math.sin(pa) * (pr + 9)); fctx.stroke();
-      }
       fctx.textAlign = 'center';
       fctx.font = '700 22px Oswald, sans-serif'; fctx.fillStyle = '#fff';
       fctx.fillText(`${Math.round(yds)} YDS`, bs.x, bs.y + pr + 28);
       fctx.font = '700 13px Inter, sans-serif'; fctx.fillStyle = '#FFE08A';
       fctx.fillText(`${Math.round(swing.power * 100)}% of ${Math.round(full)} · pin ${Math.round(pin)}`, bs.x, bs.y + pr + 47);
+      const cvd = c.putter ? 0 : curveOf(swing.lat, yds);
+      if (Math.abs(cvd) >= 1) {
+        fctx.font = '800 14px Inter, sans-serif'; fctx.fillStyle = cvd > 0 ? '#ffab8a' : '#a8dcff';
+        fctx.fillText(cvd > 0 ? `SLICE ${Math.round(cvd)} YDS ▶` : `◀ HOOK ${Math.round(-cvd)} YDS`, bs.x, bs.y + pr + 67);
+      }
 
       const gx = bs.x, gy = bs.y - 70, R = 78, span = Math.PI * 0.8;
       const ang = o => -Math.PI / 2 + o * span / 2;
@@ -1141,7 +1194,7 @@
     setText('clubStock', `${Math.round(stockNow(c))} yds`);
     const lieTxt = LIE_NAME[lie] || '';
     const adj = !c.putter && lieMult(c, lie) < 1 ? ` (${lieTxt.toLowerCase()} −${Math.round((1 - lieMult(c, lie)) * 100)}%)` : '';
-    setText('clubInfo', `Tap to change club · ${lieTxt}${adj}`);
+    setText('clubInfo', `${lieTxt}${adj}`);
     setText('pinYds', String(Math.round(distToPin())));
     const ready = state === 'ready';
     $('bar').classList.toggle('disabled', !ready);
