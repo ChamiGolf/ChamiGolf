@@ -1146,7 +1146,7 @@
       const lie = terrainAt(ball);
       for (let i = 0; i < PUTTER; i++) {
         if (i === 0 && lie !== 'tee') continue;
-        recIdx = i; if (stockNow(CLUBS[i]) <= t.dw) break;
+        recIdx = i; if (stockNow(CLUBS[i]) <= t.dw * 1.12) break;
       }
     }
     clubIdx = recIdx;
