@@ -257,7 +257,7 @@
   document.title = GAME_NAME; $('gameName').textContent = GAME_NAME;
 
   // ================= Rules =================
-  const CUP_R = 0.35, CAPTURE = 2.4, MAX_STROKES = 12;
+  const CUP_R = 0.35, CUP_D = 0.42, BALL_R = 0.075, CAPTURE = 2.4, MAX_STROKES = 12;
   const DECEL = { green: 2.6, fringe: 5.5, fairway: 6.5, tee: 6.5, rough: 22, sand: 60 };
   // Bounce: how much upward speed the ball keeps (REST) and forward speed it loses (SKID) on each landing.
   const REST = { tee: 0.42, fairway: 0.42, fringe: 0.36, green: 0.32, rough: 0.2, sand: 0.04 };
@@ -428,6 +428,8 @@
     tree: () => { tone(90, 0.12, 'square', 0.07); tone(140, 0.08, 'triangle', 0.08); },
     cup: () => { tone(660, 0.12, 'sine', 0.2); setTimeout(() => tone(990, 0.28, 'sine', 0.18), 120); },
     splash: () => tone(500, 0.45, 'sawtooth', 0.05, 70),
+    rattle: v => tone(1500 + Math.random() * 500, 0.035, 'square', clamp(0.02 + v * 0.02, 0.02, 0.07)),
+    clunk: () => { tone(170, 0.09, 'triangle', 0.25); tone(95, 0.12, 'sine', 0.2); },
     click: () => tone(700, 0.04, 'triangle', 0.08),
     buy: () => { tone(988, 0.08, 'square', 0.06); setTimeout(() => tone(1319, 0.2, 'square', 0.06), 80); },
   };
@@ -477,7 +479,7 @@
 
   // ball, shadow blob, aim arc, targets, trail
   const ballMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0 }));
-  scene.add(ballMesh);
+  ballMesh.renderOrder = 4; scene.add(ballMesh);
   const blob = new THREE.Mesh(new THREE.CircleGeometry(1, 24), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.32, depthWrite: false }));
   blob.rotation.x = -Math.PI / 2; scene.add(blob);
 
@@ -591,13 +593,23 @@
     return new THREE.CanvasTexture(c);
   }
   const FLAG_TEX = flagTexture();
+  function cupTexture() {
+    const c = document.createElement('canvas'); c.width = 8; c.height = 128;
+    const g = c.getContext('2d');
+    const grd = g.createLinearGradient(0, 0, 0, 128);
+    grd.addColorStop(0, '#f4f4ef'); grd.addColorStop(0.2, '#d9d9d2'); grd.addColorStop(0.24, '#4a3725');
+    grd.addColorStop(0.6, '#2b1f14'); grd.addColorStop(1, '#100b07');
+    g.fillStyle = grd; g.fillRect(0, 0, 8, 128);
+    return new THREE.CanvasTexture(c);
+  }
+  const CUP_TEX = cupTexture();
 
   let holeGroup = null, flagMesh = null, disposables = [];
-  function buildHole(h, course) {
+  function buildHole(h, course, maxPx = 2600) {
     if (holeGroup) { scene.remove(holeGroup); disposables.forEach(d => d.dispose()); disposables = []; }
     holeGroup = new THREE.Group(); scene.add(holeGroup);
     const pal = course.pal;
-    const { canvas, ox, oy, W, H: Hh } = paintHole(h, pal);
+    const { canvas, ox, oy, W, H: Hh } = paintHole(h, pal, maxPx);
     const tex = new THREE.CanvasTexture(canvas);
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const gGeo = new THREE.PlaneGeometry(W, Hh), gMat = new THREE.MeshLambertMaterial({ map: tex });
@@ -647,20 +659,33 @@
     disposables.push(tmGeo, tmMat);
     [-5, 5].forEach(dx => { const m = new THREE.Mesh(tmGeo, tmMat); m.position.set(h.tee.x + dx, 0.4, h.tee.y - 2); holeGroup.add(m); });
 
-    // cup, pole, flag
-    const cupGeo = new THREE.CircleGeometry(CUP_R, 24), cupMat = new THREE.MeshBasicMaterial({ color: 0x080808 });
-    const rimGeo = new THREE.RingGeometry(CUP_R, CUP_R + 0.06, 24), rimMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const poleGeo = new THREE.CylinderGeometry(0.05, 0.05, 4.2, 8), poleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+    // cup: a real hole cut into the green. A stencil mask marks the opening, then the
+    // cup's liner, dirt walls and bottom are drawn "through" the ground inside it.
+    const maskGeo = new THREE.CircleGeometry(CUP_R, 40);
+    const maskMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, stencilWrite: true, stencilRef: 1,
+      stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+    const inside = { depthFunc: THREE.AlwaysDepth, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.EqualStencilFunc,
+      stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp };
+    const wallGeo = new THREE.CylinderGeometry(CUP_R, CUP_R, CUP_D, 40, 1, true);
+    const wallMat = new THREE.MeshBasicMaterial(Object.assign({ map: CUP_TEX, side: THREE.BackSide }, inside));
+    const botGeo = new THREE.CircleGeometry(CUP_R, 40);
+    const botMat = new THREE.MeshBasicMaterial(Object.assign({ color: 0x15100b }, inside));
+    const lipGeo = new THREE.RingGeometry(CUP_R, CUP_R + 0.05, 40);
+    const lipMat = new THREE.MeshBasicMaterial({ color: 0x2c3a1c, transparent: true, opacity: 0.55, depthWrite: false });
+    const poleGeo = new THREE.CylinderGeometry(0.05, 0.05, 4.2 + CUP_D, 8), poleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
     const knobGeo = new THREE.SphereGeometry(0.12, 10, 8), knobMat = new THREE.MeshStandardMaterial({ color: 0xF2C14E, metalness: 0.6, roughness: 0.3 });
     const flagGeo = new THREE.PlaneGeometry(1.7, 1.05, 8, 1); flagGeo.translate(0.85, 0, 0);
     const flagMat = new THREE.MeshLambertMaterial({ map: FLAG_TEX, side: THREE.DoubleSide });
-    disposables.push(cupGeo, cupMat, rimGeo, rimMat, poleGeo, poleMat, knobGeo, knobMat, flagGeo, flagMat);
-    const cup = new THREE.Mesh(cupGeo, cupMat); cup.rotation.x = -Math.PI / 2; cup.position.set(h.pin.x, 0.03, h.pin.y);
-    const rim = new THREE.Mesh(rimGeo, rimMat); rim.rotation.x = -Math.PI / 2; rim.position.set(h.pin.x, 0.03, h.pin.y);
-    const pole = new THREE.Mesh(poleGeo, poleMat); pole.position.set(h.pin.x, 2.1, h.pin.y); pole.castShadow = true;
+    disposables.push(maskGeo, maskMat, wallGeo, wallMat, botGeo, botMat, lipGeo, lipMat, poleGeo, poleMat, knobGeo, knobMat, flagGeo, flagMat);
+    const mask = new THREE.Mesh(maskGeo, maskMat); mask.rotation.x = -Math.PI / 2; mask.position.set(h.pin.x, 0.004, h.pin.y); mask.renderOrder = 1;
+    const bottom = new THREE.Mesh(botGeo, botMat); bottom.rotation.x = -Math.PI / 2; bottom.position.set(h.pin.x, -CUP_D, h.pin.y); bottom.renderOrder = 2;
+    const wall = new THREE.Mesh(wallGeo, wallMat); wall.position.set(h.pin.x, -CUP_D / 2, h.pin.y); wall.renderOrder = 3;
+    const lip = new THREE.Mesh(lipGeo, lipMat); lip.rotation.x = -Math.PI / 2; lip.position.set(h.pin.x, 0.006, h.pin.y);
+    const pole = new THREE.Mesh(poleGeo, poleMat); pole.position.set(h.pin.x, (4.2 - CUP_D) / 2, h.pin.y); pole.castShadow = true; pole.renderOrder = 4;
     const knob = new THREE.Mesh(knobGeo, knobMat); knob.position.set(h.pin.x, 4.25, h.pin.y);
     flagMesh = new THREE.Mesh(flagGeo, flagMat); flagMesh.position.set(h.pin.x, 3.6, h.pin.y); flagMesh.castShadow = true;
-    holeGroup.add(cup, rim, pole, knob, flagMesh);
+    holeGroup.add(mask, bottom, wall, lip, pole, knob, flagMesh);
+    renderer.shadowMap.needsUpdate = true;
 
     const cx = b.x + b.w / 2, cy = b.y + b.h / 2, s = Math.max(b.w, b.h) * 0.75 + 60;
     sun.position.set(cx - 140, 260, cy + 110); sun.target.position.set(cx, 0, cy);
@@ -718,11 +743,11 @@
     });
   }
 
-  function loadHole(i) {
+  function loadHole(i, preview = false) {
     holeIdx = i; hole = HOLES[i];
     const mph = Math.round(Math.random() * course.wind), ang = Math.random() * Math.PI * 2;
     hole.wind = { mph, ang, x: Math.cos(ang) * mph, y: Math.sin(ang) * mph };
-    buildHole(hole, course);
+    buildHole(hole, course, preview ? 1300 : 2600);
     ball = { x: hole.tee.x, y: hole.tee.y, vx: 0, vy: 0 }; prev = { x: ball.x, y: ball.y };
     strokes = 0; flight = null; swing = null; ptr = null; splash = null; lastPutt = false;
     trailReset(); closeSheet();
@@ -754,6 +779,10 @@
       dPos.set(cx + Math.sin(a) * R, R * 0.45, cy + Math.cos(a) * R); dLook.set(cx, 0, cy); return 1.5;
     }
     if (introT > 0 || viewMode === 'overview') { overviewCam(dPos, dLook); return 3; }
+    if (ball.inCup) {
+      const d = lastDir, px = hole.pin.x, py = hole.pin.y;
+      dPos.set(px - d.x * 1.2, 2.4, py - d.y * 1.2); dLook.set(px + d.x * 0.15, -0.3, py + d.y * 0.15); return 2.5;
+    }
     if (state === 'flying' || state === 'rolling' || state === 'sinking' || state === 'penalty' || state === 'holeDone') {
       let d = lastDir;
       if (flight) { const L = Math.hypot(flight.ex - flight.sx, flight.ey - flight.sy) || 1; d = { x: (flight.ex - flight.sx) / L, y: (flight.ey - flight.sy) / L }; }
@@ -975,7 +1004,10 @@
       const dx = hole.pin.x - ball.x, dy = hole.pin.y - ball.y, d = Math.hypot(dx, dy);
       if (d < CUP_R) {
         if (sp < CAPTURE) return holeOut();
+        ball.overCup = true;
         ball.vx += dx / (d || 1) * 6 * h; ball.vy += dy / (d || 1) * 6 * h;
+      } else if (ball.overCup) {
+        ball.overCup = false; sfx.rattle(1); showRating('LIP OUT!', '#ff6b7d');
       }
       const ns = Math.max(0, sp - DECEL[t] * h);
       if (ns < 0.12) { ball.vx = ball.vy = 0; return stopped(); }
@@ -999,7 +1031,36 @@
     showBanner(msg, '+1 stroke · replay from last spot', 1.6);
     water ? sfx.splash() : sfx.land();
   }
-  function holeOut() { state = 'sinking'; sinkT = 0; sfx.cup(); }
+  // The ball drops in with real physics: it falls, can clatter off the back of the cup, and settles on the bottom.
+  function holeOut() {
+    state = 'sinking'; sinkT = 0; ball.inCup = true; ball.overCup = false;
+    ball.z = 0; ball.vz = 0; ball.settle = 0; ball.hitBottom = false;
+  }
+  function sinkStep(dt) {
+    const lim = CUP_R - BALL_R;
+    ball.vz -= 11 * dt; ball.z += ball.vz * dt;
+    ball.x += ball.vx * dt; ball.y += ball.vy * dt;
+    const dx = ball.x - hole.pin.x, dy = ball.y - hole.pin.y, d = Math.hypot(dx, dy);
+    if (d > lim) {
+      const nx = dx / d, ny = dy / d, vn = ball.vx * nx + ball.vy * ny;
+      if (ball.z > -BALL_R && d < CUP_R) {
+        // still at the lip: it tips over the edge toward the middle
+        ball.vx -= nx * 3 * dt; ball.vy -= ny * 3 * dt;
+      } else {
+        if (vn > 0) { ball.vx -= 1.55 * vn * nx; ball.vy -= 1.55 * vn * ny; if (vn > 0.25) sfx.rattle(vn); }
+        ball.x = hole.pin.x + nx * lim; ball.y = hole.pin.y + ny * lim;
+      }
+    }
+    if (ball.z <= -CUP_D) {
+      ball.z = -CUP_D;
+      if (!ball.hitBottom) { ball.hitBottom = true; sfx.clunk(); setTimeout(() => sfx.cup(), 140); }
+      if (ball.vz < -0.8) ball.vz = -ball.vz * 0.28; else ball.vz = 0;
+      const f = Math.exp(-7 * dt); ball.vx *= f; ball.vy *= f;
+    }
+    const still = ball.z <= -CUP_D + 0.001 && ball.vz === 0 && Math.hypot(ball.vx, ball.vy) < 0.15;
+    ball.settle = still ? ball.settle + dt : 0;
+    if (ball.settle > 0.45 || sinkT > 3) finishHole();
+  }
   function finishHole() {
     scores[holeIdx] = strokes;
     const d = strokes - hole.par, st = save.stats;
@@ -1030,8 +1091,7 @@
     else if (state === 'rolling') roll(dt);
     else if (state === 'sinking') {
       sinkT += dt;
-      ball.x += (hole.pin.x - ball.x) * 0.25; ball.y += (hole.pin.y - ball.y) * 0.25;
-      if (sinkT > 0.5) finishHole();
+      sinkStep(dt);
     } else if (state === 'penalty') {
       penT -= dt; if (splash) splash.t += dt;
       if (penT <= 0) {
@@ -1063,15 +1123,14 @@
     scene.fog.near = 320 + camera.position.y * 1.6; scene.fog.far = scene.fog.near + 950;
 
     const h = flight ? flight.hgt : (ball.z || 0);
-    let by = h;
-    if (state === 'sinking') by = -Math.min(1, sinkT / 0.4) * 0.4;
+    const by = h;
     const camD = camera.position.distanceTo(ballV.set(ball.x, h, ball.y));
-    const r = clamp(camD * 0.0065, 0.07, 0.9);
+    const r = ball.inCup ? BALL_R : clamp(camD * 0.0065, 0.07, 0.9);
     ballMesh.scale.setScalar(r); ballMesh.position.set(ball.x, by + r, ball.y);
     ballMesh.visible = !(state === 'penalty' && splash);
     blob.position.set(ball.x, 0.04, ball.y); blob.scale.setScalar(r * (1.1 + h * 0.01));
     blob.material.opacity = 0.32 * clamp(1 - h / 50, 0.15, 1);
-    blob.visible = ballMesh.visible && state !== 'sinking';
+    blob.visible = ballMesh.visible && !ball.inCup;
 
     const aiming = (state === 'ready' || state === 'swinging') && introT <= 0;
     aimLine.visible = fullTarget.visible = aiming;
@@ -1102,11 +1161,15 @@
     } else splashRing.visible = false;
   }
 
+  let fxDirty = true;
   function drawFx(time) {
     const d = Math.min(window.devicePixelRatio || 1, 2);
     fctx.setTransform(d, 0, 0, d, 0, 0);
-    fctx.clearRect(0, 0, innerWidth, innerHeight);
-    if (!hole || state === 'title') { drawConfetti(); return; }
+    if (!hole || state === 'title') {
+      if (fxDirty || confetti.length) { fctx.clearRect(0, 0, innerWidth, innerHeight); drawConfetti(); fxDirty = confetti.length > 0; }
+      return;
+    }
+    fctx.clearRect(0, 0, innerWidth, innerHeight); fxDirty = true;
     const bs = ballScreen();
 
     if (state === 'ready' && viewMode === 'normal' && introT <= 0 && !bs.behind && $('sheet').classList.contains('hidden')) {
@@ -1225,7 +1288,7 @@
   document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { ensureAudio(); sfx.click(); setTab(b.dataset.tab); } });
 
   function previewCourse(c) {
-    course = c; HOLES = c.holes; applyCourseLook(c); loadHole(0); state = 'title';
+    course = c; HOLES = c.holes; applyCourseLook(c); loadHole(0, true); state = 'title';
     $('banner').classList.remove('show'); bannerT = 0;
   }
 
@@ -1365,7 +1428,23 @@
   // ================= Loop =================
   let last = performance.now(), acc = 0;
   const STEP = 1 / 120;
+  // On the home screen the 3D course is just a backdrop: draw it at lower resolution,
+  // ~30 fps and with frozen shadows so menus and scrolling stay smooth.
+  let lite = null, lastDraw = 0;
+  function setLite(on) {
+    if (lite === on) return; lite = on;
+    const d = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(on ? Math.min(d, 1) * 0.75 : d);
+    renderer.shadowMap.autoUpdate = !on; renderer.shadowMap.needsUpdate = true;
+    resize();
+  }
+  document.addEventListener('visibilitychange', () => { last = performance.now(); });
   function loop(now) {
+    requestAnimationFrame(loop);
+    const onHome = state === 'title' && !$('home').classList.contains('hidden');
+    setLite(onHome);
+    if (onHome && now - lastDraw < 32) return;
+    lastDraw = now;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     acc += dt;
     while (acc >= STEP) { update(STEP); acc -= STEP; }
@@ -1375,7 +1454,6 @@
     renderer.render(scene, camera);
     drawFx(now / 1000);
     updateHud();
-    requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
 })();
