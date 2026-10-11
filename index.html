@@ -181,6 +181,8 @@
   @media (max-width:420px){.holes{grid-template-columns:repeat(3,1fr)}}
   .holes div{background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.3);border-radius:10px;padding:7px 2px;text-align:center;font-size:11px;color:#f3d7a8}
   .holes b{display:block;font:700 16px Oswald,sans-serif;color:var(--gold-l)}
+  .holes .hn{display:block;font-size:10px;color:#fff;opacity:.8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+  .sc9{font-size:12px;margin:8px 0 6px} .sc9 td,.sc9 th{padding:4px 1px;text-align:center}
   .howcard{background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.35);border-radius:14px;padding:4px 16px;font-size:14px;line-height:1.5;color:var(--cream)}
   .howcard p{margin:10px 0}
   .howcard b{color:var(--gold-l)}
@@ -474,64 +476,192 @@
        fairways: fairways.map(([w, ...pts]) => ({ w, pts })), green: { x: green[0], y: green[1], rx: green[2], ry: green[3] },
        bunkers: bunkers.map(b => ({ x: b[0], y: b[1], rx: b[2], ry: b[3] })), water: water.map(b => ({ x: b[0], y: b[1], rx: b[2], ry: b[3] })), trees: tr });
 
+  // Real-hole builder. Each hole is described along its centre line and laid out in yards here.
+  //   path: [[lat, f], ...]  lat = yards right (+) / left (-) of the tee line, f = 0 at the tee .. 1 at the pin
+  //   Positions ("at") are a fraction of the hole (0..1), yards from the tee (>= 2), or 'g-15' / 'g+10' = yards short of / past the pin.
+  //   bk / wt: [at, lat, along, across(, sea)]   fw: [[from, to, width]]   g: green [along, across]
+  //   t: tree lines [left, right] (yards off the centre line, 0 = none), ts: spacing, tr: tree size, cl: clumps [[at, lat, n, r]]
+  //   m: playable width each side [left, right], mb: room past the green
+  function R(k, src, n, name, par, real, o = {}) {
+    const yds = Math.round(real * k), path0 = o.path || [[0, 0], [0, 1]];
+    let s = yds;
+    for (let it = 0; it < 8; it++) {
+      let L = 0; for (let i = 1; i < path0.length; i++) L += Math.hypot(path0[i][0] - path0[i - 1][0], (path0[i][1] - path0[i - 1][1]) * s);
+      s *= yds / L;
+    }
+    const P = path0.map(([l, f]) => [l, -f * s]), cum = [0];
+    for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
+    const Lt = cum[cum.length - 1];
+    const dist = a => typeof a === 'string' ? Lt + parseFloat(a.slice(1) || 0) : a >= 2 ? a : a * Lt;
+    function at(a, lat = 0) {
+      const d = dist(a); let i = 1;
+      while (i < P.length - 1 && cum[i] < d) i++;
+      const A = P[i - 1], B = P[i], sl = cum[i] - cum[i - 1] || 1, t = (d - cum[i - 1]) / sl;
+      const ux = (B[0] - A[0]) / sl, uy = (B[1] - A[1]) / sl;
+      return { x: A[0] + (B[0] - A[0]) * t - uy * lat, y: A[1] + (B[1] - A[1]) * t + ux * lat, ux, uy };
+    }
+    const el = ([a, lat, al, ac, sea]) => { const p = at(a, lat), hz = Math.abs(p.ux) > Math.abs(p.uy);
+      return { x: p.x, y: p.y, rx: hz ? al : ac, ry: hz ? ac : al, sea: !!sea }; };
+    const tee = at(0), pin = at(1);
+    const gs = o.g || [14, 18], gp = at('g+0'), gh = Math.abs(gp.ux) > Math.abs(gp.uy);
+    const green = { x: pin.x, y: pin.y, rx: gh ? gs[0] : gs[1], ry: gh ? gs[1] : gs[0] };
+    const fws = (o.fw || (par === 3 ? [] : [[0.08, 0.93, 42]])).map(([a, b, w]) => {
+      const da = dist(a), db = dist(b), pts = [at(a)];
+      for (let i = 1; i < P.length - 1; i++) if (cum[i] > da && cum[i] < db) pts.push({ x: P[i][0], y: P[i][1] });
+      pts.push(at(b)); return { w, pts };
+    });
+    const bunkers = (o.bk || []).map(el), water = (o.wt || []).map(el);
+    // trees
+    const rng = makeRng(yds * 13 + par * 7 + name.length), trs = [];
+    const inE = (p, e, pad) => ((p.x - e.x) / (e.rx + pad)) ** 2 + ((p.y - e.y) / (e.ry + pad)) ** 2 <= 1;
+    const sd = (p, a, b) => { const dx = b.x - a.x, dy = b.y - a.y, l2 = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2)); return Math.hypot(p.x - a.x - dx * t, p.y - a.y - dy * t); };
+    const clear = (p, r) => !water.some(e => inE(p, e, r + 2)) && !bunkers.some(e => inE(p, e, r + 2)) && !inE(p, green, r + 6)
+      && Math.hypot(p.x - tee.x, p.y - tee.y) > r + 12 && !fws.some(f => f.pts.some((q, i) => i && sd(p, f.pts[i - 1], q) < f.w / 2 + r * 0.6));
+    const [tl, tR] = o.t || [50, 50], ts = o.ts || 30, tr = o.tr || 8;
+    for (let d = 15; d < Lt + 30; d += ts) for (const off of [-tl, tR]) {
+      if (!off) continue;
+      const p = at(Math.min(d, Lt + 30) >= 2 ? d : 2, off + (rng() - 0.5) * 10);
+      p.y += (rng() - 0.5) * 10; const r = tr * (0.8 + rng() * 0.4);
+      if (clear(p, r)) trs.push({ x: p.x, y: p.y, r });
+    }
+    for (const [a, lat, nn, r] of (o.cl || [])) for (let i = 0; i < nn; i++) {
+      const p = at(a, lat + (nn > 1 ? (rng() - 0.5) * 16 : 0)); if (nn > 1) p.y += (rng() - 0.5) * 16; trs.push({ x: p.x, y: p.y, r: r * (0.85 + rng() * 0.3) });
+    }
+    // playable area (outside it is out of bounds)
+    const [ml, mr] = o.m || [62, 62], mb = o.mb != null ? o.mb : 32;
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    const grow = (x, y) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); };
+    for (let d = 0; d <= Lt; d += 10) { const a = at(d >= 2 ? d : 0, -ml), b = at(d >= 2 ? d : 0, mr); grow(a.x, a.y); grow(b.x, b.y); }
+    grow(tee.x, tee.y + 25); grow(green.x - green.rx - 8, green.y - green.ry - mb); grow(green.x + green.rx + 8, green.y + green.ry);
+    bunkers.forEach(e => { grow(e.x - e.rx - 6, e.y - e.ry - 6); grow(e.x + e.rx + 6, e.y + e.ry + 6); });
+    water.forEach(e => { if (!e.sea) { grow(e.x - e.rx - 6, e.y - e.ry - 6); grow(e.x + e.rx + 6, e.y + e.ry + 6); } });
+    const sx = -x0, sy = -y0, r1 = v => Math.round(v * 10) / 10;
+    const mv = e => [r1(e.x + sx), r1(e.y + sy), e.rx, e.ry];
+    const h = H(par, yds, Math.round(x1 - x0), Math.round(y1 - y0), [r1(tee.x + sx), r1(tee.y + sy)], [r1(pin.x + sx), r1(pin.y + sy)],
+      fws.map(f => [f.w, ...f.pts.map(p => [r1(p.x + sx), r1(p.y + sy)])]), mv(green), bunkers.map(mv), water.map(mv),
+      trs.map(t => ({ x: t.x + sx, y: t.y + sy, r: t.r })));
+    h.name = name; h.after = `${src} #${n}`;
+    return h;
+  }
+  const BB = (n, nm, par, y, o) => R(0.85, 'Bethpage Black', n, nm, par, y, o);
+  const TPC = (n, nm, par, y, o) => R(0.85, 'TPC Sawgrass', n, nm, par, y, Object.assign({ ts: 26 }, o));
+  const AU = (n, nm, par, y, o) => R(0.8, 'Augusta National', n, nm, par, y, Object.assign({ ts: 26, t: [46, 46] }, o));
+  const SA = (n, nm, par, y, o) => R(0.8, 'St Andrews Old Course', n, nm, par, y, Object.assign({ t: [46, 46], ts: 44, tr: 3.5 }, o));
+  const PB = (n, nm, par, y, o) => R(0.85, 'Pebble Beach', n, nm, par, y, Object.assign({ ts: 30 }, o));
+
   const COURSES = [
-    { id: 'pines', name: 'Chami Links', desc: 'The home course. Tree-lined parkland and a friendly place to learn your yardages.', wind: 12,
+    { id: 'pines', name: 'Chami Links', desc: 'Long Island parkland modeled on Bethpage Black. Tree-lined and a friendly place to learn your yardages.', wind: 12,
       pal: { outer: '#2f6f30', rough: '#3f8b3c', fairEdge: '#4f9d48', fair: '#66c05c', fringe: '#5cb854', green: '#88da7f', sand: '#ead6a1', sandRim: '#a99260',
              tee: '#74cd6a', far: 0x2f6f30, sky: ['#3f8fd6', '#b9dcf3', '#eef6fb'], fog: 0xd3e8f4, sun: 0xfff0d0, leaves: [0x2d6e2f, 0x245f29, 0x387a34], style: 'round' },
       holes: [
-        H(4, 370, 220, 440, [110, 410], [115, 40], [[42, [110, 382], [104, 250], [114, 90]]], [115, 42, 17, 14],
-          [[80, 250, 11, 8], [141, 58, 8, 10], [142, 170, 9, 6]], [], trees(1, [[38, 60, 38, 400, 9], [184, 60, 184, 400, 9]])),
-        H(3, 170, 200, 240, [100, 215], [102, 46], [[30, [100, 82], [101, 72]]], [101, 48, 19, 15],
-          [[74, 34, 9, 7], [130, 62, 7, 10]], [[100, 125, 72, 33]], trees(2, [[14, 20, 14, 220, 8, 7], [186, 20, 186, 220, 8, 7]])),
-        H(5, 495, 300, 520, [250, 495], [55, 55], [[44, [250, 470], [240, 290], [170, 185], [78, 108]]], [55, 56, 18, 15],
-          [[80, 38, 7, 10], [270, 300, 9, 14], [200, 150, 10, 7]], [[115, 62, 17, 13]],
-          trees(3, [[291, 90, 291, 500, 10], [20, 150, 20, 500, 9], [60, 180, 190, 420, 6, 9]], [[240, 60, 9], [265, 105, 8], [210, 40, 8]])),
-        H(4, 415, 260, 460, [70, 435], [190, 45], [[42, [70, 410], [85, 262], [158, 142], [184, 82]]], [190, 47, 17, 14],
-          [[164, 58, 7, 9], [54, 250, 10, 14], [212, 30, 8, 6]], [[214, 262, 26, 88]],
-          trees(4, [[22, 60, 22, 440, 10], [140, 300, 150, 440, 4, 9], [60, 40, 120, 40, 3, 8]])),
-        H(3, 140, 200, 210, [100, 185], [98, 46], [[28, [100, 92], [100, 74]]], [100, 46, 16, 13],
-          [[75, 42, 7, 10], [125, 40, 7, 10], [100, 68, 13, 5]], [[58, 118, 22, 14]], trees(5, [[22, 20, 22, 195, 7, 7], [178, 20, 178, 195, 7, 7]])),
-        H(4, 355, 220, 420, [110, 395], [120, 42], [[40, [110, 372], [110, 262]], [40, [110, 205], [118, 80]]], [120, 44, 17, 13],
-          [[92, 140, 10, 7], [146, 52, 7, 9]], [[110, 232, 135, 15]],
-          trees(6, [[25, 40, 25, 195, 6], [25, 270, 25, 400, 5], [195, 40, 195, 195, 6], [195, 270, 195, 400, 5]])),
+        BB(1, 'The Turn', 4, 430, { path: [[0, 0], [0, 0.6], [35, 1]], fw: [[0.08, 0.95, 40]], bk: [['g-14', -15, 8, 6], ['g+2', 20, 7, 10], [0.62, 32, 9, 7]] }),
+        BB(4, 'Cross Bunkers', 5, 517, { path: [[0, 0], [0, 0.5], [-30, 0.75], [-45, 1]], fw: [[0.07, 0.55, 44], [0.68, 0.95, 38]],
+          bk: [[0.615, -12, 9, 40], ['g-18', 0, 6, 22], [0.45, 26, 10, 8]] }),
+        BB(5, 'The Carry', 4, 478, { path: [[0, 0], [0, 0.55], [30, 1]], fw: [[0.3, 0.95, 40]], bk: [[0.17, 0, 12, 36], [0.58, -24, 9, 8], ['g-12', -14, 7, 8], ['g-12', 16, 7, 8]] }),
+        BB(8, 'The Pond', 3, 210, { fw: [['g-30', 'g-14', 28]], wt: [[0.52, 0, 32, 55]], bk: [['g+2', -18, 7, 9], ['g-4', 18, 6, 8]] }),
+        BB(15, 'The Climb', 4, 459, { path: [[0, 0], [0, 0.6], [-20, 1]], fw: [[0.08, 0.92, 40]], bk: [[0.55, 22, 10, 7], ['g-14', -10, 6, 12], ['g-12', 14, 6, 8], ['g+12', 0, 5, 10]] }),
+        BB(18, 'The Squeeze', 4, 411, { fw: [[0.08, 0.93, 34]], bk: [[0.6, -24, 14, 7], [0.6, 24, 14, 7], [0.73, -22, 10, 6], ['g-14', -15, 7, 8], ['g-14', 15, 7, 8]] }),
       ] },
-    { id: 'coast', name: 'Sarragosa', unlock: 'pines', desc: 'Seaside links. Big wind, pot bunkers and an island green.', wind: 18,
-      pal: { outer: '#c2ad6c', rough: '#8fa54f', fairEdge: '#6fae55', fair: '#7cc663', fringe: '#6dbd5c', green: '#93de86', sand: '#efdfb0', sandRim: '#b49f68',
-             tee: '#80d070', far: 0x2a74b8, sky: ['#2f86d6', '#a9d8f5', '#f3f9fb'], fog: 0xdcecf5, sun: 0xfff6e0, leaves: [0x3e6b3a, 0x4b7a40, 0x35602f], style: 'pine' },
+    { id: 'coast', name: 'TPC Saragosa', unlock: 'pines', desc: 'Stadium golf modeled on TPC Sawgrass. Water everywhere, and the famous island green.', wind: 16,
+      pal: { outer: '#6f8f4a', rough: '#8fa54f', fairEdge: '#6fae55', fair: '#7cc663', fringe: '#6dbd5c', green: '#93de86', sand: '#efdfb0', sandRim: '#b49f68',
+             tee: '#80d070', far: 0x3f6f35, sky: ['#2f86d6', '#a9d8f5', '#f3f9fb'], fog: 0xdcecf5, sun: 0xfff6e0, leaves: [0x3e6b3a, 0x4b7a40, 0x35602f], style: 'pine' },
       holes: [
-        H(4, 390, 240, 460, [120, 435], [130, 45], [[50, [120, 410], [110, 260], [135, 95]]], [130, 48, 18, 15],
-          [[85, 300, 10, 8], [160, 200, 12, 7], [108, 60, 7, 9], [156, 40, 7, 8]], [], trees(11, [[30, 80, 30, 420, 5, 7], [210, 80, 210, 420, 5, 7]])),
-        H(3, 185, 220, 260, [110, 235], [115, 50], [[26, [112, 95], [114, 78]]], [115, 52, 18, 14],
-          [[140, 60, 7, 10], [95, 32, 9, 6]], [[60, 130, 40, 55]], trees(12, [[200, 30, 200, 240, 5, 6]])),
-        H(5, 530, 280, 560, [60, 535], [210, 50], [[48, [60, 510], [70, 350], [150, 230], [200, 110]]], [210, 52, 19, 15],
-          [[40, 330, 10, 14], [180, 170, 9, 7], [232, 70, 7, 9], [190, 30, 8, 6]], [[210, 330, 45, 80]],
-          trees(13, [[20, 100, 20, 520, 6, 7], [262, 400, 262, 540, 3, 7], [90, 60, 150, 60, 3, 8]])),
-        H(4, 350, 220, 400, [110, 375], [105, 50], [[44, [110, 350], [108, 170]]], [105, 55, 18, 14],
-          [[75, 45, 7, 9], [135, 50, 7, 9]], [[105, 120, 50, 18]], trees(14, [[25, 40, 25, 380, 6, 7], [195, 40, 195, 380, 6, 7]])),
-        H(3, 130, 200, 200, [100, 175], [100, 55], [], [100, 58, 15, 12],
-          [], [[100, 60, 48, 38]], trees(15, [[20, 20, 20, 190, 5, 6], [180, 20, 180, 190, 5, 6]])),
-        H(4, 400, 240, 440, [180, 415], [70, 45], [[46, [175, 390], [150, 240], [85, 95]]], [70, 48, 18, 14],
-          [[125, 170, 10, 7], [95, 40, 7, 9], [48, 70, 8, 6]], [[40, 250, 22, 110]], trees(16, [[225, 60, 225, 420, 6, 7], [20, 400, 60, 420, 2, 7]])),
+        TPC(4, 'Lagoon Left', 4, 384, { path: [[0, 0], [0, 0.6], [10, 1]], fw: [[0.08, 0.9, 38]], wt: [['g-30', -38, 45, 16]], bk: [['g+2', 20, 6, 9], [0.55, 26, 10, 6]] }),
+        TPC(8, 'Long Iron', 3, 237, { fw: [['g-55', 'g-14', 30]], bk: [['g-4', -19, 6, 9], ['g-6', 19, 6, 9]] }),
+        TPC(11, 'Risk & Reward', 5, 558, { path: [[0, 0], [0, 0.45], [25, 0.75], [10, 1]], fw: [[0.07, 0.5, 44], [0.58, 0.94, 36]],
+          wt: [[0.62, -32, 60, 18]], bk: [[0.45, 30, 10, 7], ['g-14', 18, 8, 6], ['g+10', -12, 6, 8]] }),
+        TPC(16, 'The Oak', 5, 523, { path: [[0, 0], [0, 0.55], [-15, 1]], fw: [[0.07, 0.93, 40]], wt: [['g-40', 40, 70, 20]],
+          cl: [[0.68, -22, 1, 13]], bk: [['g+4', -18, 7, 9], [0.48, -28, 10, 6]] }),
+        TPC(17, 'Island Green', 3, 137, { g: [12, 16], wt: [['g+0', 0, 32, 38]], t: [58, 58] }),
+        TPC(18, 'Water Left', 4, 462, { path: [[0, 0], [0, 0.5], [-25, 1]], fw: [[0.08, 0.93, 38]], wt: [[0.55, -58, 230, 22]],
+          t: [0, 50], bk: [['g-6', 20, 7, 8], [0.6, 28, 12, 7]] }),
       ] },
-    { id: 'canyon', name: 'Meribah', unlock: 'coast', desc: 'Long, rugged and tight under a sunset sky. Bring an upgraded bag.', wind: 14,
-      pal: { outer: '#a4552f', rough: '#8c8a47', fairEdge: '#5f9a45', fair: '#6eb655', fringe: '#62ad50', green: '#86d47b', sand: '#e8c590', sandRim: '#a7774a',
-             tee: '#74c766', far: 0x9c4c2a, sky: ['#c8653f', '#f2b98a', '#fbe6cf'], fog: 0xf0c9a5, sun: 0xffd2a0, leaves: [0x3f5e2a, 0x4d6b30, 0x2f4f24], style: 'pine' },
+    { id: 'meribah', name: 'Meribah Country Club', unlock: 'coast', desc: '18 holes modeled on Augusta National. Tall pines, creeks and white sand under a sunset sky.', wind: 10,
+      pal: { outer: '#2c6a34', rough: '#3d8a3f', fairEdge: '#55a84c', fair: '#6cc95f', fringe: '#62bf57', green: '#8fe086', sand: '#f4ecd8', sandRim: '#b9ab88',
+             tee: '#78d06c', far: 0x2c5f30, sky: ['#d9714a', '#f4c296', '#fde9d2'], fog: 0xf0d2b2, sun: 0xffd9a8, leaves: [0x24502a, 0x2d5e2f, 0x1f4524], style: 'pine' },
       holes: [
-        H(4, 420, 240, 480, [120, 455], [120, 45], [[40, [120, 430], [150, 320], [95, 190], [120, 85]]], [120, 47, 17, 14],
-          [[175, 300, 9, 13], [70, 200, 9, 12], [145, 60, 7, 9]], [[190, 180, 22, 40]], trees(21, [[25, 60, 25, 460, 8, 8], [215, 330, 215, 460, 3, 8]])),
-        H(3, 205, 220, 280, [110, 255], [110, 50], [[30, [110, 110], [110, 82]]], [110, 52, 20, 15],
-          [[80, 40, 8, 10], [140, 40, 8, 10], [110, 75, 14, 5]], [], trees(22, [[20, 30, 20, 260, 6, 7], [200, 30, 200, 260, 6, 7]])),
-        H(5, 560, 300, 580, [240, 555], [60, 50], [[42, [240, 530], [230, 370], [120, 280], [70, 140]]], [60, 52, 18, 15],
-          [[270, 380, 9, 14], [150, 250, 10, 7], [85, 30, 7, 9], [40, 75, 7, 8]], [[80, 370, 35, 45]],
-          trees(23, [[285, 90, 285, 560, 9, 8], [20, 180, 20, 560, 8, 8]], [[200, 80, 9], [230, 130, 8], [170, 60, 8]])),
-        H(4, 380, 260, 420, [210, 395], [60, 50], [[42, [210, 370], [200, 220], [90, 120], [65, 85]]], [60, 50, 17, 14],
-          [[225, 215, 9, 13], [115, 95, 9, 6], [80, 30, 7, 8]], [[40, 200, 25, 30]],
-          trees(24, [[245, 60, 245, 410, 8, 8], [20, 280, 20, 410, 3, 8], [120, 330, 150, 250, 4, 9]])),
-        H(3, 160, 200, 230, [100, 205], [100, 50], [[28, [100, 95], [100, 80]]], [100, 52, 17, 13],
-          [[125, 68, 7, 9], [75, 40, 7, 8]], [[100, 125, 90, 22]], trees(25, [[15, 20, 15, 215, 6, 6], [185, 20, 185, 215, 6, 6]])),
-        H(5, 510, 260, 540, [130, 515], [130, 50], [[42, [130, 490], [95, 350], [160, 200], [130, 90]]], [130, 52, 19, 15],
-          [[60, 340, 9, 14], [195, 215, 10, 12], [100, 60, 7, 9], [160, 30, 8, 6]], [[175, 110, 25, 22]],
-          trees(26, [[25, 60, 25, 520, 9, 8], [235, 250, 235, 520, 5, 8], [235, 40, 235, 170, 3, 8]])),
+        AU(1, 'Tea Olive', 4, 445, { path: [[0, 0], [0, 0.6], [18, 1]], bk: [[0.68, 26, 12, 8], ['g-14', -16, 8, 7]] }),
+        AU(2, 'Pink Dogwood', 5, 585, { path: [[0, 0], [0, 0.5], [-45, 1]], fw: [[0.07, 0.94, 44]], bk: [[0.5, 30, 12, 8], ['g-6', -18, 7, 8], ['g-10', 17, 8, 7]] }),
+        AU(3, 'Flowering Peach', 4, 350, { path: [[0, 0], [0, 0.7], [-8, 1]], g: [18, 10],
+          bk: [[0.66, -22, 8, 6], [0.7, -10, 6, 5], [0.75, -26, 6, 5], ['g-8', -15, 6, 7]] }),
+        AU(4, 'Flowering Crab Apple', 3, 240, { fw: [['g-45', 'g-14', 30]], g: [14, 20], bk: [['g-12', 14, 9, 10], ['g-2', -19, 6, 8]] }),
+        AU(5, 'Magnolia', 4, 495, { path: [[0, 0], [0, 0.6], [-30, 1]], g: [16, 18], bk: [[0.6, -26, 8, 6], [0.66, -31, 7, 6], ['g+14', 0, 5, 10]] }),
+        AU(6, 'Juniper', 3, 180, { fw: [['g-30', 'g-14', 26]], g: [14, 20], bk: [['g-12', -14, 8, 8]] }),
+        AU(7, 'Pampas', 4, 450, { fw: [[0.08, 0.93, 34]], t: [40, 40], g: [12, 16],
+          bk: [['g-13', -9, 4, 5], ['g-14', 3, 4, 5], ['g-11', 15, 5, 6], ['g+12', -10, 5, 6], ['g+12', 10, 5, 6]] }),
+        AU(8, 'Yellow Jasmine', 5, 570, { path: [[0, 0], [0, 0.5], [-10, 0.8], [0, 1]], fw: [[0.07, 0.94, 40]], g: [16, 18], bk: [[0.42, 26, 14, 8]] }),
+        AU(9, 'Carolina Cherry', 4, 460, { path: [[0, 0], [0, 0.6], [-35, 1]], bk: [['g-12', -16, 7, 7], ['g-14', -4, 5, 6]] }),
+        AU(10, 'Camellia', 4, 495, { path: [[0, 0], [0, 0.45], [-50, 1]], bk: [[0.85, 22, 12, 10], ['g-4', 18, 6, 8]] }),
+        AU(11, 'White Dogwood', 4, 520, { path: [[0, 0], [0, 0.6], [12, 1]], wt: [['g-4', -36, 22, 15]], bk: [['g+6', 18, 6, 7]] }),
+        AU(12, 'Golden Bell', 3, 155, { g: [10, 22], wt: [['g-24', 0, 6, 70]], bk: [['g-10', -2, 4, 7], ['g+10', -12, 4, 6], ['g+10', 12, 4, 6]] }),
+        AU(13, 'Azalea', 5, 545, { path: [[0, 0], [0, 0.45], [-45, 0.75], [-55, 1]], fw: [[0.07, 0.5, 44], [0.56, 0.9, 38]],
+          wt: [[0.4, -38, 60, 6], ['g-24', 0, 5, 50]], bk: [['g+12', -10, 5, 8], ['g+12', 8, 5, 8], ['g+4', 21, 6, 6]] }),
+        AU(14, 'Chinese Fir', 4, 440, { path: [[0, 0], [0, 0.6], [-12, 1]], g: [18, 20] }),
+        AU(15, 'Firethorn', 5, 550, { path: [[0, 0], [0, 0.55], [-8, 1]], fw: [[0.07, 0.84, 42]], wt: [['g-26', 0, 9, 40]], bk: [['g+12', 14, 5, 6]] }),
+        AU(16, 'Redbud', 3, 170, { path: [[0, 0], [22, 1]], g: [16, 14], wt: [[0.5, -24, 60, 22]], bk: [['g-2', 18, 6, 8], ['g+6', -16, 5, 6]] }),
+        AU(17, 'Nandina', 4, 440, { bk: [['g-14', -6, 6, 10]] }),
+        AU(18, 'Holly', 4, 465, { path: [[0, 0], [0, 0.55], [25, 1]], fw: [[0.08, 0.94, 38]], t: [40, 46],
+          bk: [[0.62, -24, 8, 6], [0.68, -26, 7, 6], ['g-12', -15, 7, 8], ['g-4', 18, 5, 7]] }),
+      ] },
+    { id: 'hollow', name: 'Brothers Hollow', unlock: 'meribah', desc: '18 holes modeled on the Old Course at St Andrews. Wide links, gorse, pot bunkers and wild wind.', wind: 22,
+      pal: { outer: '#a99a62', rough: '#9aa45a', fairEdge: '#7fa95a', fair: '#8fbf68', fringe: '#86b862', green: '#a2d68a', sand: '#dccb98', sandRim: '#9c8a5c',
+             tee: '#93c76d', far: 0x5f7d4a, sky: ['#6f8fae', '#c3d3df', '#eef2f4'], fog: 0xd8e0e6, sun: 0xfff4e0, leaves: [0x5b6b2a, 0x6e7a2e, 0x4c5c24], style: 'round' },
+      holes: [
+        SA(1, 'Burn', 4, 376, { fw: [[0.06, 0.86, 70]], g: [16, 22], wt: [['g-24', 0, 4, 60]] }),
+        SA(2, 'Dyke', 4, 453, { path: [[0, 0], [0, 0.6], [10, 1]], fw: [[0.07, 0.93, 50]], g: [16, 22], bk: [[0.55, -24, 5, 5], ['g-14', -12, 5, 5], ['g-4', -20, 4, 4]] }),
+        SA(3, 'Cartgate (Out)', 4, 397, { fw: [[0.07, 0.93, 48]], bk: [[0.45, 22, 4, 4], [0.55, 26, 4, 4], [0.63, 20, 4, 4], ['g-12', -12, 6, 7]] }),
+        SA(4, 'Ginger Beer', 4, 480, { path: [[0, 0], [0, 0.5], [-10, 1]], fw: [[0.07, 0.93, 46]], bk: [[0.55, -20, 8, 6], ['g-14', -10, 5, 6]] }),
+        SA(5, "Hole O'Cross (Out)", 5, 568, { path: [[0, 0], [0, 0.6], [15, 1]], fw: [[0.07, 0.92, 52]], g: [24, 30], bk: [[0.72, -6, 4, 5], [0.72, 6, 4, 5], [0.4, 20, 5, 5]] }),
+        SA(6, 'Heathery (Out)', 4, 412, { fw: [[0.07, 0.93, 50]], g: [18, 26], bk: [[0.48, -14, 4, 4], [0.5, -6, 4, 4], [0.52, 4, 4, 4]] }),
+        SA(7, 'High (Out)', 4, 371, { path: [[0, 0], [0, 0.6], [25, 1]], fw: [[0.07, 0.93, 46]], bk: [['g-13', 0, 5, 10], ['g-4', -16, 4, 5]] }),
+        SA(8, 'Short', 3, 175, { g: [16, 22], bk: [['g-14', -4, 5, 7]] }),
+        SA(9, 'End', 4, 352, { fw: [[0.07, 0.92, 56]], bk: [[0.6, -10, 4, 4], [0.62, 14, 4, 4], ['g-20', 0, 4, 5]] }),
+        SA(10, 'Bobby Jones', 4, 386, { path: [[0, 0], [0, 0.6], [-10, 1]], fw: [[0.07, 0.92, 52]], bk: [[0.6, 24, 5, 5], ['g-18', -10, 4, 4]] }),
+        SA(11, 'High (In)', 3, 174, { g: [12, 22], wt: [['g+30', 0, 14, 80]], bk: [['g-11', 10, 4, 4], ['g-11', -12, 5, 6]] }),
+        SA(12, 'Heathery (In)', 4, 348, { fw: [[0.07, 0.93, 50]], g: [10, 26], bk: [[0.55, -2, 4, 4], [0.62, 8, 4, 4], [0.68, -8, 4, 4], ['g-16', 4, 4, 4]] }),
+        SA(13, "Hole O'Cross (In)", 4, 465, { path: [[0, 0], [0, 0.55], [12, 1]], fw: [[0.07, 0.93, 50]], g: [22, 28],
+          bk: [[0.55, -18, 4, 4], [0.57, -10, 4, 4], [0.59, -24, 4, 4], [0.76, 10, 5, 5]] }),
+        SA(14, 'Long', 5, 618, { path: [[0, 0], [0, 0.5], [-20, 0.75], [0, 1]], fw: [[0.06, 0.94, 48]], g: [22, 28], m: [62, 38], t: [46, 0],
+          bk: [[0.4, -18, 4, 4], [0.42, -26, 4, 4], [0.44, -10, 4, 4], [0.78, -14, 10, 10], ['g-8', 12, 4, 4]] }),
+        SA(15, 'Cartgate (In)', 4, 455, { fw: [[0.07, 0.93, 50]], bk: [[0.6, 6, 4, 4], [0.72, -12, 4, 4], [0.72, -4, 4, 4], ['g-10', -14, 5, 6]] }),
+        SA(16, 'Corner of the Dyke', 4, 418, { fw: [[0.07, 0.93, 46]], m: [62, 40], t: [46, 0],
+          bk: [[0.6, 4, 5, 4], [0.62, -4, 4, 4], [0.62, 11, 4, 4], ['g-12', -10, 5, 6]] }),
+        SA(17, 'Road', 4, 495, { path: [[0, 0], [0, 0.55], [30, 1]], fw: [[0.3, 0.95, 44]], cl: [[0.25, 30, 6, 9]], mb: 12, g: [12, 24],
+          bk: [['g-2', -15, 5, 5]] }),
+        SA(18, 'Tom Morris', 4, 357, { fw: [[0.05, 0.93, 74]], g: [18, 26], m: [64, 40], t: [46, 0], wt: [[0.14, 0, 4, 80]] }),
+      ] },
+    { id: 'valley', name: 'Deans Valley', unlock: 'hollow', desc: '18 holes modeled on Pebble Beach. Cliff-top holes along the ocean and tiny greens.', wind: 18,
+      pal: { outer: '#4f8a45', rough: '#5f9e48', fairEdge: '#5aa84f', fair: '#6fc462', fringe: '#66bb5a', green: '#8cdc82', sand: '#efe2bd', sandRim: '#ad9a6c',
+             tee: '#7bd06d', far: 0x1f6aa8, sky: ['#2a7fcf', '#a6d4f2', '#f1f8fb'], fog: 0xd6e8f3, sun: 0xfff3dc, leaves: [0x2a4f2c, 0x335a32, 0x223f24], style: 'pine' },
+      holes: [
+        PB(1, 'Opening Bend', 4, 380, { path: [[0, 0], [0, 0.6], [25, 1]], g: [12, 14], bk: [[0.6, -24, 8, 6], ['g-4', -16, 6, 6]] }),
+        PB(2, 'The Barranca', 5, 511, { path: [[0, 0], [0, 0.7], [-8, 1]], fw: [[0.07, 0.74, 44], [0.84, 0.94, 38]], wt: [['g-85', 0, 5, 70]],
+          bk: [[0.5, 24, 8, 6], ['g-10', -14, 5, 6], ['g-10', 14, 5, 6]] }),
+        PB(3, 'Dogleg Left', 4, 404, { path: [[0, 0], [0, 0.55], [-40, 1]], bk: [[0.55, -30, 10, 6], ['g-12', 16, 6, 6]] }),
+        PB(4, 'Cliff Edge', 4, 331, { fw: [[0.08, 0.93, 40]], wt: [[0.5, 108, 200, 62, 1]], t: [48, 0], bk: [[0.55, 4, 6, 5], ['g-6', -16, 5, 7]] }),
+        PB(5, 'Ocean Par 3', 3, 192, { path: [[0, 0], [10, 1]], wt: [[0.6, 98, 110, 60, 1]], t: [45, 0], bk: [['g-8', -16, 6, 8]] }),
+        PB(6, 'The Plateau', 5, 506, { path: [[0, 0], [0, 0.55], [-15, 1]], fw: [[0.07, 0.94, 42]], wt: [[0.5, 104, 280, 64, 1]], t: [48, 0],
+          bk: [[0.5, -24, 10, 6], ['g-12', -14, 6, 6]] }),
+        PB(7, 'Tiny Seven', 3, 109, { g: [9, 12], m: [40, 34], mb: 14, t: [0, 0],
+          wt: [['g+38', 0, 22, 80, 1], ['g+0', 56, 40, 26, 1]], bk: [['g-8', -6, 4, 6], ['g+0', -12, 6, 4], ['g+0', 12, 6, 4], ['g+8', 8, 4, 5]] }),
+        PB(8, 'The Chasm', 4, 428, { path: [[0, 0], [0, 0.6], [-15, 1]], fw: [[0.08, 0.64, 40], [0.87, 0.93, 26]], t: [46, 0],
+          wt: [[0.76, 60, 26, 90, 1], [0.4, 104, 150, 60, 1]], bk: [['g-10', -14, 5, 6], ['g+8', 10, 5, 5]] }),
+        PB(9, 'Seaside Nine', 4, 505, { path: [[0, 0], [0, 0.6], [-10, 1]], wt: [[0.5, 98, 240, 58, 1]], t: [46, 0], bk: [['g-14', -14, 6, 8]] }),
+        PB(10, 'Bluff Top', 4, 495, { path: [[0, 0], [0, 0.55], [-14, 1]], fw: [[0.08, 0.93, 38]], wt: [[0.5, 96, 230, 58, 1]], t: [46, 0],
+          bk: [[0.55, -24, 8, 6], ['g-8', -14, 5, 7]] }),
+        PB(11, 'Inland Climb', 4, 390, { path: [[0, 0], [0, 0.6], [-12, 1]], bk: [['g-10', -15, 6, 6], ['g-12', 14, 5, 6]] }),
+        PB(12, 'Shallow Green', 3, 202, { fw: [['g-40', 'g-12', 28]], g: [10, 20], bk: [['g-11', -8, 5, 10], ['g+2', 18, 4, 6]] }),
+        PB(13, 'The Slope', 4, 445, { path: [[0, 0], [0, 0.6], [8, 1]], bk: [[0.6, -22, 12, 6], ['g-10', 16, 6, 6]] }),
+        PB(14, 'Long Fourteen', 5, 580, { path: [[0, 0], [0, 0.4], [20, 0.7], [30, 1]], fw: [[0.07, 0.95, 42]],
+          bk: [[0.72, -22, 10, 6], ['g-14', -2, 5, 10], ['g+2', 18, 5, 6]] }),
+        PB(15, 'Fifteen', 4, 397, { path: [[0, 0], [0, 0.6], [-6, 1]], bk: [[0.55, -22, 8, 6], ['g-10', -15, 5, 6], ['g-8', 15, 5, 6]] }),
+        PB(16, 'Barranca Bend', 4, 403, { path: [[0, 0], [0, 0.55], [22, 1]], fw: [[0.08, 0.63, 40], [0.74, 0.94, 36]], wt: [[0.685, 0, 5, 70]],
+          bk: [['g-10', -15, 5, 6]] }),
+        PB(17, 'Hourglass', 3, 178, { g: [10, 24], wt: [['g+30', 0, 18, 80, 1], [0.5, -84, 90, 46, 1]], t: [0, 46],
+          bk: [['g-11', 0, 4, 14], ['g+2', -16, 4, 5], ['g+4', 18, 4, 5]] }),
+        PB(18, 'Sea Wall', 5, 543, { path: [[0, 0], [0, 0.5], [-30, 1]], wt: [[0.5, -104, 280, 58, 1]], t: [0, 48], cl: [[0.55, 14, 1, 9]],
+          bk: [[0.62, 26, 8, 6], ['g-6', -15, 5, 6], ['g+4', 14, 5, 5]] }),
       ] },
   ];
   COURSES.forEach(c => { c.par = c.holes.reduce((a, h) => a + h.par, 0); c.yds = c.holes.reduce((a, h) => a + h.yds, 0); });
@@ -888,6 +1018,7 @@
     for (let i = 0; i < 70; i++) {
       const x = ox + rng() * W, y = oy + rng() * Hh;
       if (x > b.x - 8 && x < b.x + b.w + 8 && y > b.y - 8 && y < b.y + b.h + 8) continue;
+      if (h.water.some(e => inEl({ x, y }, e, 12))) continue;
       scenery.push({ x, y, r: 7 + rng() * 5 });
     }
     h.allTrees = h.trees.concat(scenery);
@@ -952,7 +1083,7 @@
 
   function terrainAt(p) {
     const b = hole.bounds;
-    if (p.x < b.x || p.y < b.y || p.x > b.x + b.w || p.y > b.y + b.h) return 'oob';
+    if (p.x < b.x || p.y < b.y || p.x > b.x + b.w || p.y > b.y + b.h) return hole.water.some(e => inEl(p, e)) ? 'water' : 'oob';
     if (inEl(p, hole.green)) return 'green';
     for (const e of hole.bunkers) if (inEl(p, e)) return 'sand';
     if (inEl(p, hole.green, 2.5)) return 'fringe';
@@ -1004,7 +1135,7 @@
     viewMode = 'normal'; introT = 1.5;
     readyForShot();
     overviewCam(camPos, camLook); placeCamera();
-    showBanner(`Hole ${i + 1}`, `Par ${hole.par} · ${hole.yds} yards`, 1.8);
+    showBanner(hole.name ? `${i + 1}. ${hole.name}` : `Hole ${i + 1}`, `Par ${hole.par} · ${hole.yds} yards${hole.after ? ' · After ' + hole.after : ''}`, 2.4);
   }
 
   function relTotal() { let r = 0; scores.forEach((s, i) => { if (s != null) r += s - HOLES[i].par; }); return r; }
@@ -1644,7 +1775,7 @@
   }
   function renderCourse() {
     const c = course, open = isUnlocked(c), best = save.stats.bestBy[c.id], played = save.stats.roundsBy[c.id] || 0;
-    const holes = c.holes.map((h, i) => `<div><span class="hm" style="background-image:url('${holeThumb(c, i)}')"></span>HOLE ${i + 1}<b>Par ${h.par}</b>${h.yds} yds</div>`).join('');
+    const holes = c.holes.map((h, i) => `<div><span class="hm" style="background-image:url('${holeThumb(c, i)}')"></span>HOLE ${i + 1}<b>Par ${h.par}</b>${h.yds} yds<span class="hn">${h.name || ''}</span></div>`).join('');
     const bag = CLUBS.map(m => m.short).join(' · ');
     $('courseDetail').innerHTML = `<button class="back" data-cback="1">← All courses</button>
       <div class="cdname">${c.name}</div><div class="cddesc">${c.desc}</div>
@@ -1928,12 +2059,26 @@
     state = 'finished';
     const rel = relTotal(), s = save.stats;
     let tp = 0, ts = 0;
-    let rows = '<tr><th>HOLE</th><th>PAR</th><th>SCORE</th><th>+/-</th></tr>';
-    HOLES.forEach((h, i) => {
-      const sc = scores[i], d = sc - h.par; tp += h.par; ts += sc;
-      rows += `<tr><td>${i + 1}</td><td>${h.par}</td><td${d < 0 ? ' class="under"' : ''}>${sc}</td><td>${fmtRel(d)}</td></tr>`;
-    });
-    rows += `<tr class="total"><td>Total</td><td>${tp}</td><td${rel < 0 ? ' class="under"' : ''}>${ts}</td><td>${fmtRel(rel)}</td></tr>`;
+    let rows = '';
+    HOLES.forEach((h, i) => { tp += h.par; ts += scores[i]; });
+    if (HOLES.length > 9) {
+      // 18 holes: a real scorecard, front nine and back nine side by side
+      const nine = (a, label) => {
+        const idx = [...Array(9)].map((_, j) => a + j), sp = idx.reduce((t, i) => t + HOLES[i].par, 0), ss = idx.reduce((t, i) => t + scores[i], 0);
+        return `<table class="sc9"><tr><th>HOLE</th>${idx.map(i => `<th>${i + 1}</th>`).join('')}<th>${label}</th></tr>`
+          + `<tr><td>PAR</td>${idx.map(i => `<td>${HOLES[i].par}</td>`).join('')}<td>${sp}</td></tr>`
+          + `<tr class="total"><td>YOU</td>${idx.map(i => `<td${scores[i] < HOLES[i].par ? ' class="under"' : ''}>${scores[i]}</td>`).join('')}<td>${ss}</td></tr></table>`;
+      };
+      rows = `<tr><td colspan="4" style="padding:0;border:0">${nine(0, 'OUT')}${nine(9, 'IN')}</td></tr>`
+        + `<tr class="total"><td>Total</td><td>Par ${tp}</td><td${rel < 0 ? ' class="under"' : ''}>${ts}</td><td>${fmtRel(rel)}</td></tr>`;
+    } else {
+      rows = '<tr><th>HOLE</th><th>PAR</th><th>SCORE</th><th>+/-</th></tr>';
+      HOLES.forEach((h, i) => {
+        const sc = scores[i], d = sc - h.par;
+        rows += `<tr><td>${i + 1}</td><td>${h.par}</td><td${d < 0 ? ' class="under"' : ''}>${sc}</td><td>${fmtRel(d)}</td></tr>`;
+      });
+      rows += `<tr class="total"><td>Total</td><td>${tp}</td><td${rel < 0 ? ' class="under"' : ''}>${ts}</td><td>${fmtRel(rel)}</td></tr>`;
+    }
     $('scoreTable').innerHTML = rows;
     $('finalCourse').textContent = course.name;
     $('finalTitle').textContent = rel <= -2 ? 'Tour pro! 🏆' : rel <= 2 ? 'Great round!' : rel <= 8 ? 'Nice round' : 'Keep grinding';
