@@ -114,6 +114,73 @@
   .pip{width:16px;height:6px;border-radius:3px;background:rgba(255,255,255,.18)}
   .pip.on{background:var(--gold)}
 
+  .back{background:none;border:0;color:var(--gold-l);font:700 14px Inter,sans-serif;padding:10px 2px 2px;cursor:pointer}
+  .slot{background:rgba(79,7,18,.88);border:1px solid rgba(242,193,78,.4);border-radius:16px;padding:12px;margin-bottom:12px}
+  .slothead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+  .slothead span{font:800 10px Inter;letter-spacing:.16em;color:var(--gold)}
+  .slothead b{font:700 19px Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.03em;text-align:right}
+  .sbar{display:grid;grid-template-columns:70px 1fr 96px;align-items:center;gap:8px;font-size:12px;margin:4px 0}
+  .sbar span{color:#f3d7a8;font-weight:600}
+  .sbar i{display:block;height:7px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden}
+  .sbar i b{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
+  .sbar em{font-style:normal;color:#fff;opacity:.85;text-align:right;white-space:nowrap}
+  .uprow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0 4px}
+  .nx{font-size:11px;color:#f3d7a8;margin-top:5px}
+  .models{border-top:1px solid rgba(242,193,78,.2);margin-top:10px;padding-top:4px}
+  .model{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(242,193,78,.12)}
+  .model:last-child{border-bottom:0}
+  .model .mi{flex:1;min-width:0}
+  .model .mn{font:700 15px Oswald,sans-serif;letter-spacing:.02em}
+  .model .mn small{font:600 11px Inter;color:var(--gold-l);margin-left:4px}
+  .model .md{font-size:11.5px;color:#f3d7a8;line-height:1.35;margin-top:2px}
+  .model.on .mn{color:var(--gold-l)}
+  .tagon{font:800 10px Inter;letter-spacing:.1em;color:var(--red-dd);background:var(--gold);border-radius:999px;padding:4px 9px;white-space:nowrap}
+  button.ghost.sm{padding:6px 14px;font-size:14px}
+  .gstage{position:relative;height:300px;border-radius:18px;overflow:hidden;border:2px solid rgba(242,193,78,.55);
+          background:radial-gradient(ellipse at 50% 85%,#4f9d48 0%,#2f6f30 45%,#3f8fd6 46%,#b9dcf3 100%)}
+  #gPrev{width:100%;height:100%;display:block}
+  .nameRow{display:block;font:800 10px Inter;letter-spacing:.16em;color:var(--gold);margin:14px 2px 0;text-transform:uppercase}
+  .nameRow input{display:block;width:100%;margin-top:6px;padding:11px 14px;border-radius:12px;border:2px solid rgba(242,193,78,.55);background:var(--red-dd);
+                 color:#fff;font:700 18px Oswald,sans-serif;letter-spacing:.03em;-webkit-user-select:text;user-select:text;touch-action:auto}
+  .presets{display:flex;flex-wrap:wrap;gap:8px}
+  .presets button{border:2px solid rgba(242,193,78,.5);background:var(--red-dd);color:#fff;border-radius:999px;padding:7px 12px 7px 8px;font:700 13px Inter,sans-serif;
+                  display:flex;align-items:center;gap:7px;cursor:pointer}
+  .presets button i{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.6)}
+  .lookrow{margin-top:14px}
+  .lookrow .lh{font:800 10px Inter;letter-spacing:.16em;color:var(--gold);margin:0 2px 7px;text-transform:uppercase;display:flex;justify-content:space-between}
+  .lookrow .lh b{color:#fff;letter-spacing:.04em;font-weight:600}
+  .sw{display:flex;flex-wrap:wrap;gap:8px}
+  .sw button{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer;padding:0}
+  .sw button.on{border:3px solid var(--gold-l);box-shadow:0 0 0 3px rgba(255,224,138,.35)}
+  .hero{height:150px;border-radius:18px;background:#2f6f30 center/cover no-repeat;border:2px solid rgba(242,193,78,.55);margin-top:8px}
+  .cdname{font:700 34px/1.05 Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.03em;margin-top:6px}
+  .cddesc{font-size:14px;color:#f3d7a8;margin:4px 0 10px;line-height:1.4}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips span{background:rgba(69,6,15,.85);border:1px solid rgba(242,193,78,.45);border-radius:999px;padding:5px 11px;font:700 12px Inter}
+  .chips b{color:var(--gold-l)}
+  .cdbtns{display:flex;gap:10px;margin:14px 0 4px}
+  .cdbtns button{flex:1}
+  .board{width:100%;border-collapse:collapse;font-size:14px;background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.35);border-radius:14px;overflow:hidden;margin:0}
+  .board td,.board th{padding:8px 10px;text-align:left}
+  .board td:last-child,.board th:last-child{text-align:right}
+  .board tr.me td{color:var(--gold-l)}
+  .board .rk{width:34px;font:700 16px Oswald,sans-serif;color:var(--gold)}
+  .empty{background:rgba(79,7,18,.85);border:1px dashed rgba(242,193,78,.4);border-radius:14px;padding:14px;font-size:13px;color:#f3d7a8;text-align:center}
+  .holes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  .holes .hm{display:block;height:84px;border-radius:7px;background:#2f6f30 center/contain no-repeat;margin:0 4px 6px}
+  @media (max-width:420px){.holes{grid-template-columns:repeat(3,1fr)}}
+  .holes div{background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.3);border-radius:10px;padding:7px 2px;text-align:center;font-size:11px;color:#f3d7a8}
+  .holes b{display:block;font:700 16px Oswald,sans-serif;color:var(--gold-l)}
+  .howcard{background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.35);border-radius:14px;padding:4px 16px;font-size:14px;line-height:1.5;color:var(--cream)}
+  .howcard p{margin:10px 0}
+  .howcard b{color:var(--gold-l)}
+  .needle{display:flex;height:16px;border-radius:8px;overflow:hidden;margin:10px 0 4px}
+  .needle i{flex:1}
+  .nlabels{display:flex;justify-content:space-between;font:800 10px Inter;letter-spacing:.06em;color:#f3d7a8;margin-bottom:10px}
+  .cg{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0 10px}
+  .cg td,.cg th{padding:6px 4px;border-bottom:1px solid rgba(242,193,78,.2);text-align:left}
+  .cg th{font-size:10px}
+  .tabs button{font-size:10px}
   .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
   .tile{background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.35);border-radius:14px;padding:12px}
   .tile .v{font:700 28px/1 Oswald,sans-serif;color:var(--gold-l)}
@@ -198,8 +265,16 @@
     <div class="wrap">
       <div id="err" class="hidden">Your browser couldn't start 3D graphics. Try Chrome or Safari with hardware acceleration turned on.</div>
       <section id="tab-play"><div class="sect">CHOOSE A COURSE</div><div id="courseList"></div></section>
+      <section id="tab-course" class="hidden"><div id="courseDetail"></div></section>
+      <section id="tab-golfer" class="hidden">
+        <div class="sect">YOUR GOLFER</div>
+        <div class="gstage"><canvas id="gPrev"></canvas></div>
+        <label class="nameRow">Name on the leaderboard<input id="gName" maxlength="14" autocomplete="off" spellcheck="false"></label>
+        <div class="sect">OUTFITS</div>
+        <div class="presets" id="presetRow"></div>
+        <div id="lookRows"></div>
+      </section>
       <section id="tab-clubs" class="hidden">
-        <div class="sect">YOUR BAG</div>
         <div id="clubList"></div>
       </section>
       <section id="tab-stats" class="hidden">
@@ -209,23 +284,12 @@
         <div class="rows" id="bestRows"></div>
         <button class="reset" id="resetBtn">Reset all progress</button>
       </section>
-      <section id="tab-how" class="hidden">
-        <div class="sect">HOW TO PLAY</div>
-        <ol class="howlist">
-          <li>Every club has a <b>stock yardage</b>. Pulling back 100% hits that full distance.</li>
-          <li>Check <b>PIN</b> at the top for yards remaining, pick a club, then pull back just enough. For example, 120 yards with a 150-yard club is about 80%.</li>
-          <li><b>Swipe</b> left or right to aim. Tap the club name to open your bag, or use <b>◀ ▶</b>.</li>
-          <li><b>Press the ball and pull back.</b> The needle swings across the gauge. Let go in the bright <b>gold</b> zone for a perfect strike.</li>
-          <li><b>Pull back and to the right</b> to slice (the ball curves right). Pull back and to the left to hook (it curves left). The further sideways you pull, the bigger the curve.</li>
-      <li>Rough cuts distance 15% and sand cuts it 40% (less with the Sand Wedge). Watch the <b>wind</b> arrow: it pushes the ball while it is in the air, and high shots get pushed more.</li>
-          <li>Water and out of bounds cost a stroke. <b>MAP</b> shows the whole hole, and you can tap it to aim.</li>
-          <li>Win money for par or better. Upgrade clubs in the <b>Clubs</b> tab for more yards, a slower needle and a bigger gold zone.</li>
-        </ol>
-      </section>
+      <section id="tab-how" class="hidden"><div id="howBody"></div></section>
     </div>
   </main>
   <nav class="tabs">
     <button data-tab="play" class="on"><span class="ic">⛳</span>Play</button>
+    <button data-tab="golfer"><span class="ic">👔</span>Golfer</button>
     <button data-tab="clubs"><span class="ic">🏌️</span>Clubs</button>
     <button data-tab="stats"><span class="ic">📊</span>Stats</button>
     <button data-tab="how"><span class="ic">❓</span>How</button>
@@ -267,24 +331,86 @@
   const curveOf = (lat, carry) => { const a = Math.abs(lat || 0); return a < 0.08 ? 0 : Math.sign(lat) * (a - 0.08) / 0.92 * carry * 0.24; };
   const LIE_MULT = { tee: 1, fairway: 1, fringe: 0.97, green: 0.95, rough: 0.85, sand: 0.6 };
   const LIE_NAME = { tee: 'Tee box', fairway: 'Fairway', fringe: 'Fringe', green: 'Green', rough: 'Rough', sand: 'Bunker' };
-  // Stock yardages (before upgrades). Pull 100% = full stock distance.
-  const CLUBS = [
-    { name: 'Driver',     short: 'DR', carry: 240, roll: 0.12, loft: 24, spread: 3.2 },
-    { name: '3 Wood',     short: '3W', carry: 215, roll: 0.10, loft: 26, spread: 2.9 },
-    { name: '4 Iron',     short: '4i', carry: 195, roll: 0.08, loft: 28, spread: 2.7 },
-    { name: '6 Iron',     short: '6i', carry: 170, roll: 0.06, loft: 30, spread: 2.5 },
-    { name: '8 Iron',     short: '8i', carry: 145, roll: 0.05, loft: 33, spread: 2.2 },
-    { name: 'Pitching Wedge', short: 'PW', carry: 120, roll: 0.03, loft: 36, spread: 2.0 },
-    { name: 'Sand Wedge', short: 'SW', carry: 90, roll: 0.02, loft: 40, spread: 1.8, sand: true },
-    { name: 'Putter',     short: 'PT', carry: 30, putter: true, spread: 1 },
+  // Every slot in the bag has several club models you can buy and swap in.
+  //   carry  full-swing yards (pull 100%)        roll   how far it runs after landing
+  //   loft   how high it flies                   spread how far a mistimed shot starts off line
+  //   speed  how fast the timing needle swings (higher = harder to time)
+  //   zone   width of the gold PERFECT zone      curve  how hard a mistimed shot slices/hooks
+  //   spin   extra backspin (ball checks up)     rough  share of distance kept from the rough (default 85%)
+  const SLOTS = ['Driver', 'Fairway wood', 'Long iron', 'Mid iron', 'Short iron', 'Wedge', 'Scoring wedge', 'Putter'];
+  const MODELS = [
+    { id: 'driver', slot: 0, name: 'Driver', short: 'DR', price: 0, carry: 240, roll: 0.12, loft: 24, spread: 3.2, speed: 1.25, zone: 0.09, curve: 1.1,
+      desc: 'The starter driver. Long, with an average needle.' },
+    { id: 'titan', slot: 0, name: 'Titan Driver', short: 'TD', price: 1500, carry: 262, roll: 0.14, loft: 22, spread: 3.6, speed: 1.5, zone: 0.075, curve: 1.3,
+      desc: 'Most power in the game. Fast needle, small gold zone and wild misses.' },
+    { id: 'laser', slot: 0, name: 'Laser Driver', short: 'LD', price: 1100, carry: 245, roll: 0.11, loft: 25, spread: 2.4, speed: 1.05, zone: 0.12, curve: 0.75,
+      desc: 'Fairway finder. Slower needle, bigger gold zone, misses curve less.' },
+    { id: 'wood3', slot: 1, name: '3 Wood', short: '3W', price: 0, carry: 215, roll: 0.10, loft: 26, spread: 2.9, speed: 1.15, zone: 0.09, curve: 1.0,
+      desc: 'Second-longest club. Safer than the driver on tight holes.' },
+    { id: 'hybrid', slot: 1, name: 'Rescue Hybrid', short: 'HY', price: 800, carry: 205, roll: 0.08, loft: 30, spread: 2.4, speed: 1.0, zone: 0.11, curve: 0.8, rough: 0.95,
+      desc: 'Cuts through rough: keeps 95% of its distance (most clubs keep 85%).' },
+    { id: 'iron4', slot: 2, name: '4 Iron', short: '4i', price: 0, carry: 195, roll: 0.08, loft: 28, spread: 2.7, speed: 1.1, zone: 0.085, curve: 0.95,
+      desc: 'Long approach shots and par 3s.' },
+    { id: 'blade4', slot: 2, name: 'Tour Blade 4 Iron', short: 'T4', price: 900, carry: 204, roll: 0.08, loft: 28, spread: 2.1, speed: 1.3, zone: 0.07, curve: 0.9,
+      desc: 'Players iron: longer and straighter, but the timing is tough.' },
+    { id: 'iron6', slot: 3, name: '6 Iron', short: '6i', price: 0, carry: 170, roll: 0.06, loft: 30, spread: 2.5, speed: 1.0, zone: 0.095, curve: 0.8,
+      desc: 'The all-round mid iron.' },
+    { id: 'forged6', slot: 3, name: 'Forged 6 Iron', short: 'F6', price: 600, carry: 176, roll: 0.06, loft: 31, spread: 2.2, speed: 0.95, zone: 0.11, curve: 0.7,
+      desc: 'A little longer and a lot more forgiving.' },
+    { id: 'iron8', slot: 4, name: '8 Iron', short: '8i', price: 0, carry: 145, roll: 0.05, loft: 33, spread: 2.2, speed: 0.95, zone: 0.10, curve: 0.65,
+      desc: 'High, soft shots into the green.' },
+    { id: 'forged8', slot: 4, name: 'Forged 8 Iron', short: 'F8', price: 600, carry: 151, roll: 0.04, loft: 34, spread: 2.0, speed: 0.9, zone: 0.115, curve: 0.55, spin: 0.1,
+      desc: 'Extra spin so approach shots stop near where they land.' },
+    { id: 'pw', slot: 5, name: 'Pitching Wedge', short: 'PW', price: 0, carry: 120, roll: 0.03, loft: 36, spread: 2.0, speed: 0.9, zone: 0.105, curve: 0.5, spin: 0.05,
+      desc: 'Full wedge shots and long chips.' },
+    { id: 'gap', slot: 5, name: 'Gap Wedge', short: 'GW', price: 500, carry: 105, roll: 0.02, loft: 40, spread: 1.8, speed: 0.85, zone: 0.12, curve: 0.45, spin: 0.2,
+      desc: 'Fills the gap between PW and SW with lots of backspin.' },
+    { id: 'sw', slot: 6, name: 'Sand Wedge', short: 'SW', price: 0, carry: 90, roll: 0.02, loft: 40, spread: 1.8, speed: 0.85, zone: 0.11, curve: 0.4, spin: 0.1, sand: true,
+      desc: 'Escapes bunkers: only loses 8% from sand (other clubs lose 40%).' },
+    { id: 'lob', slot: 6, name: 'Lob Wedge', short: 'LW', price: 700, carry: 70, roll: 0.01, loft: 50, spread: 1.6, speed: 0.8, zone: 0.13, curve: 0.35, spin: 0.35, sand: true,
+      desc: 'Sky-high flop shots that stop dead. Also great from sand.' },
+    { id: 'putter', slot: 7, name: 'Blade Putter', short: 'PT', price: 0, carry: 30, putter: true, spread: 1, speed: 0.75, zone: 0.12,
+      desc: 'Rolls up to 30 yds on the green.' },
+    { id: 'mallet', slot: 7, name: 'Mallet Putter', short: 'MP', price: 600, carry: 30, putter: true, spread: 1, speed: 0.55, zone: 0.17,
+      desc: 'Very slow needle and a wide gold zone. Drains short putts.' },
+    { id: 'longputt', slot: 7, name: 'Long Putter', short: 'LP', price: 900, carry: 42, putter: true, spread: 1, speed: 0.7, zone: 0.13,
+      desc: 'Reaches 42 yds for long lag putts across big greens.' },
   ];
-  const PUTTER = CLUBS.length - 1;
+  const modelById = id => MODELS.find(m => m.id === id);
+  const STARTER_BAG = ['driver', 'wood3', 'iron4', 'iron6', 'iron8', 'pw', 'sw', 'putter'];
+  const CLUBS = [];
+  const PUTTER = 7;
+
+  // ================= Golfer looks =================
+  const LOOK_PRESETS = [
+    { name: 'Red & Gold', look: { jacket: '#B3122B', shirt: '#ffffff', tie: '#F2C14E', pants: '#1c1c22', shoes: '#111111', skin: '#e0ac7e', hair: '#3b2416' } },
+    { name: 'Brother', look: { jacket: '#111113', shirt: '#111113', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
+    { name: 'Navy Blazer', look: { jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#b9a47c', shoes: '#4a2c17' } },
+    { name: 'Gold Jacket', look: { jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
+    { name: 'Charcoal', look: { jacket: '#3a3d42', shirt: '#bcd6f2', tie: '#1f2c4d', pants: '#3a3d42', shoes: '#111111' } },
+  ];
+  const SWATCHES = {
+    jacket: [['Black', '#111113'], ['Navy', '#1f2c4d'], ['Charcoal', '#3a3d42'], ['Gray', '#7d8088'], ['Red', '#B3122B'], ['Maroon', '#6b0f1e'],
+             ['Gold', '#C9962B'], ['Royal', '#2747a8'], ['Green', '#1f5a34'], ['Brown', '#5a3b24'], ['Tan', '#b9a47c'], ['White', '#eeeeea']],
+    shirt: [['White', '#ffffff'], ['Light blue', '#bcd6f2'], ['Pink', '#f3c4cf'], ['Lavender', '#cfc3ec'], ['Gray', '#c9c9c9'], ['Gold', '#F2C14E'],
+            ['Red', '#B3122B'], ['Black', '#111113']],
+    tie: [['Red', '#B3122B'], ['Gold', '#F2C14E'], ['Navy', '#1f2c4d'], ['Black', '#09090a'], ['Maroon', '#6b0f1e'], ['Green', '#1f5a34'],
+          ['Purple', '#5b2a86'], ['Silver', '#b8bcc4'], ['Light blue', '#8fb8e6'], ['White', '#f2f2ee']],
+    pants: [['Black', '#111113'], ['Navy', '#1f2c4d'], ['Charcoal', '#3a3d42'], ['Gray', '#8a8d93'], ['Khaki', '#b9a47c'], ['Brown', '#5a3b24'],
+            ['Red', '#B3122B'], ['White', '#eeeeea']],
+    shoes: [['Black', '#0a0a0a'], ['Brown', '#4a2c17'], ['White', '#eeeeea']],
+    skin: [['1', '#f6d2b5'], ['2', '#e0ac7e'], ['3', '#c68a5e'], ['4', '#9a643f'], ['5', '#6b4026'], ['6', '#4a2c1a']],
+    hair: [['Black', '#141010'], ['Dark brown', '#3b2416'], ['Brown', '#6a4527'], ['Blonde', '#d8b46a'], ['Red', '#9c3d1c'], ['Gray', '#9a9a9a']],
+  };
+  const LOOK_PARTS = [['jacket', 'Suit jacket'], ['shirt', 'Shirt'], ['tie', 'Tie'], ['pants', 'Dress pants'], ['shoes', 'Shoes'], ['skin', 'Skin tone'], ['hair', 'Hair']];
 
   // ================= Save data =================
   const SAVE_KEY = 'fairwayclub-save';
   const freshStats = () => ({ rounds: 0, holes: 0, aces: 0, eagles: 0, birdies: 0, pars: 0, shots: 0, perfects: 0,
     longest: 0, earnedTotal: 0, strokesTotal: 0, parTotal: 0, roundsBy: {}, bestBy: {} });
-  let save = { coins: 0, lv: {}, ball: 0, course: 'pines', stats: freshStats() };
+  const freshSave = () => ({ coins: 0, lv: {}, ball: 0, course: 'pines', stats: freshStats(), bag: STARTER_BAG.slice(), owned: STARTER_BAG.slice(),
+    name: 'Player', look: Object.assign({}, LOOK_PRESETS[0].look), board: {} });
+  let save = freshSave();
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (s) {
@@ -294,14 +420,24 @@
       if (s.rounds && !save.stats.rounds) { save.stats.rounds = s.rounds; save.stats.roundsBy.pines = s.rounds; }
     }
   } catch (e) {}
+  // Older saves keyed upgrades by club name.
+  const OLD_NAMES = { 'Driver': 'driver', '3 Wood': 'wood3', '4 Iron': 'iron4', '6 Iron': 'iron6', '8 Iron': 'iron8', 'Pitching Wedge': 'pw', 'Sand Wedge': 'sw', 'Putter': 'putter' };
+  for (const k in OLD_NAMES) if (save.lv[k] != null) { save.lv[OLD_NAMES[k]] = Math.max(save.lv[OLD_NAMES[k]] || 0, save.lv[k]); delete save.lv[k]; }
+  if (!Array.isArray(save.bag) || save.bag.length !== 8 || !save.bag.every(modelById)) save.bag = STARTER_BAG.slice();
+  if (!Array.isArray(save.owned)) save.owned = STARTER_BAG.slice();
+  STARTER_BAG.forEach(id => { if (!save.owned.includes(id)) save.owned.push(id); });
+  save.look = Object.assign({}, LOOK_PRESETS[0].look, save.look || {});
+  if (!save.board) save.board = {};
+  function loadBag() { CLUBS.length = 0; save.bag.forEach(id => CLUBS.push(modelById(id))); }
+  loadBag();
   function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} }
 
   const MAX_LV = 5, COSTS = [150, 350, 700, 1200, 2000];
-  const lvOf = c => save.lv[c.name] || 0;
+  const lvOf = c => save.lv[c.id] || 0;
   const distMult = c => c.putter ? 1 : 0.92 + 0.04 * lvOf(c);
   const stockOf = c => Math.round(c.carry * distMult(c));
   const needleMult = c => Math.pow(0.88, lvOf(c));
-  const perfectZone = c => 0.09 + 0.014 * lvOf(c);
+  const perfectZone = c => c.zone + 0.014 * lvOf(c);
   const windMult = () => 1 - 0.12 * save.ball;
   const PAY = { '-3': 400, '-2': 250, '-1': 100, '0': 50, '1': 15 };
   const ROUND_BONUS = 50, UNDER_PAR_BONUS = 40;
@@ -326,7 +462,7 @@
        bunkers: bunkers.map(b => ({ x: b[0], y: b[1], rx: b[2], ry: b[3] })), water: water.map(b => ({ x: b[0], y: b[1], rx: b[2], ry: b[3] })), trees: tr });
 
   const COURSES = [
-    { id: 'pines', name: 'Crimson Pines', desc: 'Tree-lined parkland. A friendly place to learn your yardages.', wind: 12,
+    { id: 'pines', name: 'Chami Links', desc: 'The home course. Tree-lined parkland and a friendly place to learn your yardages.', wind: 12,
       pal: { outer: '#2f6f30', rough: '#3f8b3c', fairEdge: '#4f9d48', fair: '#66c05c', fringe: '#5cb854', green: '#88da7f', sand: '#ead6a1', sandRim: '#a99260',
              tee: '#74cd6a', far: 0x2f6f30, sky: ['#3f8fd6', '#b9dcf3', '#eef6fb'], fog: 0xd3e8f4, sun: 0xfff0d0, leaves: [0x2d6e2f, 0x245f29, 0x387a34], style: 'round' },
       holes: [
@@ -346,7 +482,7 @@
           [[92, 140, 10, 7], [146, 52, 7, 9]], [[110, 232, 135, 15]],
           trees(6, [[25, 40, 25, 195, 6], [25, 270, 25, 400, 5], [195, 40, 195, 195, 6], [195, 270, 195, 400, 5]])),
       ] },
-    { id: 'coast', name: 'Gold Coast Links', unlock: 'pines', desc: 'Seaside links. Big wind, pot bunkers and an island green.', wind: 18,
+    { id: 'coast', name: 'Sarragosa', unlock: 'pines', desc: 'Seaside links. Big wind, pot bunkers and an island green.', wind: 18,
       pal: { outer: '#c2ad6c', rough: '#8fa54f', fairEdge: '#6fae55', fair: '#7cc663', fringe: '#6dbd5c', green: '#93de86', sand: '#efdfb0', sandRim: '#b49f68',
              tee: '#80d070', far: 0x2a74b8, sky: ['#2f86d6', '#a9d8f5', '#f3f9fb'], fog: 0xdcecf5, sun: 0xfff6e0, leaves: [0x3e6b3a, 0x4b7a40, 0x35602f], style: 'pine' },
       holes: [
@@ -364,7 +500,7 @@
         H(4, 400, 240, 440, [180, 415], [70, 45], [[46, [175, 390], [150, 240], [85, 95]]], [70, 48, 18, 14],
           [[125, 170, 10, 7], [95, 40, 7, 9], [48, 70, 8, 6]], [[40, 250, 22, 110]], trees(16, [[225, 60, 225, 420, 6, 7], [20, 400, 60, 420, 2, 7]])),
       ] },
-    { id: 'canyon', name: 'Cardinal Canyon', unlock: 'coast', desc: 'Long, rugged and tight under a sunset sky. Bring an upgraded bag.', wind: 14,
+    { id: 'canyon', name: 'Meribah', unlock: 'coast', desc: 'Long, rugged and tight under a sunset sky. Bring an upgraded bag.', wind: 14,
       pal: { outer: '#a4552f', rough: '#8c8a47', fairEdge: '#5f9a45', fair: '#6eb655', fringe: '#62ad50', green: '#86d47b', sand: '#e8c590', sandRim: '#a7774a',
              tee: '#74c766', far: 0x9c4c2a, sky: ['#c8653f', '#f2b98a', '#fbe6cf'], fog: 0xf0c9a5, sun: 0xffd2a0, leaves: [0x3f5e2a, 0x4d6b30, 0x2f4f24], style: 'pine' },
       holes: [
@@ -517,6 +653,97 @@
   const splashRing = new THREE.Mesh(new THREE.RingGeometry(0.8, 1, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false }));
   splashRing.rotation.x = -Math.PI / 2; scene.add(splashRing);
 
+  // ================= Golfer =================
+  // Built facing +z with the target out to his left (+x), so the swing happens in the x/z plane.
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z), UP = V3(0, 1, 0);
+  const TILT = 0.45, HIP_Y = 0.95;
+  const SHOULDER = V3(0, 0.58 * Math.cos(TILT), 0.58 * Math.sin(TILT));   // relative to the hips
+  const HANDS = V3(0.03, -0.62, 0.12);                                     // relative to the shoulders
+  const CLUB_LEN = { wood: 1.15, iron: 0.98, wedge: 0.92, putter: 0.86 };
+  const clubKind = c => c.putter ? 'putter' : c.slot <= 1 ? 'wood' : c.slot >= 5 ? 'wedge' : 'iron';
+  const stance = k => 0.39 + Math.sqrt(Math.max(0.01, CLUB_LEN[k] ** 2 - 0.81 * 0.81 - 0.0009));   // feet-to-ball distance
+
+  function lookMats() {
+    const m = {};
+    ['jacket', 'shirt', 'tie', 'pants', 'shoes', 'skin', 'hair'].forEach(k => m[k] = new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    m.metal = new THREE.MeshStandardMaterial({ color: 0xd4d8de, metalness: 0.75, roughness: 0.3 });
+    m.dark = new THREE.MeshStandardMaterial({ color: 0x1d1d22, metalness: 0.5, roughness: 0.35 });
+    m.grip = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
+    m.glove = new THREE.MeshLambertMaterial({ color: 0xf5f5f0 });
+    return m;
+  }
+  function applyLook(m, look) { for (const k in look) if (m[k]) m[k].color.set(look[k]); }
+  function limb(a, b, r1, r2, mat) {
+    const d = V3(0, 0, 0).subVectors(b, a), L = d.length();
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(r2, r1, L, 10), mat);
+    mesh.position.copy(a).addScaledVector(d, 0.5);
+    mesh.quaternion.setFromUnitVectors(UP, d.normalize());
+    mesh.castShadow = true; return mesh;
+  }
+  function part(geo, mat, x, y, z, parent) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m; }
+
+  function makeGolfer(m) {
+    const root = new THREE.Group();
+    for (const sx of [-1, 1]) {
+      root.add(limb(V3(sx * 0.15, 0.07, 0.03), V3(sx * 0.12, HIP_Y, 0), 0.07, 0.085, m.pants));
+      part(new THREE.BoxGeometry(0.13, 0.08, 0.3), m.shoes, sx * 0.15, 0.04, 0.08, root);
+    }
+    const upper = new THREE.Group(); upper.position.y = HIP_Y; root.add(upper);          // turns in the swing
+    part(new THREE.BoxGeometry(0.4, 0.2, 0.25), m.pants, 0, 0, 0, upper);
+    const torso = new THREE.Group(); torso.rotation.x = TILT; upper.add(torso);           // bent over the ball
+    const chest = part(new THREE.CylinderGeometry(0.24, 0.2, 0.62, 12), m.jacket, 0, 0.33, 0, torso); chest.scale.z = 0.62;
+    part(new THREE.BoxGeometry(0.13, 0.22, 0.02), m.shirt, 0, 0.52, 0.138, torso);
+    part(new THREE.BoxGeometry(0.045, 0.3, 0.016), m.tie, 0, 0.42, 0.15, torso);
+    part(new THREE.BoxGeometry(0.065, 0.05, 0.03), m.tie, 0, 0.6, 0.148, torso);
+    part(new THREE.BoxGeometry(0.17, 0.05, 0.12), m.shirt, 0, 0.64, 0.03, torso);       // collar
+    for (const sx of [-1, 1]) part(new THREE.SphereGeometry(0.085, 12, 8), m.jacket, sx * 0.21, 0.58, 0, torso);
+    part(new THREE.CylinderGeometry(0.055, 0.06, 0.12, 10), m.skin, 0, 0.69, 0.01, torso);
+    const head = part(new THREE.SphereGeometry(0.12, 18, 14), m.skin, 0, 0.82, 0.02, torso); head.scale.set(0.95, 1.1, 1);
+    part(new THREE.SphereGeometry(0.022, 8, 6), m.skin, 0, 0.8, 0.135, torso);            // nose
+    const hair = part(new THREE.SphereGeometry(0.128, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.55), m.hair, 0, 0.84, 0.0, torso);
+    hair.scale.set(0.97, 1.08, 1.04); hair.rotation.x = -0.35;
+
+    const pivot = new THREE.Group(); pivot.position.copy(SHOULDER); upper.add(pivot);    // arms + club swing from here
+    for (const sx of [-1, 1]) pivot.add(limb(V3(sx * 0.21, 0, 0), HANDS, 0.058, 0.045, m.jacket));
+    part(new THREE.SphereGeometry(0.055, 10, 8), m.glove, HANDS.x, HANDS.y, HANDS.z, pivot);
+    const hinge = new THREE.Group(); hinge.position.copy(HANDS); pivot.add(hinge);      // wrist cock
+    const clubs = {}, axis = {}, B = {};
+    for (const k of Object.keys(CLUB_LEN)) {
+      B[k] = stance(k);
+      const head = V3(-0.03, 0.03 - (HIP_Y + SHOULDER.y + HANDS.y), B[k] - SHOULDER.z - HANDS.z);
+      const g = new THREE.Group(), dir = head.clone().normalize();
+      g.add(limb(dir.clone().multiplyScalar(-0.06), dir.clone().multiplyScalar(0.22), 0.02, 0.02, m.grip));
+      g.add(limb(dir.clone().multiplyScalar(0.2), head, 0.011, 0.011, m.metal));
+      let hm;
+      if (k === 'wood') { hm = part(new THREE.SphereGeometry(0.07, 14, 10), m.dark, 0, 0, 0, g); hm.scale.set(1.5, 0.65, 1.15); }
+      else if (k === 'putter') hm = part(new THREE.BoxGeometry(0.15, 0.035, 0.05), m.metal, 0, 0, 0, g);
+      else hm = part(new THREE.BoxGeometry(0.1, 0.06, 0.022), m.metal, 0, 0, 0, g);
+      hm.position.copy(head).add(V3(0.04, 0.0, 0));
+      g.visible = false; hinge.add(g); clubs[k] = g;
+      // swing plane holds the target line (x) and the line from the shoulders to the ball
+      const sball = V3(0, 0.03 - (HIP_Y + SHOULDER.y), B[k] - SHOULDER.z).normalize();
+      axis[k] = V3(0, -sball.z, sball.y).normalize();
+    }
+    root.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    return { root, upper, pivot, hinge, clubs, axis, B, kind: null };
+  }
+  // a = arm swing (+ back, − through), h = wrist cock, t = body turn
+  function poseGolfer(g, kind, a, h, t) {
+    if (g.kind !== kind) { for (const k in g.clubs) g.clubs[k].visible = k === kind; g.kind = kind; }
+    g.pivot.quaternion.setFromAxisAngle(g.axis[kind], a);
+    g.hinge.quaternion.setFromAxisAngle(g.axis[kind], h);
+    g.upper.rotation.y = t;
+  }
+  const easeIn = x => x * x, easeOut = x => 1 - (1 - x) * (1 - x);
+  const lerpPose = (p, q, k) => ({ a: p.a + (q.a - p.a) * k, h: p.h + (q.h - p.h) * k, t: p.t + (q.t - p.t) * k });
+  const backPose = (putt, p) => putt ? { a: 0.12 + 0.45 * p, h: 0, t: 0 } : { a: 0.25 + 1.6 * p, h: 0.25 + 1.25 * p, t: -0.15 - 0.75 * p };
+  const IMPACT = { a: 0, h: 0, t: 0.12 };
+  const finishPose = (putt, p) => putt ? { a: -0.15 - 0.45 * p, h: 0, t: 0 } : { a: -2.2, h: -1.2, t: 1.15 };
+
+  const playerMats = lookMats();
+  const golfer = makeGolfer(playerMats); scene.add(golfer.root);
+  applyLook(playerMats, save.look);
+
   // ================= Course painting =================
   const ell = (g, e, pad = 0) => { g.beginPath(); g.ellipse(e.x, e.y, e.rx + pad, e.ry + pad, 0, 0, Math.PI * 2); };
   function paintHole(h, pal, maxPx = 2600, margin = 70) {
@@ -576,6 +803,14 @@
     return { canvas: g.canvas, ox, oy, W, H: Hh };
   }
 
+  const holeThumbs = {};
+  function holeThumb(course, i) {
+    const key = course.id + i;
+    if (holeThumbs[key]) return holeThumbs[key];
+    const { canvas } = paintHole(course.holes[i], course.pal, 220, 8);
+    try { holeThumbs[key] = canvas.toDataURL('image/jpeg', 0.8); } catch (e) { holeThumbs[key] = ''; }
+    return holeThumbs[key];
+  }
   const thumbs = {};
   function courseThumb(course) {
     if (thumbs[course.id]) return thumbs[course.id];
@@ -604,7 +839,7 @@
   }
   const CUP_TEX = cupTexture();
 
-  let holeGroup = null, flagMesh = null, disposables = [];
+  let holeGroup = null, flagMesh = null, pinGroup = null, pinT = 0, pinPulled = false, disposables = [];
   function buildHole(h, course, maxPx = 2600) {
     if (holeGroup) { scene.remove(holeGroup); disposables.forEach(d => d.dispose()); disposables = []; }
     holeGroup = new THREE.Group(); scene.add(holeGroup);
@@ -681,10 +916,12 @@
     const bottom = new THREE.Mesh(botGeo, botMat); bottom.rotation.x = -Math.PI / 2; bottom.position.set(h.pin.x, -CUP_D, h.pin.y); bottom.renderOrder = 2;
     const wall = new THREE.Mesh(wallGeo, wallMat); wall.position.set(h.pin.x, -CUP_D / 2, h.pin.y); wall.renderOrder = 3;
     const lip = new THREE.Mesh(lipGeo, lipMat); lip.rotation.x = -Math.PI / 2; lip.position.set(h.pin.x, 0.006, h.pin.y);
-    const pole = new THREE.Mesh(poleGeo, poleMat); pole.position.set(h.pin.x, (4.2 - CUP_D) / 2, h.pin.y); pole.castShadow = true; pole.renderOrder = 4;
-    const knob = new THREE.Mesh(knobGeo, knobMat); knob.position.set(h.pin.x, 4.25, h.pin.y);
-    flagMesh = new THREE.Mesh(flagGeo, flagMat); flagMesh.position.set(h.pin.x, 3.6, h.pin.y); flagMesh.castShadow = true;
-    holeGroup.add(mask, bottom, wall, lip, pole, knob, flagMesh);
+    const pole = new THREE.Mesh(poleGeo, poleMat); pole.position.set(0, (4.2 - CUP_D) / 2, 0); pole.castShadow = true; pole.renderOrder = 4;
+    const knob = new THREE.Mesh(knobGeo, knobMat); knob.position.set(0, 4.25, 0);
+    flagMesh = new THREE.Mesh(flagGeo, flagMat); flagMesh.position.set(0, 3.6, 0); flagMesh.castShadow = true;
+    pinGroup = new THREE.Group(); pinGroup.position.set(h.pin.x, 0, h.pin.y); pinGroup.add(pole, knob, flagMesh);
+    pinT = 0; pinPulled = false;
+    holeGroup.add(mask, bottom, wall, lip, pinGroup);
     renderer.shadowMap.needsUpdate = true;
 
     const cx = b.x + b.w / 2, cy = b.y + b.h / 2, s = Math.max(b.w, b.h) * 0.75 + 60;
@@ -696,7 +933,7 @@
   // ================= Game state =================
   let course = courseById(save.course), HOLES = course.holes;
   let holeIdx = 0, hole = null, ball = { x: 0, y: 0, vx: 0, vy: 0 }, prev = null, strokes = 0, scores = [], earned = [];
-  let state = 'title', clubIdx = 0, recIdx = 0, aimAng = 0, flight = null, swing = null, ptr = null;
+  let state = 'title', clubIdx = 0, recIdx = 0, aimAng = 0, flight = null, swing = null, ptr = null, strike = null, swingAnim = null;
   let viewMode = 'normal', introT = 0, sinkT = 0, penT = 0, splash = null, doneT = 0, lastPutt = false, lastClub = -1;
   let lastDir = { x: 0, y: -1 }, bannerT = 0, ratingT = 0, firstShot = true, confetti = [];
 
@@ -711,7 +948,7 @@
     for (const f of hole.fairways) if (inFairway(p, f)) return 'fairway';
     return 'rough';
   }
-  const lieMult = (c, lie) => (lie === 'sand' && c.sand) ? 0.92 : (LIE_MULT[lie] || 1);
+  const lieMult = (c, lie) => (lie === 'sand' && c.sand) ? 0.92 : (lie === 'rough' && c.rough) ? c.rough : (LIE_MULT[lie] || 1);
   const stockNow = (c = CLUBS[clubIdx]) => c.putter ? c.carry : c.carry * distMult(c) * lieMult(c, terrainAt(ball));
   const distToPin = () => Math.hypot(hole.pin.x - ball.x, hole.pin.y - ball.y);
 
@@ -725,7 +962,7 @@
     return lie === 'tee' ? 0 : 1;
   }
   function readyForShot() {
-    state = 'ready';
+    state = 'ready'; swingAnim = null; strike = null;
     recIdx = autoClub(); clubIdx = recIdx;
     aimAng = Math.atan2(hole.pin.y - ball.y, hole.pin.x - ball.x);
   }
@@ -749,7 +986,7 @@
     hole.wind = { mph, ang, x: Math.cos(ang) * mph, y: Math.sin(ang) * mph };
     buildHole(hole, course, preview ? 1300 : 2600);
     ball = { x: hole.tee.x, y: hole.tee.y, vx: 0, vy: 0 }; prev = { x: ball.x, y: ball.y };
-    strokes = 0; flight = null; swing = null; ptr = null; splash = null; lastPutt = false;
+    strokes = 0; flight = null; swing = null; ptr = null; splash = null; lastPutt = false; strike = null; swingAnim = null;
     trailReset(); closeSheet();
     viewMode = 'normal'; introT = 1.5;
     readyForShot();
@@ -799,7 +1036,8 @@
       dPos.set(ball.x - dx * 4, 1.6, ball.y - dy * 4); dLook.set(ball.x + dx * ahead, 0, ball.y + dy * ahead);
     } else {
       const ahead = Math.min(stockNow(), distToPin() + 20) * 0.55;
-      dPos.set(ball.x - dx * 12, 3.6, ball.y - dy * 12); dLook.set(ball.x + dx * ahead, 0, ball.y + dy * ahead);
+      // close behind the golfer so you can see the swing, still looking down the target line
+      dPos.set(ball.x - dx * 6.5 - dy * 0.6, 2.5, ball.y - dy * 6.5 + dx * 0.6); dLook.set(ball.x + dx * ahead, 0, ball.y + dy * ahead);
     }
     return 6;
   }
@@ -845,13 +1083,13 @@
     } else if (ptr.mode === 'swing') {
       ptr.x = e.clientX; ptr.y = e.clientY;
       swing.power = clamp(Math.max(0, ptr.y - ptr.y0) / pullPx(), 0, 1);
-      swing.lat = CLUBS[clubIdx].putter ? 0 : clamp((ptr.x - ptr.x0) / pullPx(), -1, 1);
     }
   });
   function endPointer() {
     if (!ptr) return;
     if (ptr.mode === 'swing' && state === 'swinging') {
-      if (swing.power < 0.03) { state = 'ready'; swing = null; } else shoot(swing.power, swing.o, swing.lat);
+      if (swing.power < 0.03) { state = 'ready'; swing = null; }
+      else { strike = { power: swing.power, o: swing.o, lat: 0, t: 0, putt: !!CLUBS[clubIdx].putter }; state = 'striking'; }
     }
     ptr = null;
   }
@@ -888,12 +1126,14 @@
   function shoot(power, o, lat) {
     const c = CLUBS[clubIdx], lie = terrainAt(ball), pz = perfectZone(c);
     const ao = Math.abs(o), oe = ao < pz ? 0 : Math.sign(o) * (ao - pz) / (1 - pz), aoe = Math.abs(oe);
-    const shape = c.putter || Math.abs(lat || 0) < 0.08 ? '' : (lat > 0 ? ' · SLICE' : ' · HOOK');
+    // Where the needle stops shapes the shot: gold = straight, right of gold = slice (curves right),
+    // left of gold = hook (curves hard left — the far-left red is a duck hook).
     save.stats.shots++;
-    if (oe === 0) { showRating('PERFECT!' + shape, '#FFE08A'); sfx.perfect(); save.stats.perfects++; }
-    else if (aoe < 0.35) showRating('GREAT' + shape, '#F2C14E');
-    else if (aoe < 0.7) showRating('GOOD' + shape, '#ffffff');
-    else showRating((oe < 0 ? 'MISS LEFT' : 'MISS RIGHT') + shape, '#ff6b7d');
+    if (oe === 0) { showRating('PERFECT!', '#FFE08A'); sfx.perfect(); save.stats.perfects++; }
+    else if (c.putter) showRating(oe > 0 ? (aoe < 0.4 ? 'PUSHED A BIT' : 'PUSHED RIGHT') : (aoe < 0.4 ? 'PULLED A BIT' : 'PULLED LEFT'), aoe < 0.4 ? '#F2C14E' : '#ff6b7d');
+    else if (aoe < 0.35) showRating(oe > 0 ? 'GOOD · FADE' : 'GOOD · DRAW', '#F2C14E');
+    else if (aoe < 0.7) showRating(oe > 0 ? 'SLICE ▶' : '◀ HOOK', '#ffffff');
+    else showRating(oe > 0 ? 'BIG SLICE ▶▶' : '◀◀ DUCK HOOK', '#ff6b7d');
 
     prev = { x: ball.x, y: ball.y };
     strokes++; firstShot = false; trailReset(); swing = null; lastClub = clubIdx;
@@ -904,29 +1144,30 @@
 
     if (c.putter) {
       const dist = full * power * (1 - 0.06 * aoe + gauss() * 0.025);
-      const ang = aimAng + (oe * 5 * lieErr + gauss() * 0.3) * DEG;
+      const ang = aimAng + (oe * 4.5 * lieErr + gauss() * 0.3) * DEG;
       const v = Math.sqrt(2 * DECEL.green * Math.max(0.05, dist));
       ball.vx = Math.cos(ang) * v; ball.vy = Math.sin(ang) * v;
       state = 'rolling'; sfx.putt();
       return;
     }
     const carry = Math.max(3, full * power * (1 - 0.07 * aoe + gauss() * 0.015));
-    const ang = aimAng + (oe * 8 * (c.spread / 3.2) * lieErr + gauss() * 0.35) * DEG;
+    const ang = aimAng + ((oe < 0 ? oe * 4 : oe * 1.5) * (c.spread / 3.2) * lieErr + gauss() * 0.35) * DEG;
     const dir = { x: Math.cos(ang), y: Math.sin(ang) }, right = { x: -dir.y, y: dir.x };
     // Wind pushes the ball in the air. High shots ride it more; a headwind hurts more than a tailwind helps.
     const wm = windMult(), wx = hole.wind.x * wm, wy = hole.wind.y * wm;
     const along = wx * dir.x + wy * dir.y, across = wx * right.x + wy * right.y;
     const hf = clamp(c.loft / 30, 0.75, 1.35) * clamp(Math.sqrt(power), 0.5, 1);
     const carryW = Math.max(3, carry * (1 + (along >= 0 ? 0.006 : 0.009) * along * hf));
-    // Sideways curve from the pull (slice/hook) plus crosswind drift.
-    const side = curveOf(lat, carry) * lieErr + across * carry * 0.0065 * hf;
+    // Sideways curve from the needle (slice right / hook left, hooks bend harder) plus crosswind drift.
+    const bend = (oe > 0 ? oe * 0.2 : oe * 0.3) * c.curve;
+    const side = bend * carry * lieErr + across * carry * 0.0065 * hf;
     const D = { x: dir.x * carryW, y: dir.y * carryW }, Q = { x: right.x * side, y: right.y * side };
     const ex = ball.x + D.x + Q.x, ey = ball.y + D.y + Q.y;
     const tx = D.x + 2 * Q.x, ty = D.y + 2 * Q.y, tl = Math.hypot(tx, ty) || 1;
     const ignore = new Set(hole.allTrees.filter(t => Math.hypot(t.x - ball.x, t.y - ball.y) < t.r + 2));
     const hMax = c.loft * clamp(Math.sqrt(power), 0.35, 1);
     // Roll: tailwind, a pure strike and a hook run further; a slice and a mishit run less.
-    const shapeRoll = Math.abs(lat || 0) < 0.08 ? 1 : (lat < 0 ? 1.15 : 0.9);
+    const shapeRoll = oe === 0 ? 1 : (oe < 0 ? 1.15 : 0.9);
     const rollMul = clamp(1 + along * 0.012, 0.7, 1.35) * (oe === 0 ? 1.12 : 1 - 0.25 * aoe) * shapeRoll;
     flight = { sx: ball.x, sy: ball.y, ex, ey, qx: Q.x, qy: Q.y, t: 0, T: 0.9 + carryW / 100, h: hMax, hgt: 0, carry: carryW, club: c, ignore,
       dirEnd: { x: tx / tl, y: ty / tl }, rollMul, q: oe === 0 ? 1 : clamp(1 - aoe, 0.2, 1) };
@@ -965,7 +1206,7 @@
     // Low clubs run out; wedges land steep with backspin and check up.
     const rollYds = Math.max(0.3, f.carry * c.roll * 1.6 * f.rollMul * (1 - 0.45 * steep));
     const v = Math.sqrt(2 * DECEL.fairway * rollYds);
-    ball.spin = steep * 0.35 * f.q;
+    ball.spin = (steep * 0.35 + (c.spin || 0)) * f.q;
     ball.vx = f.dirEnd.x * v; ball.vy = f.dirEnd.y * v;
     ball.z = 0; ball.vz = -(5 + f.h * 0.35);
     touchdown(t);
@@ -1083,10 +1324,21 @@
     if (!hole) return;
     if (introT > 0) introT -= dt;
     if (state === 'swinging' && swing) {
-      swing.phase += dt * 0.6 * (0.5 + 0.9 * swing.power) * needleMult(CLUBS[clubIdx]);
+      swing.phase += dt * 0.78 * (0.5 + 0.9 * swing.power) * CLUBS[clubIdx].speed * needleMult(CLUBS[clubIdx]);
       const f = swing.phase % 1;
       swing.o = f < 0.5 ? -1 + 4 * f : 3 - 4 * f;
     }
+    if (state === 'striking' && strike) {
+      strike.t += dt;
+      if (strike.t >= (strike.putt ? 0.24 : 0.14)) {
+        swingAnim = { putt: strike.putt, p: strike.power, t: 0 };
+        swing = { power: strike.power, o: strike.o, lat: 0, phase: 0 };
+        shoot(strike.power, strike.o, 0); strike = null;
+      }
+    }
+    if (swingAnim) swingAnim.t += dt;
+    if (pinPulled && pinT < 1) pinT = Math.min(1, pinT + dt / 1.1);
+    if (!pinPulled && lastPutt && (state === 'rolling' || state === 'sinking') && distToPin() < 6) pinPulled = true;
     if (state === 'flying') { fly(dt); if (flight) trailPush(ball.x, flight.hgt + 0.1, ball.y); }
     else if (state === 'rolling') roll(dt);
     else if (state === 'sinking') {
@@ -1147,6 +1399,38 @@
       if (state === 'swinging') {
         liveTarget.position.set(ball.x + dx * live - dy * cv, 0.08, ball.y + dy * live + dx * cv);
         liveTarget.scale.setScalar(sz(Math.max(live, 1)) * 0.85);
+      }
+    }
+
+    // golfer: stands beside the ball (target to his left) and swings with the pull
+    const gReady = state === 'ready' || state === 'swinging' || state === 'striking' || state === 'title';
+    golfer.root.visible = viewMode !== 'overview' || state !== 'ready';
+    if (gReady) {
+      const c = CLUBS[clubIdx], kind = clubKind(c), dx = Math.cos(aimAng), dz = Math.sin(aimAng), B = golfer.B[kind];
+      golfer.root.position.set(ball.x + dz * B, 0, ball.y - dx * B);
+      golfer.root.rotation.y = Math.atan2(-dz, dx);
+      let pose = { a: Math.sin(time * 1.7) * 0.025, h: 0, t: 0 };
+      if (state === 'swinging' && swing) pose = backPose(!!c.putter, swing.power);
+      else if (state === 'striking' && strike) pose = lerpPose(backPose(strike.putt, strike.power), IMPACT, easeIn(clamp(strike.t / (strike.putt ? 0.24 : 0.14), 0, 1)));
+      golfer.cur = pose; poseGolfer(golfer, kind, pose.a, pose.h, pose.t);
+    } else if (swingAnim) {
+        const k = easeOut(clamp(swingAnim.t / (swingAnim.putt ? 0.5 : 0.45), 0, 1));
+      const pose = lerpPose(IMPACT, finishPose(swingAnim.putt, swingAnim.p), k);
+      poseGolfer(golfer, golfer.kind, pose.a, pose.h, pose.t);
+    }
+
+    // don't let the chase camera pass through the golfer
+    if (golfer.root.visible && Math.hypot(camera.position.x - golfer.root.position.x, camera.position.z - golfer.root.position.z) < 1.4) golfer.root.visible = false;
+
+    // flagstick: lifted out of the cup and laid on the green when a putt gets close
+    if (pinGroup) {
+      const k = pinT;
+      if (k < 0.5) { const u = easeOut(k / 0.5); pinGroup.position.y = u * (4.3 + CUP_D) * 0.55; pinGroup.rotation.z = 0; pinGroup.position.x = hole.pin.x; }
+      else {
+        const u = easeOut((k - 0.5) / 0.5);
+        pinGroup.rotation.z = -u * Math.PI / 2;
+        pinGroup.position.x = hole.pin.x + u * 2.2;
+        pinGroup.position.y = (1 - u) * (4.3 + CUP_D) * 0.55 + u * 0.08;
       }
     }
 
@@ -1225,6 +1509,11 @@
       fctx.lineCap = 'butt';
       fctx.fillStyle = '#FFE08A'; fctx.font = '800 10px Inter, sans-serif';
       fctx.fillText('PERFECT', gx, gy - R - 18);
+      fctx.font = '800 11px Inter, sans-serif';
+      const lx = gx + Math.cos(ang(-1)) * (R + 6), ly = gy + Math.sin(ang(-1)) * (R + 6) + 26;
+      const rx = gx + Math.cos(ang(1)) * (R + 6);
+      fctx.fillStyle = '#a8dcff'; fctx.fillText(c.putter ? '◀ PULL' : '◀ HOOK', lx, ly);
+      fctx.fillStyle = '#ffab8a'; fctx.fillText(c.putter ? 'PUSH ▶' : 'SLICE ▶', rx, ly);
     }
     drawConfetti();
   }
@@ -1278,14 +1567,174 @@
   let tab = 'play';
   function setTab(t) {
     tab = t;
-    document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-    ['play', 'clubs', 'stats', 'how'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
+    const navTab = t === 'course' ? 'play' : t;
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === navTab));
+    ['play', 'course', 'golfer', 'clubs', 'stats', 'how'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
     if (t === 'play') renderCourses();
+    if (t === 'course') renderCourse();
+    if (t === 'golfer') renderGolfer();
     if (t === 'clubs') renderClubs();
     if (t === 'stats') renderStats();
+    if (t === 'how') renderHow();
     $('homeCoins').textContent = money(save.coins);
+    document.querySelector('.hbody').scrollTop = 0;
   }
-  document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { ensureAudio(); sfx.click(); setTab(b.dataset.tab); } });
+  document.querySelector('.tabs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    ensureAudio(); sfx.click(); clubsReturn = null; setTab(b.dataset.tab);
+  });
+
+  // ---- Course detail + leaderboard ----
+  const fmtDate = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}`; };
+  const esc = t => String(t).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  let lastEntry = null;
+  function openCourse(c) {
+    if (c.id !== course.id) previewCourse(c);
+    if (isUnlocked(c)) { save.course = c.id; persist(); }
+    setTab('course');
+  }
+  function boardHtml(c, limit = 10) {
+    const rows = (save.board[c.id] || []).slice(0, limit);
+    if (!rows.length) return '<div class="empty">No rounds yet. Finish a round here to post the first score.</div>';
+    return `<table class="board"><tr><th></th><th>GOLFER</th><th>STROKES</th><th>SCORE</th></tr>` + rows.map((r, i) =>
+      `<tr class="${r === lastEntry || (lastEntry && r.date === lastEntry.date) ? 'me' : ''}"><td class="rk">${i + 1}</td><td>${esc(r.name)}<div style="font-size:11px;color:#c9a98a">${fmtDate(r.date)}</div></td><td>${r.strokes}</td><td><b>${fmtRel(r.rel)}</b></td></tr>`).join('') + '</table>';
+  }
+  function renderCourse() {
+    const c = course, open = isUnlocked(c), best = save.stats.bestBy[c.id], played = save.stats.roundsBy[c.id] || 0;
+    const holes = c.holes.map((h, i) => `<div><span class="hm" style="background-image:url('${holeThumb(c, i)}')"></span>HOLE ${i + 1}<b>Par ${h.par}</b>${h.yds} yds</div>`).join('');
+    const bag = CLUBS.map(m => m.short).join(' · ');
+    $('courseDetail').innerHTML = `<button class="back" data-cback="1">← All courses</button>
+      <div class="cdname">${c.name}</div><div class="cddesc">${c.desc}</div>
+      <div class="chips"><span><b>${c.holes.length}</b> holes</span><span>Par <b>${c.par}</b></span><span><b>${c.yds.toLocaleString()}</b> yds</span>
+        <span>Wind up to <b>${c.wind}</b> mph</span><span>Best <b>${best == null ? '—' : fmtRel(best)}</b></span><span>Played <b>${played}</b></span></div>
+      <div class="cdbtns">${open ? '<button class="main" data-tee="1">Tee off</button>' : `<div class="lock" style="flex:1">🔒 Finish a round at ${courseById(c.unlock).name} to unlock</div>`}
+        <button class="ghost" data-chclubs="1">Change clubs</button></div>
+      <div style="font-size:12px;color:#f3d7a8;text-align:center">In your bag: ${bag}</div>
+      <div class="sect">THE HOLES</div><div class="holes">${holes}</div>
+      <div class="sect">LEADERBOARD · LOWEST SCORES</div>${boardHtml(c)}`;
+  }
+  $('courseDetail').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    ensureAudio(); sfx.click();
+    if (b.dataset.cback) setTab('play');
+    else if (b.dataset.tee) startRound(course);
+    else if (b.dataset.chclubs) { clubsReturn = course.id; setTab('clubs'); }
+  });
+  function recordScore(rel, strokes) {
+    const list = save.board[course.id] || (save.board[course.id] = []);
+    const entry = { name: save.name || 'Player', rel, strokes, date: Date.now() };
+    list.push(entry); list.sort((a, b) => a.rel - b.rel || a.date - b.date);
+    const rank = list.indexOf(entry) + 1;
+    save.board[course.id] = list.slice(0, 10); lastEntry = entry;
+    return rank <= 10 ? rank : 0;
+  }
+
+  // ---- Golfer page ----
+  let prev3 = null;
+  const previewMats = lookMats();
+  function golferPreview() {
+    if (prev3) return prev3;
+    const r = new THREE.WebGLRenderer({ canvas: $('gPrev'), antialias: true, alpha: true });
+    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const sc = new THREE.Scene();
+    sc.add(new THREE.HemisphereLight(0xeaf4ff, 0x40602f, 0.85));
+    const dl = new THREE.DirectionalLight(0xfff0d8, 0.75); dl.position.set(2.5, 4, 3); sc.add(dl);
+    const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
+    const turn = new THREE.Group(); sc.add(turn);
+    const g = makeGolfer(previewMats); turn.add(g.root);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.04, 14, 10), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }));
+    turn.add(ball);
+    const pad = new THREE.Mesh(new THREE.CircleGeometry(1.5, 40), new THREE.MeshLambertMaterial({ color: 0x5fb556 }));
+    pad.rotation.x = -Math.PI / 2; turn.add(pad);
+    prev3 = { r, sc, cam, g, ball, turn, w: 0, h: 0 };
+    return prev3;
+  }
+  function renderPreview(time) {
+    const P = golferPreview(), cv = $('gPrev'), w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) return;
+    if (P.w !== w || P.h !== h) { P.r.setSize(w, h, false); P.cam.aspect = w / h; P.cam.updateProjectionMatrix(); P.w = w; P.h = h; }
+    const kind = clubKind(CLUBS[0]), B = P.g.B[kind];
+    P.g.root.position.set(0, 0, -B / 2); P.ball.position.set(0, 0.04, B / 2);
+    P.turn.rotation.y = time * 0.35;
+    // a slow demo swing on a loop
+    const T = time % 4, p = 1;
+    let pose = { a: 0, h: 0, t: 0 };
+    if (T > 1 && T < 2.2) pose = lerpPose(pose, backPose(false, p), easeOut((T - 1) / 1.2));
+    else if (T >= 2.2 && T < 2.36) pose = lerpPose(backPose(false, p), IMPACT, easeIn((T - 2.2) / 0.16));
+    else if (T >= 2.36) pose = lerpPose(IMPACT, finishPose(false, p), easeOut(clamp((T - 2.36) / 0.45, 0, 1)));
+    poseGolfer(P.g, kind, pose.a, pose.h, pose.t);
+    P.cam.position.set(0, 1.25, 4.6); P.cam.lookAt(0, 0.85, 0);
+    P.r.render(P.sc, P.cam);
+  }
+  function setLook(look) {
+    Object.assign(save.look, look); persist();
+    applyLook(playerMats, save.look); applyLook(previewMats, save.look);
+  }
+  function renderGolfer() {
+    $('gName').value = save.name || '';
+    $('presetRow').innerHTML = LOOK_PRESETS.map((p, i) =>
+      `<button data-preset="${i}"><i style="background:${p.look.jacket}"></i>${p.name}${p.name === 'Brother' ? ' (all black)' : ''}</button>`).join('');
+    $('lookRows').innerHTML = LOOK_PARTS.map(([k, label]) => {
+      const cur = (save.look[k] || '').toLowerCase(), hit = SWATCHES[k].find(x => x[1].toLowerCase() === cur);
+      return `<div class="lookrow"><div class="lh">${label}<b>${hit ? (k === 'skin' ? '' : hit[0]) : ''}</b></div><div class="sw">` +
+        SWATCHES[k].map(([n, c]) => `<button data-part="${k}" data-col="${c}" title="${n}" aria-label="${label}: ${n}" class="${c.toLowerCase() === cur ? 'on' : ''}" style="background:${c}"></button>`).join('') +
+        '</div></div>';
+    }).join('');
+    applyLook(previewMats, save.look);
+  }
+  $('tab-golfer').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    ensureAudio(); sfx.click();
+    if (b.dataset.preset != null) setLook(LOOK_PRESETS[+b.dataset.preset].look);
+    else if (b.dataset.part) setLook({ [b.dataset.part]: b.dataset.col });
+    renderGolfer();
+  });
+  $('gName').addEventListener('input', e => { save.name = e.target.value.trim().slice(0, 14); persist(); });
+  $('gName').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); e.stopPropagation(); });
+
+  // ---- How to play ----
+  function renderHow() {
+    const pz = 0.09;
+    const guide = SLOTS.map((n, i) => {
+      const ms = MODELS.filter(m => m.slot === i);
+      return `<tr><td><b>${n}</b></td><td>${ms.map(m => `${m.name} (${m.carry}${m.putter ? ' roll' : ''})`).join('<br>')}</td></tr>`;
+    }).join('');
+    $('howBody').innerHTML = `
+      <div class="sect">THE SWING</div>
+      <div class="howcard">
+        <p><b>1. Aim.</b> Swipe left or right anywhere away from the ball. <b>MAP</b> shows the whole hole and you can tap it to aim.</p>
+        <p><b>2. Pick a club.</b> Tap the club name or use ◀ ▶. The game suggests one (marked BEST) from the yards to the pin.</p>
+        <p><b>3. Pull back for power.</b> Press the ball and drag down. Your golfer takes the club back as you pull. 100% hits the club's full yardage; 120 yds with a 150-yd club is about 80%.</p>
+        <p><b>4. Time the release.</b> While you hold, the needle swings across the gauge above the ball. Let go when it's in the gold.</p>
+      </div>
+      <div class="sect">THE TIMING NEEDLE</div>
+      <div class="howcard">
+        <div class="needle"><i style="background:#B3122B"></i><i style="background:#D9622B"></i><i style="background:#C9962B"></i><i style="background:#FFE08A;flex:.7"></i><i style="background:#C9962B"></i><i style="background:#D9622B"></i><i style="background:#B3122B"></i></div>
+        <div class="nlabels"><span>◀ DUCK HOOK</span><span>HOOK</span><span>PERFECT</span><span>SLICE</span><span>BIG SLICE ▶</span></div>
+        <p><b>Gold = perfect.</b> Dead straight, full distance and extra roll.</p>
+        <p><b>Release right of gold → slice.</b> The ball starts a touch right and curves right. The further right, the bigger the slice. Slices roll out less.</p>
+        <p><b>Release left of gold → hook.</b> The ball starts left and bends hard left. Hooks curve about 50% more than slices, so the far-left red zone sends it <b>way</b> left. Hooks run out more after landing.</p>
+        <p><b>The needle gets faster</b> the harder you pull and the longer the club. Drivers are the hardest to time, wedges and putters the easiest. Every miss also loses a little distance.</p>
+        <p><b>Putting:</b> the needle pushes (right) or pulls (left) the putt off line instead of curving it. When a putt gets close, the flag is pulled out of the hole.</p>
+      </div>
+      <div class="sect">HOW CLUBS DIFFER</div>
+      <div class="howcard">
+        <p><b>Power</b> how far a 100% swing carries.</p>
+        <p><b>Accuracy</b> how wide the gold PERFECT zone is.</p>
+        <p><b>Control</b> how slowly the needle moves. A slower needle is easier to time.</p>
+        <p><b>Straight</b> how much a mistimed shot curves. Power clubs like the Titan Driver miss big; the Laser Driver misses small.</p>
+        <p><b>Spin</b> high-loft and spin clubs land soft and stop; low clubs run out after landing.</p>
+        <p><b>Upgrades</b> (up to 5 per club) add 4% distance each and also widen the gold zone and slow the needle.</p>
+        <table class="cg"><tr><th>SLOT</th><th>MODELS (STOCK YDS)</th></tr>${guide}</table>
+      </div>
+      <div class="sect">LIES, WIND & MONEY</div>
+      <div class="howcard">
+        <p><b>Rough</b> costs 15% distance (Hybrid only 5%). <b>Sand</b> costs 40% (Sand/Lob Wedge only 8%). Rough and sand also make misses wilder.</p>
+        <p><b>Wind</b> pushes the ball in the air; high shots get pushed more. The Pro Ball upgrade cuts wind effect.</p>
+        <p><b>Water / out of bounds</b> cost a stroke and you replay from the last spot.</p>
+        <p><b>Money</b> comes from par or better plus a round bonus. Spend it in <b>Clubs</b> on new models and upgrades. Customize your look in <b>Golfer</b>.</p>
+      </div>`;
+  }
 
   function previewCourse(c) {
     course = c; HOLES = c.holes; applyCourseLook(c); loadHole(0, true); state = 'title';
@@ -1297,8 +1746,8 @@
       const open = isUnlocked(c), best = save.stats.bestBy[c.id], played = save.stats.roundsBy[c.id] || 0;
       const meta = `${c.holes.length} holes · Par ${c.par} · ${c.yds.toLocaleString()} yds · Wind up to ${c.wind} mph`;
       const rec = best == null ? 'Not played yet' : `Best ${fmtRel(best)} · Played ${played}`;
-      const act = open ? `<button class="main sm" data-play="${c.id}">Play</button>`
-        : `<div class="lock">🔒 Finish a round at ${courseById(c.unlock).name} to unlock</div>`;
+      const act = open ? `<button class="main sm">View course</button>`
+        : `<div class="lock">🔒 Finish a round at ${courseById(c.unlock).name} to unlock · tap to preview</div>`;
       return `<div class="course${c.id === course.id ? ' sel' : ''}" data-pick="${c.id}">
         <div class="thumb" style="background-image:url('${courseThumb(c)}');${open ? '' : 'filter:grayscale(.8) brightness(.6)'}"></div>
         <div class="ci"><div class="cn">${c.name}</div><div class="cd">${c.desc}</div><div class="cm">${meta}</div><div class="cm" style="color:#FFE08A;margin-top:3px">${rec}</div>
@@ -1307,43 +1756,74 @@
   }
   $('courseList').addEventListener('click', e => {
     ensureAudio();
-    const play = e.target.closest('[data-play]');
-    if (play) { startRound(courseById(play.dataset.play)); return; }
     const pick = e.target.closest('[data-pick]');
-    if (pick) {
-      const c = courseById(pick.dataset.pick);
-      if (c.id !== course.id && isUnlocked(c)) { save.course = c.id; persist(); previewCourse(c); renderCourses(); sfx.click(); }
-    }
+    if (pick) { sfx.click(); openCourse(courseById(pick.dataset.pick)); }
   });
 
+  // ---- Clubs tab: shop, equip and upgrades ----
+  const pipRow = (n, of = MAX_LV) => Array.from({ length: of }, (_, i) => `<span class="pip${i < n ? ' on' : ''}"></span>`).join('');
+  function clubBars(c) {
+    const lv = lvOf(c), zone = perfectZone(c), spd = c.speed * needleMult(c);
+    const bar = (label, v, txt) => `<div class="sbar"><span>${label}</span><i><b style="width:${Math.round(clamp(v, 0.04, 1) * 100)}%"></b></i><em>${txt}</em></div>`;
+    const rows = [];
+    if (c.putter) rows.push(bar('Roll', stockOf(c) / 45, `${stockOf(c)} yds`));
+    else rows.push(bar('Power', stockOf(c) / 280, `${stockOf(c)} yds`));
+    rows.push(bar('Accuracy', zone / 0.24, `${Math.round(zone * 100)}% gold`));
+    rows.push(bar('Control', (1.65 - spd) / 1.25, spd < 0.75 ? 'slow needle' : spd < 1.05 ? 'medium needle' : 'fast needle'));
+    if (!c.putter) {
+      rows.push(bar('Straight', 1 - c.curve / 1.5, c.curve >= 1.1 ? 'big misses' : c.curve >= 0.8 ? 'normal misses' : 'small misses'));
+      rows.push(bar('Spin', ((c.loft - 20) / 32) * 0.6 + (c.spin || 0), c.spin >= 0.2 ? 'stops fast' : c.loft >= 33 ? 'soft landing' : 'runs out'));
+    }
+    return rows.join('');
+  }
+  let clubsReturn = null;
   function renderClubs() {
-    const rows = CLUBS.map(c => {
-      const lv = lvOf(c), pips = Array.from({ length: MAX_LV }, (_, i) => `<span class="pip${i < lv ? ' on' : ''}"></span>`).join('');
-      const zone = Math.round(perfectZone(c) * 100), speed = Math.round(needleMult(c) * 100);
-      let next = '';
-      if (lv < MAX_LV) next = c.putter ? ' · next: steadier stroke' : ` · next: ${Math.round(c.carry * (distMult(c) + 0.04))} yds`;
-      const cost = COSTS[lv];
-      const btn = lv >= MAX_LV ? '<button class="main sm" disabled>MAX</button>'
-        : `<button class="main sm" data-key="${c.name}"${save.coins < cost ? ' disabled' : ''}>${money(cost)}</button>`;
-      return `<div class="clubcard"><div class="yd">${stockOf(c)}<small>${c.putter ? 'MAX ROLL' : 'STOCK YDS'}</small></div>
-        <div class="info"><div class="name">${c.name}</div><div class="stats">Gold zone ${zone}% · Needle speed ${speed}%${next}</div><div class="pips">${pips}</div></div>${btn}</div>`;
-    });
-    const wNow = Math.round(windMult() * 100), bl = save.ball, bpips = Array.from({ length: MAX_LV }, (_, i) => `<span class="pip${i < bl ? ' on' : ''}"></span>`).join('');
+    const back = clubsReturn ? `<button class="back" data-back="1">← Back to ${courseById(clubsReturn).name}</button>` : '';
+    const cards = SLOTS.map((slotName, si) => {
+      const eq = CLUBS[si], lv = lvOf(eq), cost = COSTS[lv];
+      const up = lv >= MAX_LV ? '<button class="main sm" disabled>MAX</button>'
+        : `<button class="main sm" data-up="${eq.id}"${save.coins < cost ? ' disabled' : ''}>Upgrade ${money(cost)}</button>`;
+      const nextTxt = lv >= MAX_LV ? 'Fully upgraded' : eq.putter ? 'Next: wider gold zone, slower needle'
+        : `Next: ${Math.round(eq.carry * (distMult(eq) + 0.04))} yds, wider gold zone, slower needle`;
+      const others = MODELS.filter(m => m.slot === si).map(m => {
+        const own = save.owned.includes(m.id), on = m.id === eq.id;
+        const btn = on ? '<span class="tagon">IN BAG</span>'
+          : own ? `<button class="ghost sm" data-eq="${m.id}">Equip</button>`
+          : `<button class="main sm" data-buy="${m.id}"${save.coins < m.price ? ' disabled' : ''}>${money(m.price)}</button>`;
+        const yd = m.putter ? `${Math.round(m.carry * distMult(m))} yd roll` : `${Math.round(m.carry * distMult(m))} yds`;
+        return `<div class="model${on ? ' on' : ''}"><div class="mi"><div class="mn">${m.name} <small>${yd}</small></div><div class="md">${m.desc}</div></div>${btn}</div>`;
+      }).join('');
+      return `<div class="slot"><div class="slothead"><span>${slotName.toUpperCase()}</span><b>${eq.name}</b></div>
+        <div class="bars">${clubBars(eq)}</div>
+        <div class="uprow"><div><div class="pips">${pipRow(lv)}</div><div class="nx">${nextTxt}</div></div>${up}</div>
+        <div class="models">${others}</div></div>`;
+    }).join('');
+    const wNow = Math.round(windMult() * 100), bl = save.ball;
     const bbtn = bl >= MAX_LV ? '<button class="main sm" disabled>MAX</button>'
-      : `<button class="main sm" data-key="__ball"${save.coins < COSTS[bl] ? ' disabled' : ''}>${money(COSTS[bl])}</button>`;
-    rows.push(`<div class="clubcard"><div class="yd">${wNow}%<small>WIND EFFECT</small></div>
-      <div class="info"><div class="name">Pro Ball</div><div class="stats">Cuts how far the wind pushes your shots${bl < MAX_LV ? ` · next: ${wNow - 12}%` : ''}</div><div class="pips">${bpips}</div></div>${bbtn}</div>`);
-    $('clubList').innerHTML = rows.join('');
+      : `<button class="main sm" data-ball="1"${save.coins < COSTS[bl] ? ' disabled' : ''}>${money(COSTS[bl])}</button>`;
+    const ballCard = `<div class="slot"><div class="slothead"><span>GOLF BALL</span><b>Pro Ball</b></div>
+      <div class="uprow"><div><div class="pips">${pipRow(bl)}</div><div class="nx">Wind effect ${wNow}%${bl < MAX_LV ? ` · next: ${wNow - 12}%` : ''}</div></div>${bbtn}</div></div>`;
+    $('clubList').innerHTML = back + `<div class="sect">YOUR BAG · 8 CLUBS</div>` + cards + ballCard;
   }
   $('clubList').addEventListener('click', e => {
-    const key = e.target.dataset && e.target.dataset.key;
-    if (!key) return;
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
     ensureAudio();
-    const lv = key === '__ball' ? save.ball : (save.lv[key] || 0), cost = COSTS[lv];
-    if (lv >= MAX_LV || save.coins < cost) return;
-    save.coins -= cost;
-    if (key === '__ball') save.ball++; else save.lv[key] = lv + 1;
-    persist(); sfx.buy(); renderClubs(); $('homeCoins').textContent = money(save.coins);
+    if (b.dataset.back) { const c = courseById(clubsReturn); clubsReturn = null; openCourse(c); return; }
+    if (b.dataset.ball) {
+      const cost = COSTS[save.ball]; if (save.ball >= MAX_LV || save.coins < cost) return;
+      save.coins -= cost; save.ball++;
+    } else if (b.dataset.up) {
+      const m = modelById(b.dataset.up), lv = lvOf(m), cost = COSTS[lv];
+      if (lv >= MAX_LV || save.coins < cost) return;
+      save.coins -= cost; save.lv[m.id] = lv + 1;
+    } else if (b.dataset.buy) {
+      const m = modelById(b.dataset.buy); if (save.coins < m.price || save.owned.includes(m.id)) return;
+      save.coins -= m.price; save.owned.push(m.id); save.bag[m.slot] = m.id; loadBag();
+    } else if (b.dataset.eq) {
+      const m = modelById(b.dataset.eq); save.bag[m.slot] = m.id; loadBag(); sfx.click();
+    } else return;
+    if (!b.dataset.eq) sfx.buy();
+    persist(); renderClubs(); $('homeCoins').textContent = money(save.coins);
   });
 
   function renderStats() {
@@ -1363,7 +1843,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    save = { coins: 0, lv: {}, ball: 0, course: 'pines', stats: freshStats() }; persist();
+    const keep = { name: save.name, look: save.look }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
@@ -1413,6 +1893,8 @@
     const best = s.bestBy[course.id];
     if (best == null || rel < best) { line = best == null ? 'First round here!' : 'New course best!'; s.bestBy[course.id] = rel; }
     else line = `Course best: ${fmtRel(best)}`;
+    const rank = recordScore(rel, ts);
+    if (rank) line += ` · Leaderboard #${rank}`;
     const newly = COURSES.filter(c => wasLocked.includes(c.id) && isUnlocked(c));
     if (newly.length) line += ` · 🔓 ${newly.map(c => c.name).join(', ')} unlocked!`;
     persist();
@@ -1421,7 +1903,7 @@
   }
 
   $('againBtn').addEventListener('click', () => startRound(course));
-  $('homeBtn').addEventListener('click', showHome);
+  $('homeBtn').addEventListener('click', () => { showHome(); setTab('course'); });
 
   showHome();
 
@@ -1444,6 +1926,7 @@
     const onHome = state === 'title' && !$('home').classList.contains('hidden');
     setLite(onHome);
     if (onHome && now - lastDraw < 32) return;
+    if (onHome && tab === 'golfer') renderPreview(now / 1000);
     lastDraw = now;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     acc += dt;
