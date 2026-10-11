@@ -19,13 +19,15 @@
 
   /* ---------- In-game HUD ---------- */
   .top{position:fixed;top:0;left:0;right:0;display:flex;gap:4px;padding:calc(env(safe-area-inset-top) + 8px) 8px 8px;
-       background:linear-gradient(180deg,rgba(69,6,15,.96),rgba(122,12,29,.88));border-bottom:2px solid var(--gold);pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+       background:linear-gradient(180deg,rgba(69,6,15,.96),rgba(122,12,29,.88));border-bottom:2px solid var(--gold);pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35);flex-wrap:wrap}
+  .brandbar{flex:0 0 100%;text-align:center;font:700 16px/1 Oswald,sans-serif;letter-spacing:.14em;color:var(--gold-l);margin-bottom:5px}
+  .disclaim{flex:0 0 100%;text-align:center;font:600 10px/1.2 Inter,sans-serif;color:rgba(246,220,176,.75);letter-spacing:.02em}
   .stat{flex:1;text-align:center;min-width:0}
   .stat .l{font:800 10px/1 Inter,sans-serif;letter-spacing:.14em;color:var(--gold)}
   .stat .v{font:700 22px/1.2 Oswald,sans-serif;margin-top:3px;white-space:nowrap}
   #windV{display:flex;align-items:center;justify-content:center;gap:3px;font-size:17px}
   #windArrow{width:20px;height:20px;transition:transform .25s ease-out}
-  .bottom{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;gap:8px;padding:8px 10px calc(env(safe-area-inset-bottom) + 10px);
+  .bottom{position:fixed;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px calc(env(safe-area-inset-bottom) + 10px);
           background:linear-gradient(0deg,rgba(69,6,15,.96),rgba(122,12,29,.85));border-top:2px solid var(--gold);box-shadow:0 -4px 18px rgba(0,0,0,.35)}
   #bar{transition:opacity .2s} #bar.swinging{opacity:.18;pointer-events:none}
   .cbtn{width:46px;height:46px;flex:none;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);color:var(--gold);
@@ -37,10 +39,10 @@
   .club .n{font:700 21px/1.1 Oswald,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-l)}
   .club .n small{font-size:14px;color:#fff;margin-left:6px;letter-spacing:0}
   .club .i{font-size:12px;color:#f6dcb0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .pill{position:fixed;top:calc(env(safe-area-inset-top) + 78px);height:36px;padding:0 14px;border-radius:999px;border:2px solid var(--gold);
+  .pill{position:fixed;top:calc(env(safe-area-inset-top) + 99px);height:36px;padding:0 14px;border-radius:999px;border:2px solid var(--gold);
         background:var(--red-dd);color:var(--gold);font:800 12px Inter,sans-serif;letter-spacing:.08em;cursor:pointer}
   #viewBtn{right:10px} #exitBtn{left:10px}
-  #pinBox{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 78px);background:rgba(69,6,15,.85);border:1px solid var(--gold);
+  #pinBox{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 99px);background:rgba(69,6,15,.85);border:1px solid var(--gold);
           border-radius:999px;padding:6px 14px;font:700 15px Oswald,sans-serif;letter-spacing:.04em;pointer-events:none;white-space:nowrap}
   #pinBox b{color:var(--gold-l)}
   .disabled{opacity:.4;pointer-events:none}
@@ -50,7 +52,7 @@
   #banner .t{font:700 46px/1 Oswald,sans-serif;color:var(--gold-l);letter-spacing:.03em;text-transform:uppercase;text-shadow:0 3px 0 var(--red-d),0 6px 18px rgba(0,0,0,.55)}
   #banner .s{display:inline-block;margin-top:10px;font:700 14px Inter,sans-serif;background:rgba(69,6,15,.85);border:1px solid var(--gold);padding:6px 14px;border-radius:999px}
   #banner .s:empty{display:none}
-  #rating{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top) + 128px);text-align:center;pointer-events:none;
+  #rating{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top) + 149px);text-align:center;pointer-events:none;
           font:700 30px Oswald,sans-serif;letter-spacing:.06em;opacity:0;transition:opacity .2s;text-shadow:0 2px 0 var(--red-d),0 4px 12px rgba(0,0,0,.5)}
   #rating.show{opacity:1}
 
@@ -228,6 +230,7 @@
 
 <!-- ===== In-game HUD ===== -->
 <div class="top" id="hud">
+  <div class="brandbar">ChamiGolf</div>
   <div class="stat"><div class="l">HOLE</div><div class="v" id="hHole">1/6</div></div>
   <div class="stat"><div class="l">PAR</div><div class="v" id="hPar">4</div></div>
   <div class="stat"><div class="l">STROKE</div><div class="v" id="hStroke">0</div></div>
@@ -247,6 +250,7 @@
   <button class="cbtn" id="prevClub" aria-label="Previous club">◀</button>
   <div class="club" id="clubBtn" role="button" aria-label="Change club"><div class="chg">CHANGE CLUB &#9662;</div><div class="n"><span id="clubName">Driver</span><small id="clubStock"></small></div><div class="i" id="clubInfo"></div></div>
   <button class="cbtn" id="nextClub" aria-label="Next club">▶</button>
+  <div class="disclaim">Not affiliated with Chaminade High School in any way.</div>
 </div>
 
 <div id="banner"><div class="t"></div><div class="s"></div></div>
@@ -295,6 +299,7 @@
       <section id="tab-how" class="hidden"><div id="howBody"></div></section>
     </div>
   </main>
+  <div class="disclaim" style="padding:6px 0">Not affiliated with Chaminade High School in any way.</div>
   <nav class="tabs">
     <button data-tab="play" class="on"><span class="ic">⛳</span>Play</button>
     <button data-tab="golfer"><span class="ic">👔</span>Golfer</button>
@@ -329,14 +334,14 @@
   document.title = GAME_NAME; $('gameName').textContent = GAME_NAME;
 
   // ================= Rules =================
-  const CUP_R = 0.35, CUP_D = 0.42, BALL_R = 0.075, CAPTURE = 2.4, MAX_STROKES = 12;
+  const CUP_R = 0.225, CUP_D = 0.42, BALL_R = 0.075, CAPTURE = 2.4, MAX_STROKES = 12;
   const DECEL = { green: 2.6, fringe: 5.5, fairway: 6.5, tee: 6.5, rough: 22, sand: 60 };
   // Bounce: how much upward speed the ball keeps (REST) and forward speed it loses (SKID) on each landing.
   const REST = { tee: 0.42, fairway: 0.42, fringe: 0.36, green: 0.32, rough: 0.2, sand: 0.04 };
   const SKID = { tee: 0.1, fairway: 0.1, fringe: 0.14, green: 0.18, rough: 0.25, sand: 0.85 };
   const GRAV = 20;
-  // Sideways pull (-1 left .. 1 right) -> yards of curve. Right = slice, left = hook.
-  const curveOf = (lat, carry) => { const a = Math.abs(lat || 0); return a < 0.08 ? 0 : Math.sign(lat) * (a - 0.08) / 0.92 * carry * 0.24; };
+  // Sideways pull (-1 left .. 1 right) -> yards of planned curve. Pull right = fade (curves right), left = draw.
+  const curveOf = (lat, carry) => { const a = Math.abs(lat || 0); return a < 0.12 ? 0 : Math.sign(lat) * (a - 0.12) / 0.88 * carry * 0.13; };
   const LIE_MULT = { tee: 1, fairway: 1, fringe: 0.97, green: 0.95, rough: 0.85, sand: 0.6 };
   const LIE_NAME = { tee: 'Tee box', fairway: 'Fairway', fringe: 'Fringe', green: 'Green', rough: 'Rough', sand: 'Bunker' };
   // Every slot in the bag has several club models you can buy and swap in.
@@ -1045,7 +1050,7 @@
     } else {
       const ahead = Math.min(stockNow(), distToPin() + 20) * 0.55;
       // close behind the golfer so you can see the swing, still looking down the target line
-      dPos.set(ball.x - dx * 6.5 - dy * 0.6, 2.5, ball.y - dy * 6.5 + dx * 0.6); dLook.set(ball.x + dx * ahead, 0, ball.y + dy * ahead);
+      dPos.set(ball.x - dx * 9 - dy * 0.6, 2.4, ball.y - dy * 9 + dx * 0.6); dLook.set(ball.x + dx * ahead, 0, ball.y + dy * ahead);
     }
     return 6;
   }
@@ -1112,13 +1117,14 @@
     } else if (ptr.mode === 'swing') {
       ptr.x = e.clientX; ptr.y = e.clientY;
       swing.power = clamp(Math.max(0, ptr.y - ptr.y0) / pullPx(), 0, 1);
+      swing.lat = clamp((ptr.x - ptr.x0) / (pullPx() * 0.6), -1, 1);   // sideways = draw / fade
     }
   });
   function endPointer() {
     if (!ptr) return;
     if (ptr.mode === 'swing' && state === 'swinging') {
       if (swing.power < 0.03) { state = 'ready'; swing = null; }
-      else { strike = { power: swing.power, o: swing.o, lat: 0, t: 0, putt: !!CLUBS[clubIdx].putter }; state = 'striking'; }
+      else { strike = { power: swing.power, o: swing.o, lat: CLUBS[clubIdx].putter ? 0 : swing.lat, t: 0, putt: !!CLUBS[clubIdx].putter }; state = 'striking'; }
     }
     ptr = null;
   }
@@ -1189,12 +1195,13 @@
     const carryW = Math.max(3, carry * (1 + (along >= 0 ? 0.006 : 0.009) * along * hf));
     // Sideways curve from the needle (slice right / hook left, hooks bend harder) plus crosswind drift.
     const bend = (oe > 0 ? oe * 0.2 : oe * 0.3) * c.curve;
-    const side = bend * carry * lieErr + across * carry * 0.0065 * hf;
+    // plus the planned draw / fade from pulling back to the left / right
+    const side = bend * carry * lieErr + across * carry * 0.0065 * hf + curveOf(lat, carry);
     const D = { x: dir.x * carryW, y: dir.y * carryW }, Q = { x: right.x * side, y: right.y * side };
     const ex = ball.x + D.x + Q.x, ey = ball.y + D.y + Q.y;
     const tx = D.x + 2 * Q.x, ty = D.y + 2 * Q.y, tl = Math.hypot(tx, ty) || 1;
     const ignore = new Set(hole.allTrees.filter(t => Math.hypot(t.x - ball.x, t.y - ball.y) < t.r + 2));
-    const hMax = c.loft * clamp(Math.sqrt(power), 0.35, 1);
+    const hMax = apexOf(c, power, carryW);
     // Roll: tailwind, a pure strike and a hook run further; a slice and a mishit run less.
     const shapeRoll = oe === 0 ? 1 : (oe < 0 ? 1.15 : 0.9);
     const rollMul = clamp(1 + along * 0.012, 0.7, 1.35) * (oe === 0 ? 1.12 : 1 - 0.25 * aoe) * shapeRoll;
@@ -1361,8 +1368,8 @@
       strike.t += dt;
       if (strike.t >= (strike.putt ? 0.24 : 0.14)) {
         swingAnim = { putt: strike.putt, p: strike.power, t: 0 };
-        swing = { power: strike.power, o: strike.o, lat: 0, phase: 0 };
-        shoot(strike.power, strike.o, 0); strike = null;
+        swing = { power: strike.power, o: strike.o, lat: strike.lat, phase: 0 };
+        shoot(strike.power, strike.o, strike.lat); strike = null;
       }
     }
     if (swingAnim) swingAnim.t += dt;
@@ -1384,10 +1391,16 @@
     confetti = confetti.filter(p => p.life > 0 && p.y < innerHeight + 20);
   }
 
+  // How high a shot peaks. Full swings use the club's loft; short, soft swings stay low like a chip
+  // instead of popping straight up like a flop shot.
+  function apexOf(c, power, carry) {
+    return Math.min(c.loft * clamp(Math.sqrt(power), 0.35, 1), carry * (0.22 + 0.5 * clamp(power, 0, 1)));
+  }
+
   // ================= Render =================
   function setArc(dist, c, cv = 0) {
     const p = aimGeo.attributes.position.array, dx = Math.cos(aimAng), dy = Math.sin(aimAng);
-    const hMax = c.putter ? 0 : c.loft * clamp(Math.sqrt(dist / Math.max(1, stockNow(c))), 0.35, 1);
+    const hMax = c.putter ? 0 : apexOf(c, dist / Math.max(1, stockNow(c)), dist);
     for (let i = 0; i <= AIM_N; i++) {
       const s = i / AIM_N, k = cv * s * s;
       p[i * 3] = ball.x + dx * dist * s - dy * k;
@@ -1414,8 +1427,8 @@
     blob.visible = ballMesh.visible && !ball.inCup;
 
     const aiming = (state === 'ready' || state === 'swinging') && introT <= 0;
-    aimLine.visible = fullTarget.visible = aiming;
-    liveTarget.visible = aiming && state === 'swinging';
+    aimLine.visible = aiming;
+    fullTarget.visible = liveTarget.visible = false;   // just the aim line, no landing circles
     if (aiming) {
       const c = CLUBS[clubIdx], full = stockNow(c), dx = Math.cos(aimAng), dy = Math.sin(aimAng);
       const live = state === 'swinging' ? full * swing.power : full;
@@ -1521,7 +1534,7 @@
       const cvd = c.putter ? 0 : curveOf(swing.lat, yds);
       if (Math.abs(cvd) >= 1) {
         fctx.font = '800 14px Inter, sans-serif'; fctx.fillStyle = cvd > 0 ? '#ffab8a' : '#a8dcff';
-        fctx.fillText(cvd > 0 ? `SLICE ${Math.round(cvd)} YDS ▶` : `◀ HOOK ${Math.round(-cvd)} YDS`, bs.x, bs.y + pr + 67);
+        fctx.fillText(cvd > 0 ? `FADE ${Math.round(cvd)} YDS ▶` : `◀ DRAW ${Math.round(-cvd)} YDS`, bs.x, bs.y + pr + 67);
       }
 
       const gx = bs.x, gy = bs.y - 70, R = 78, span = Math.PI * 0.8;
@@ -1744,6 +1757,7 @@
         <p><b>Gold = perfect.</b> Dead straight, full distance and extra roll.</p>
         <p><b>Release right of gold → slice.</b> The ball starts a touch right and curves right. The further right, the bigger the slice. Slices roll out less.</p>
         <p><b>Release left of gold → hook.</b> The ball starts left and bends hard left. Hooks curve about 50% more than slices, so the far-left red zone sends it <b>way</b> left. Hooks run out more after landing.</p>
+        <p><b>Shape it on purpose:</b> while you pull back, slide your finger right for a <b>fade</b> (curves right) or left for a <b>draw</b> (curves left). The dotted line bends to show it. Putts don't curve.</p>
         <p><b>The needle gets faster</b> the harder you pull and the longer the club. Drivers are the hardest to time, wedges and putters the easiest. Every miss also loses a little distance.</p>
         <p><b>Putting:</b> the needle pushes (right) or pulls (left) the putt off line instead of curving it. When a putt gets close, the flag is pulled out of the hole.</p>
       </div>
