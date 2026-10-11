@@ -384,9 +384,9 @@
   // ================= Golfer looks =================
   const LOOK_PRESETS = [
     { name: 'Red & Gold', look: { jacket: '#B3122B', shirt: '#ffffff', tie: '#F2C14E', pants: '#1c1c22', shoes: '#111111', skin: '#e0ac7e', hair: '#3b2416' } },
-    { name: 'Brother', look: { jacket: '#111113', shirt: '#111113', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
+    { name: 'Brother Outfit', look: { jacket: '#111113', shirt: '#ffffff', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
     { name: 'Navy Blazer', look: { jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#b9a47c', shoes: '#4a2c17' } },
-    { name: 'Gold Jacket', look: { jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
+    { name: 'NHS Outfit', look: { jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
     { name: 'Charcoal', look: { jacket: '#3a3d42', shirt: '#bcd6f2', tie: '#1f2c4d', pants: '#3a3d42', shoes: '#111111' } },
   ];
   const SWATCHES = {
@@ -1673,7 +1673,7 @@
   function renderGolfer() {
     $('gName').value = save.name || '';
     $('presetRow').innerHTML = LOOK_PRESETS.map((p, i) =>
-      `<button data-preset="${i}"><i style="background:${p.look.jacket}"></i>${p.name}${p.name === 'Brother' ? ' (all black)' : ''}</button>`).join('');
+      `<button data-preset="${i}"><i style="background:${p.look.jacket}"></i>${p.name}</button>`).join('');
     $('lookRows').innerHTML = LOOK_PARTS.map(([k, label]) => {
       const cur = (save.look[k] || '').toLowerCase(), hit = SWATCHES[k].find(x => x[1].toLowerCase() === cur);
       return `<div class="lookrow"><div class="lh">${label}<b>${hit ? (k === 'skin' ? '' : hit[0]) : ''}</b></div><div class="sw">` +
