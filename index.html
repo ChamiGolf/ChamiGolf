@@ -920,15 +920,27 @@
     const blit = (g, L) => { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(L.canvas, 0, 0); g.restore(); };
     const g = mk(), rng = makeRng(h.yds * 7 + h.par);
 
+    // soft grain: tiny light/dark specks (sx = speck size in yards)
+    const grain = (gg, n, dark, light, sx, x0 = ox, y0 = oy, w = W, hh = Hh) => {
+      for (let i = 0; i < n; i++) {
+        gg.fillStyle = rng() < 0.5 ? dark : light;
+        gg.fillRect(x0 + rng() * w, y0 + rng() * hh, sx, sx);
+      }
+    };
+    // clumps: soft patches so grass isn't one flat colour
+    const clumps = (gg, n, rMin, rMax, dark, light) => {
+      for (let i = 0; i < n; i++) {
+        gg.fillStyle = rng() < 0.55 ? dark : light;
+        gg.beginPath(); gg.ellipse(ox + rng() * W, oy + rng() * Hh, rMin + rng() * (rMax - rMin), rMin + rng() * (rMax - rMin), rng() * 3, 0, Math.PI * 2); gg.fill();
+      }
+    };
+    const area = W * Hh, cap = maxPx * maxPx;
+
     g.fillStyle = pal.outer; g.fillRect(ox, oy, W, Hh);
     g.fillStyle = pal.rough; g.fillRect(b.x, b.y, b.w, b.h);
-    const speck = Math.min(W * Hh / 5, maxPx * maxPx / 40);
-    for (let i = 0; i < speck; i++) {
-      g.fillStyle = rng() < 0.5 ? 'rgba(0,0,0,.07)' : 'rgba(255,255,255,.05)';
-      g.fillRect(ox + rng() * W, oy + rng() * Hh, 0.7, 0.7);
-    }
-    g.fillStyle = 'rgba(255,255,255,.03)';
-    for (let y = b.y; y < b.y + b.h; y += 20) g.fillRect(b.x, y, b.w, 10);
+    clumps(g, Math.min(area / 30, cap / 900), 2, 9, 'rgba(15,45,5,.05)', 'rgba(200,245,150,.035)');
+    clumps(g, Math.min(area / 10, cap / 300), 0.6, 2, 'rgba(15,45,5,.06)', 'rgba(200,245,150,.04)');
+    grain(g, Math.min(area / 3, cap / 30), 'rgba(15,45,5,.09)', 'rgba(190,235,140,.05)', 0.6);
 
     g.lineCap = 'round'; g.lineJoin = 'round';
     const strokeFair = (gg, extra) => {
@@ -937,23 +949,52 @@
         gg.lineWidth = f.w + extra; gg.stroke();
       }
     };
-    g.strokeStyle = pal.fairEdge; strokeFair(g, 3);
-    const L = mk(); L.lineCap = 'round'; L.lineJoin = 'round'; L.strokeStyle = pal.fair; strokeFair(L, 0);
-    L.globalCompositeOperation = 'source-atop'; L.fillStyle = 'rgba(255,255,255,.09)';
-    for (let y = oy, k = 0; y < oy + Hh; y += 8, k++) if (k % 2) L.fillRect(ox, y, W, 8);
-    blit(g, L);
+    // edge where the rough meets the first cut: a thin shadow, then the darker first cut
+    g.strokeStyle = 'rgba(0,0,0,.22)'; strokeFair(g, 5.4);
+    g.strokeStyle = pal.fairEdge; strokeFair(g, 4);
+    // fairway: textured layer (fairway paint + mowing stripes + patchy tone + fine grain, clipped to its shape)
+    const fairLayer = (extra, rim) => {
+      const L = mk(); L.lineCap = 'round'; L.lineJoin = 'round'; L.strokeStyle = pal.fair; strokeFair(L, extra);
+      L.globalCompositeOperation = 'source-atop';
+      if (rim) { L.fillStyle = 'rgba(15,45,5,.08)'; L.fillRect(ox, oy, W, Hh); }
+      for (let y = oy, k = 0; y < oy + Hh; y += 8, k++) { L.fillStyle = k % 2 ? 'rgba(255,255,255,.11)' : 'rgba(15,45,5,.035)'; L.fillRect(ox, y, W, 8); }
+      clumps(L, Math.min(area / 40, cap / 1200), 2, 7, 'rgba(15,45,5,.035)', 'rgba(200,245,150,.03)');
+      if (!rim) grain(L, Math.min(area / 3, cap / 30), 'rgba(15,45,5,.07)', 'rgba(200,245,150,.06)', 0.45);
+      blit(g, L);
+    };
+    fairLayer(0, true);    // full width, slightly darker: leaves a soft inner rim
+    fairLayer(-3, false);  // main fairway on top
 
     for (const e of h.water) { ell(g, e, 1.4); g.fillStyle = '#5e7f45'; g.fill(); ell(g, e); g.fillStyle = '#1d5a8c'; g.fill(); }
 
     const t = h.tee;
+    g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(t.x - 7.4, t.y - 4.9, 14.8, 9.8);
     g.fillStyle = pal.tee; g.fillRect(t.x - 7, t.y - 4.5, 14, 9);
     g.fillStyle = 'rgba(255,255,255,.1)'; g.fillRect(t.x - 7, t.y - 4.5, 14, 3);
 
+    // fringe (collar): its own ring with a shadow line on the outside and fine grain
     const gr = h.green;
-    ell(g, gr, 2.5); g.fillStyle = pal.fringe; g.fill();
+    ell(g, gr, 3.1); g.fillStyle = 'rgba(0,0,0,.22)'; g.fill();
+    const F = mk(); ell(F, gr, 2.5); F.fillStyle = pal.fringe; F.fill();
+    F.globalCompositeOperation = 'source-atop';
+    for (let a = 0; a < 48; a++) {  // radial mowing on the collar
+      const an = a / 48 * Math.PI * 2;
+      F.strokeStyle = a % 2 ? 'rgba(200,245,150,.07)' : 'rgba(15,45,5,.05)'; F.lineWidth = 1.2;
+      F.beginPath(); F.moveTo(gr.x, gr.y); F.lineTo(gr.x + Math.cos(an) * (gr.rx + 4), gr.y + Math.sin(an) * (gr.ry + 4)); F.stroke();
+    }
+    const gx = gr.x - gr.rx - 3, gy = gr.y - gr.ry - 3, gw = gr.rx * 2 + 6, gh = gr.ry * 2 + 6, gd = Math.min(gw * gh * 3, cap / 30);
+    grain(F, gd, 'rgba(15,45,5,.09)', 'rgba(200,245,150,.06)', 0.45, gx, gy, gw, gh);
+    blit(g, F);
+    ell(g, gr, 0.35); g.fillStyle = 'rgba(0,0,0,.2)'; g.fill();
+    // green: tight cross-cut checkerboard, very fine grain, soft crown highlight
     const G = mk(); ell(G, gr); G.fillStyle = pal.green; G.fill();
-    G.globalCompositeOperation = 'source-atop'; G.fillStyle = 'rgba(0,0,0,.05)';
-    for (let y = gr.y - gr.ry, k = 0; y < gr.y + gr.ry; y += 2.5, k++) if (k % 2) G.fillRect(gr.x - gr.rx, y, gr.rx * 2, 2.5);
+    G.globalCompositeOperation = 'source-atop';
+    for (let y = gr.y - gr.ry, k = 0; y < gr.y + gr.ry; y += 2.5, k++) { G.fillStyle = k % 2 ? 'rgba(15,45,5,.055)' : 'rgba(200,245,150,.04)'; G.fillRect(gr.x - gr.rx, y, gr.rx * 2, 2.5); }
+    for (let x = gr.x - gr.rx, k = 0; x < gr.x + gr.rx; x += 2.5, k++) if (k % 2) { G.fillStyle = 'rgba(15,45,5,.035)'; G.fillRect(x, gr.y - gr.ry, 2.5, gr.ry * 2); }
+    grain(G, gd * 2, 'rgba(15,45,5,.05)', 'rgba(200,245,150,.05)', 0.3, gx, gy, gw, gh);
+    const rg = G.createRadialGradient(gr.x - gr.rx * 0.2, gr.y - gr.ry * 0.2, 0, gr.x, gr.y, Math.max(gr.rx, gr.ry));
+    rg.addColorStop(0, 'rgba(200,245,150,.08)'); rg.addColorStop(0.7, 'rgba(255,255,255,0)'); rg.addColorStop(1, 'rgba(15,45,5,.08)');
+    G.fillStyle = rg; G.fillRect(gr.x - gr.rx, gr.y - gr.ry, gr.rx * 2, gr.ry * 2);
     blit(g, G);
 
     for (const e of h.bunkers) {
@@ -1001,6 +1042,27 @@
     return new THREE.CanvasTexture(c);
   }
   const CUP_TEX = cupTexture();
+  // tileable grass detail: grey noise + short blade strokes, averages to 0.5 so far-away turf keeps its colour
+  function grassDetail() {
+    const N = 256, c = document.createElement('canvas'); c.width = N; c.height = N;
+    const g = c.getContext('2d'), r = makeRng(4242);
+    g.fillStyle = 'rgb(128,128,128)'; g.fillRect(0, 0, N, N);
+    const img = g.getImageData(0, 0, N, N), d = img.data;
+    for (let i = 0; i < d.length; i += 4) { const v = 128 + (r() - 0.5) * 70; d[i] = d[i + 1] = d[i + 2] = v; }
+    g.putImageData(img, 0, 0);
+    g.lineCap = 'round';
+    for (let i = 0; i < 2600; i++) {
+      const x = r() * N, y = r() * N, len = 3 + r() * 6, an = -Math.PI / 2 + (r() - 0.5) * 0.9, v = r() < 0.5 ? 70 : 190;
+      g.strokeStyle = `rgba(${v},${v},${v},.45)`; g.lineWidth = 1 + r() * 0.8;
+      for (const [dx, dy] of [[0, 0], [N, 0], [-N, 0], [0, N], [0, -N]]) {
+        g.beginPath(); g.moveTo(x + dx, y + dy); g.lineTo(x + dx + Math.cos(an) * len, y + dy + Math.sin(an) * len); g.stroke();
+      }
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return t;
+  }
+  const GRASS_DETAIL = grassDetail();
 
   let holeGroup = null, flagMesh = null, pinGroup = null, pinT = 0, pinPulled = false, disposables = [];
   function buildHole(h, course, maxPx = 2600) {
@@ -1011,6 +1073,13 @@
     const tex = new THREE.CanvasTexture(canvas);
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const gGeo = new THREE.PlaneGeometry(W, Hh), gMat = new THREE.MeshLambertMaterial({ map: tex });
+    // fine grass-blade detail tiled every ~3 yards so the turf has texture up close
+    gMat.onBeforeCompile = sh => {
+      sh.uniforms.detailMap = { value: GRASS_DETAIL };
+      sh.uniforms.detailRep = { value: new THREE.Vector2(W / 3, Hh / 3) };
+      sh.fragmentShader = 'uniform sampler2D detailMap;\nuniform vec2 detailRep;\n' + sh.fragmentShader.replace('#include <map_fragment>',
+        '#include <map_fragment>\n  float gd = texture2D(detailMap, vUv * detailRep).r;\n  diffuseColor.rgb *= 0.88 + 0.24 * gd;');
+    };
     disposables.push(tex, gGeo, gMat);
     const ground = new THREE.Mesh(gGeo, gMat);
     ground.rotation.x = -Math.PI / 2; ground.position.set(ox + W / 2, 0, oy + Hh / 2); ground.receiveShadow = true;
