@@ -662,15 +662,15 @@
     hair: [['Black', '#141010'], ['Dark brown', '#3b2416'], ['Brown', '#6a4527'], ['Blonde', '#d8b46a'], ['Red', '#9c3d1c'], ['Gray', '#9a9a9a']],
   };
   // What each colour costs in the shop (by swatch name). Skin tone and hair are always free.
-  const PRICES = {
-    jacket: { 'Off-white': 2400, Black: 600, Navy: 500, Charcoal: 400, Gray: 300, Red: 0, Maroon: 800, Gold: 3000, Royal: 1200, Green: 1500, Brown: 700, Tan: 900, White: 2000 },
-    shirt: { White: 0, 'Light blue': 150, Pink: 250, Lavender: 300, Gray: 150, Gold: 500, Red: 400, Black: 600 },
-    tie: { Red: 150, Gold: 0, Navy: 150, Black: 200, Maroon: 250, Green: 350, Purple: 600, Silver: 800, 'Light blue': 300, White: 500 },
-    pants: { Black: 150, Navy: 200, Charcoal: 250, Gray: 300, Khaki: 400, Brown: 450, Red: 1200, White: 1500 },
+  const PRICES = {   // ranked by how clean and premium each colour looks: the classiest cost the most
+    jacket: { Red: 0, Gray: 300, Brown: 400, Tan: 500, Maroon: 700, Green: 900, Royal: 1100, Charcoal: 1300, Navy: 1500, Black: 1800, White: 2200, 'Off-white': 2600, Gold: 3200 },
+    shirt: { White: 0, Gray: 150, Pink: 200, Lavender: 250, Red: 300, Gold: 400, 'Light blue': 500, Black: 700 },
+    tie: { Gold: 0, Green: 150, 'Light blue': 200, Maroon: 250, White: 300, Purple: 400, Red: 500, Black: 600, Navy: 700, Silver: 900 },
+    pants: { Brown: 150, Red: 200, Khaki: 300, Gray: 450, Charcoal: 600, Navy: 750, Black: 900, White: 1500 },
     shoes: { Black: 0, Brown: 400, White: 900 },
-    trim: { Gold: 0, White: 400, Red: 500, Navy: 500, Black: 400, Silver: 1200 },
-    'bag-trim': { Gold: 0, Red: 200, White: 200, Black: 200, Navy: 250, Silver: 600 },
-    'bag-covers': { Gold: 0, Red: 200, Black: 200, White: 250, Navy: 250, Green: 300 },
+    trim: { Gold: 0, Red: 300, Navy: 400, Black: 500, White: 700, Silver: 1200 },
+    'bag-trim': { Gold: 0, Red: 150, Navy: 200, Black: 250, White: 350, Silver: 600 },
+    'bag-covers': { Gold: 0, Green: 150, Red: 200, Navy: 250, Black: 300, White: 400 },
   };
   const LOOK_PARTS = [['style', 'Top'], ['jacket', 'Suit jacket'], ['trim', 'Sleeve stripe'], ['shirt', 'Shirt'], ['tie', 'Tie'], ['pants', 'Dress pants'],
     ['shoes', 'Shoes'], ['skin', 'Skin tone'], ['hair', 'Hair']];
