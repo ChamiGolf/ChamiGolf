@@ -27,30 +27,71 @@
   .stat .v{font:700 22px/1.2 Oswald,sans-serif;margin-top:3px;white-space:nowrap}
   #windV{display:flex;align-items:center;justify-content:center;gap:3px;font-size:17px}
   #windArrow{width:20px;height:20px;transition:transform .25s ease-out}
-  .bottom{position:fixed;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px calc(env(safe-area-inset-bottom) + 10px);
-          background:linear-gradient(0deg,rgba(69,6,15,.96),rgba(122,12,29,.85));border-top:2px solid var(--gold);box-shadow:0 -4px 18px rgba(0,0,0,.35)}
-  #bar{transition:opacity .2s} #bar.swinging{opacity:.18;pointer-events:none}
-  .cbtn{width:46px;height:46px;flex:none;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);color:var(--gold);
-        font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
-  .cbtn:active{transform:scale(.94)}
-  .club{flex:1;text-align:center;min-width:0;cursor:pointer;border-radius:14px;padding:5px 6px 6px;border:2px solid var(--gold);background:linear-gradient(180deg,#9b1228,#5c0815);box-shadow:0 3px 0 #8a6416}
-  .club .chg{display:inline-block;font:800 10px Inter,sans-serif;letter-spacing:.14em;color:var(--red-dd);background:var(--gold);border-radius:999px;padding:2px 9px;margin-bottom:3px}
-  .club:active{transform:translateY(2px);box-shadow:0 1px 0 #8a6416}
-  .club .n{font:700 21px/1.1 Oswald,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-l)}
-  .club .n small{font-size:14px;color:#fff;margin-left:6px;letter-spacing:0}
-  .club .i{font-size:12px;color:#f6dcb0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* club wheel: a round button in the corner; tap it and your clubs fan out around it. The – folds it into the corner. */
+  #bar{position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom) + 16px);width:96px;height:96px;z-index:4;transition:opacity .2s,width .2s,height .2s}
+  #bar.swinging{opacity:.18;pointer-events:none}
+  #bar .chub{position:absolute;inset:0;border-radius:50%;border:3px solid var(--gold);cursor:pointer;padding:0;
+             background:radial-gradient(circle at 35% 30%,#c8172f,#5c0815 75%);box-shadow:0 6px 18px rgba(0,0,0,.5),inset 0 -4px 0 rgba(0,0,0,.25);
+             display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+  #bar .chub:active{transform:scale(.95)}
+  #bar .cs{font:700 30px/1 Oswald,sans-serif;color:var(--gold-l);letter-spacing:.02em}
+  #bar .cy{font:700 13px/1.2 Inter,sans-serif;color:#fff;margin-top:2px}
+  #bar .ck{font:800 8px Inter;letter-spacing:.14em;color:var(--gold);margin-top:2px}
+  #bar .clab{position:absolute;right:106px;bottom:22px;text-align:right;white-space:nowrap;pointer-events:none;background:rgba(69,6,15,.88);border:1px solid var(--gold);
+             border-radius:12px;padding:5px 11px;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+  #bar .clab .n{font:700 16px/1.1 Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.04em}
+  #bar .clab .i{font:600 11px Inter,sans-serif;color:#f6dcb0;margin-top:1px}
+  #bar .cmin{position:absolute;left:-6px;top:-6px;width:28px;height:28px;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);color:var(--gold-l);
+             font:800 16px/1 Inter;cursor:pointer;padding:0;z-index:2}
+  #bar .rc{position:absolute;left:26px;top:26px;width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);background:linear-gradient(180deg,#9b1228,#45060f);
+           color:#fff;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;
+           transform:translate(0,0) scale(.3);transition:transform .22s ease-out,opacity .18s;box-shadow:0 4px 10px rgba(0,0,0,.45)}
+  #bar .rc b{font:700 15px/1 Oswald,sans-serif;color:var(--gold-l)}
+  #bar .rc small{font:700 9.5px/1.1 Inter;color:#fff}
+  #bar .rc.on{background:linear-gradient(180deg,var(--gold-l),var(--gold-d));border-color:#fff}
+  #bar .rc.on b,#bar .rc.on small{color:var(--red-dd)}
+  #bar .rc.rec::after{content:'★';position:absolute;top:-7px;right:-4px;font-size:12px;color:var(--gold-l);text-shadow:0 1px 2px #000}
+  #bar.open .rc{opacity:1;pointer-events:auto}
+  #bar.open .clab{display:none}
+  #bar.min{width:56px;height:56px}
+  #bar.min .cs{font-size:18px}
+  #bar.min .cy,#bar.min .ck,#bar.min .clab{display:none}
+  #bar.min .cmin{width:22px;height:22px;font-size:13px;left:-6px;top:-6px}
   .pill{position:fixed;top:calc(env(safe-area-inset-top) + 99px);height:36px;padding:0 14px;border-radius:999px;border:2px solid var(--gold);
         background:var(--red-dd);color:var(--gold);font:800 12px Inter,sans-serif;letter-spacing:.08em;cursor:pointer}
   #viewBtn{right:10px} #exitBtn{left:10px}
   #pinBox{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 99px);background:rgba(69,6,15,.85);border:1px solid var(--gold);
           border-radius:999px;padding:6px 14px;font:700 15px Oswald,sans-serif;letter-spacing:.04em;pointer-events:none;white-space:nowrap}
   #pinBox b{color:var(--gold-l)}
-  #reader{position:fixed;right:10px;top:calc(env(safe-area-inset-top) + 143px);width:136px;background:rgba(69,6,15,.9);border:2px solid var(--gold);
-          border-radius:14px;padding:6px 6px 7px;pointer-events:none;z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.35)}
-  #reader .rh{font:800 9px Inter,sans-serif;letter-spacing:.16em;color:var(--gold);text-align:center;margin-bottom:5px}
-  #reader canvas{width:120px;height:120px;display:block;margin:0 auto;border-radius:10px}
-  #reader .rb{font:700 15px/1.1 Oswald,sans-serif;text-align:center;color:var(--gold-l);margin-top:6px;letter-spacing:.02em}
-  #reader .rs{font:600 11px/1.3 Inter,sans-serif;color:#f3d7a8;text-align:center;margin-top:2px}
+  /* right-hand panel: green heat map on top, hole mini-map below; folds away to a tab */
+  #side{position:fixed;right:10px;top:calc(env(safe-area-inset-top) + 143px);width:178px;z-index:3;pointer-events:none;
+        background:rgba(12,14,18,.82);border:1.5px solid rgba(255,255,255,.35);border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  #side .shead{pointer-events:auto;display:flex;align-items:center;justify-content:space-between;width:100%;border:0;cursor:pointer;
+        background:linear-gradient(90deg,#7A0C1D,#B3122B);color:var(--gold-l);font:800 10px Inter,sans-serif;letter-spacing:.14em;padding:7px 10px}
+  #side .shead b{font-size:12px;transition:transform .2s}
+  #side.closed{width:auto}
+  #side.closed .sbody{display:none}
+  #side.closed .shead b{transform:rotate(-90deg)}
+  #side .ghd{display:flex;justify-content:space-between;align-items:center;padding:5px 8px 3px;font:700 11px Inter,sans-serif;color:#fff}
+  #side .ghd span:last-child{color:#9fe3ff}
+  #side canvas{display:block;width:178px}
+  #greenCv{height:126px}
+  #mapCv{height:196px;border-top:1px solid rgba(255,255,255,.25)}
+  #side .rb{font:700 14px/1.1 Oswald,sans-serif;text-align:center;color:var(--gold-l);padding:5px 6px 0;letter-spacing:.02em}
+  #side .rs{font:600 10.5px/1.3 Inter,sans-serif;color:#f3d7a8;text-align:center;padding:1px 6px 6px}
+  #side .mm{position:relative}
+  #side .mmchips{position:absolute;left:6px;bottom:6px;display:flex;flex-direction:column;gap:3px}
+  #side .mmchips div{display:flex;gap:6px;align-items:baseline;background:rgba(0,0,0,.62);border-radius:6px;padding:2px 7px;font:600 10px Inter,sans-serif;color:#ddd}
+  #side .mmchips b{font:700 12px Inter,sans-serif;color:#fff}
+  #side .mmchips div:nth-child(2) b{color:#FFE08A}
+  #side .mmchips div:nth-child(3) b{color:#ff6b6b}
+  /* floating pin marker over the flag */
+  #pinMark{position:fixed;left:0;top:0;z-index:2;pointer-events:none;display:none;flex-direction:column;align-items:center;transform:translate(-50%,-100%)}
+  #pinMark .pm{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#111;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.5);
+               display:flex;align-items:center;justify-content:center}
+  #pinMark .pm svg{transform:rotate(45deg);width:20px;height:20px}
+  #pinMark .pd{margin-top:6px;font:800 12px Inter,sans-serif;color:#fff;background:rgba(0,0,0,.6);border-radius:999px;padding:2px 8px;white-space:nowrap}
+  #pinMark.edge .pm{border-color:var(--gold-l)}
   .disabled{opacity:.4;pointer-events:none}
 
   #banner{position:fixed;left:0;right:0;top:30%;text-align:center;pointer-events:none;opacity:0;transform:scale(.8);transition:opacity .25s,transform .25s}
@@ -214,6 +255,16 @@
   .pcard.locked .mini{filter:grayscale(.6) brightness(.7)}
   .pcard .lk{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;filter:none}
   .pcard small{display:block;font:800 9px Inter;letter-spacing:.14em;color:var(--gold);margin-top:-3px}
+  .sw button{position:relative}
+  .sw button.buy{opacity:.85}
+  .sw button.buy em{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);font:800 8.5px Inter;font-style:normal;color:#45060f;background:var(--gold);
+                     border-radius:999px;padding:1px 4px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+  .sw{row-gap:12px}
+  .buybar{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--gold)}
+  .buybar .bsw{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.6);flex:none}
+  .buybar .bi{flex:1;min-width:0;display:flex;flex-direction:column}
+  .buybar .bi b{font:700 15px Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.03em}
+  .buybar .bi span{font-size:12px;color:#f3d7a8}
   .locknote{margin-top:10px;background:rgba(0,0,0,.28);border:1px dashed rgba(242,193,78,.5);border-radius:12px;padding:10px 12px;font-size:13px;color:#f3d7a8;line-height:1.4}
   .locknote b{color:var(--gold-l)}
   .chiprow{display:flex;flex-wrap:wrap;gap:6px}
@@ -376,13 +427,23 @@
 <button class="pill" id="exitBtn">✕ QUIT</button>
 <div id="pinBox">PIN <b id="pinYds">0</b> YDS</div>
 <button class="pill" id="viewBtn">MAP</button>
-<div id="reader" style="display:none"><div class="rh">GREEN READER</div><canvas id="readerCv" width="236" height="236"></canvas>
-  <div class="rb" id="readerBreak">Straight</div><div class="rs" id="readerSlope"></div></div>
+<div id="side" style="display:none">
+  <button class="shead" id="sideToggle"><span>🗺️ GREEN &amp; HOLE MAP</span><b>▾</b></button>
+  <div class="sbody">
+    <div class="ghd"><span id="gHead">Green</span><span id="gSlope"></span></div>
+    <canvas id="greenCv" width="356" height="252"></canvas>
+    <div id="readerBox"><div class="rb" id="readerBreak"></div><div class="rs" id="readerSlope"></div></div>
+    <div class="mm"><canvas id="mapCv" width="356" height="392"></canvas>
+      <div class="mmchips"><div><span>Next</span><b id="mmNext"></b></div><div><span>Dist</span><b id="mmDist"></b></div><div><span>Height</span><b id="mmHt"></b></div></div></div>
+  </div>
+</div>
+<div id="pinMark"><div class="pm"><svg viewBox="0 0 20 20"><path d="M5 2v16" stroke="#fff" stroke-width="2"/><path d="M6 3h10l-3 3.5 3 3.5H6z" fill="#e3212f"/></svg></div><div class="pd" id="pinMarkD"></div></div>
 
-<div class="bottom" id="bar">
-  <button class="cbtn" id="prevClub" aria-label="Previous club">◀</button>
-  <div class="club" id="clubBtn" role="button" aria-label="Change club"><div class="chg">CHANGE CLUB &#9662;</div><div class="n"><span id="clubName">Driver</span><small id="clubStock"></small></div><div class="i" id="clubInfo"></div></div>
-  <button class="cbtn" id="nextClub" aria-label="Next club">▶</button>
+<div id="bar">
+  <div id="cRing"></div>
+  <div class="clab"><div class="n" id="clubName">Driver</div><div class="i" id="clubInfo"></div></div>
+  <button class="chub" id="clubBtn" aria-label="Change club"><span class="cs" id="clubShort">DR</span><span class="cy" id="clubStock"></span><span class="ck">CLUBS</span></button>
+  <button class="cmin" id="cMin" aria-label="Fold the club button into the corner">–</button>
   <div class="disclaim">Not affiliated with Chaminade High School in any way.</div>
 </div>
 
@@ -580,10 +641,10 @@
   // ================= Golfer looks =================
   const LOOK_PRESETS = [
     { name: 'Red & Gold', look: { style: 'suit', jacket: '#B3122B', shirt: '#ffffff', tie: '#F2C14E', pants: '#1c1c22', shoes: '#111111', trim: '#F2C14E', skin: '#e0ac7e', hair: '#3b2416' } },
-    { name: 'Classic Outfit', look: { style: 'suit', jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#1f2c4d', shoes: '#111111' } },
+    { name: 'Classic Outfit', price: 1500, look: { style: 'suit', jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#1f2c4d', shoes: '#111111' } },
     { name: 'Senior Sweater', lock: 'senior', look: { style: 'sweater', jacket: '#f4f1ea', trim: '#F2C14E', shirt: '#bcd6f2', tie: '#2747a8', pants: '#8a8d93', shoes: '#111111' } },
-    { name: 'Brother Outfit', look: { style: 'suit', jacket: '#111113', shirt: '#ffffff', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
-    { name: 'NHS Outfit', look: { style: 'suit', jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
+    { name: 'Brother Outfit', price: 1800, look: { style: 'suit', jacket: '#111113', shirt: '#ffffff', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
+    { name: 'NHS Outfit', price: 4000, look: { style: 'suit', jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
   ];
   const SWATCHES = {
     jacket: [['Off-white', '#f4f1ea'], ['Black', '#111113'], ['Navy', '#1f2c4d'], ['Charcoal', '#3a3d42'], ['Gray', '#7d8088'], ['Red', '#B3122B'], ['Maroon', '#6b0f1e'],
@@ -599,6 +660,17 @@
     // (the senior sweater's own colour is in the jacket list: Off-white)
     skin: [['1', '#f6d2b5'], ['2', '#e0ac7e'], ['3', '#c68a5e'], ['4', '#9a643f'], ['5', '#6b4026'], ['6', '#4a2c1a']],
     hair: [['Black', '#141010'], ['Dark brown', '#3b2416'], ['Brown', '#6a4527'], ['Blonde', '#d8b46a'], ['Red', '#9c3d1c'], ['Gray', '#9a9a9a']],
+  };
+  // What each colour costs in the shop (by swatch name). Skin tone and hair are always free.
+  const PRICES = {
+    jacket: { 'Off-white': 2400, Black: 600, Navy: 500, Charcoal: 400, Gray: 300, Red: 0, Maroon: 800, Gold: 3000, Royal: 1200, Green: 1500, Brown: 700, Tan: 900, White: 2000 },
+    shirt: { White: 0, 'Light blue': 150, Pink: 250, Lavender: 300, Gray: 150, Gold: 500, Red: 400, Black: 600 },
+    tie: { Red: 150, Gold: 0, Navy: 150, Black: 200, Maroon: 250, Green: 350, Purple: 600, Silver: 800, 'Light blue': 300, White: 500 },
+    pants: { Black: 150, Navy: 200, Charcoal: 250, Gray: 300, Khaki: 400, Brown: 450, Red: 1200, White: 1500 },
+    shoes: { Black: 0, Brown: 400, White: 900 },
+    trim: { Gold: 0, White: 400, Red: 500, Navy: 500, Black: 400, Silver: 1200 },
+    'bag-trim': { Gold: 0, Red: 200, White: 200, Black: 200, Navy: 250, Silver: 600 },
+    'bag-covers': { Gold: 0, Red: 200, Black: 200, White: 250, Navy: 250, Green: 300 },
   };
   const LOOK_PARTS = [['style', 'Top'], ['jacket', 'Suit jacket'], ['trim', 'Sleeve stripe'], ['shirt', 'Shirt'], ['tie', 'Tie'], ['pants', 'Dress pants'],
     ['shoes', 'Shoes'], ['skin', 'Skin tone'], ['hair', 'Hair']];
@@ -640,7 +712,7 @@
     longest: 0, earnedTotal: 0, strokesTotal: 0, parTotal: 0, roundsBy: {}, bestBy: {},
     albatross: 0, chipIns: 0, sandHoles: 0, longPutts: 0, underPar: 0, miniAces: 0 });
   const freshSave = () => ({ coins: 0, lv: {}, ball: 0, course: 'pines', stats: freshStats(), bag: STARTER_BAG.slice(), owned: STARTER_BAG.slice(),
-    name: 'Player', look: Object.assign({}, LOOK_PRESETS[0].look), gbag: Object.assign({}, BAG_PRESETS[0].bag), board: {} });
+    name: 'Player', look: Object.assign({}, LOOK_PRESETS[0].look), gbag: Object.assign({}, BAG_PRESETS[0].bag), board: {}, awards: {}, unlocks: {}, ownedLook: {} });
   let save = freshSave();
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -662,6 +734,22 @@
   if (save.look.style !== 'sweater' || !save.unlocks.senior) save.look.style = 'suit';
   save.gbag = Object.assign({}, BAG_PRESETS[0].bag, save.gbag || {});
   save.awards = save.awards || {};
+  // ---- Shop: which colours you own ----
+  save.ownedLook = save.ownedLook || {};
+  const ckey = (part, hex) => `${part}:${String(hex).toLowerCase()}`;
+  const swList = part => part.startsWith('bag-') ? BAG_SWATCHES[part.slice(4)] : SWATCHES[part];
+  function priceOf(part, hex) {
+    const table = PRICES[part]; if (!table) return 0;
+    const sw = (swList(part) || []).find(x => x[1].toLowerCase() === String(hex).toLowerCase());
+    return sw && table[sw[0]] != null ? table[sw[0]] : 0;
+  }
+  const ownsC = (part, hex) => priceOf(part, hex) === 0 || !!save.ownedLook[ckey(part, hex)];
+  const grantC = (part, hex) => { save.ownedLook[ckey(part, hex)] = 1; };
+  // you keep whatever you're already wearing, plus the starter outfit and the Chaminade bag
+  ['jacket', 'shirt', 'tie', 'pants', 'shoes', 'trim'].forEach(k => { grantC(k, LOOK_PRESETS[0].look[k]); if (save.look[k]) grantC(k, save.look[k]); });
+  ['trim', 'covers'].forEach(k => { grantC('bag-' + k, BAG_PRESETS[0].bag[k]); if (save.gbag[k]) grantC('bag-' + k, save.gbag[k]); });
+  const OUTFIT_PARTS = ['jacket', 'shirt', 'tie', 'pants', 'shoes', 'trim'];
+  const presetOwned = p => !p.price || OUTFIT_PARTS.every(k => p.look[k] == null || ownsC(k, p.look[k]));
 
   // ================= Achievements =================
   // [id, icon, name, how, progress(stats) → [have, need], reward money]
@@ -1916,6 +2004,7 @@
     holeGroup = new THREE.Group(); scene.add(holeGroup);
     const pal = course.pal;
     const { canvas, ox, oy, W, H: Hh } = paintHole(h, pal, maxPx);
+    h.paint = { canvas, ox, oy, W, H: Hh };
     const tex = new THREE.CanvasTexture(canvas);
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const gcx = ox + W / 2, gcz = oy + Hh / 2;
@@ -2212,9 +2301,8 @@
   const pullPx = () => Math.min(210, innerHeight * 0.24);
   let frameK = 0, barTopPx = 0;
   const frameV = new THREE.Vector3();
-  function barTop() {
-    if (!barTopPx) { const r = $('bar').getBoundingClientRect(); if (r.height) barTopPx = r.top; }
-    return barTopPx || innerHeight * 0.88;
+  function barTop() {   // the club wheel sits in the corner now, so the ball can sit lower on screen
+    return innerHeight - 24;
   }
   const aimBallY = () => barTop() - pullPx() - 36;   // finger at full pull stays 36px above the bar
   let camLift = 0, camFloor = 0; const liftLook = new THREE.Vector3();
@@ -2254,6 +2342,7 @@
 
   glCanvas.addEventListener('pointerdown', e => {
     ensureAudio();
+    if ($('bar').classList.contains('open')) { wheelOpen(false); return; }
     if (state !== 'ready' || introT > 0) return;
     try { glCanvas.setPointerCapture(e.pointerId); } catch (_) {}
     if (viewMode === 'overview') {
@@ -2293,9 +2382,32 @@
   glCanvas.addEventListener('pointercancel', () => { if (state === 'swinging') { state = 'ready'; swing = null; } ptr = null; });
 
   function setClub(i) { if (state !== 'ready' || (hole && hole.mini)) return; clubIdx = (i + CLUBS.length) % CLUBS.length; sfx.click(); }
-  $('prevClub').addEventListener('click', () => setClub(clubIdx - 1));
-  $('nextClub').addEventListener('click', () => setClub(clubIdx + 1));
-  $('clubBtn').addEventListener('click', openSheet);
+  // ---- club wheel ----
+  save.ui = save.ui || {};
+  function wheelOpen(open) {
+    const bar = $('bar');
+    if (open && (state !== 'ready' || (hole && hole.mini))) return;
+    bar.classList.toggle('open', open);
+    if (!open) { [...$('cRing').children].forEach(b => b.style.transform = ''); return; }
+    const n = CLUBS.length, R = 164, a0 = 173, a1 = 281;
+    $('cRing').innerHTML = CLUBS.map((c, i) => `<button class="rc${i === clubIdx ? ' on' : ''}${i === recIdx ? ' rec' : ''}" data-i="${i}"><b>${c.short}</b><small>${Math.round(stockNow(c))}</small></button>`).join('');
+    requestAnimationFrame(() => [...$('cRing').children].forEach((b, i) => {
+      const a = (a0 + (a1 - a0) * i / (n - 1)) * DEG;
+      b.style.transitionDelay = `${i * 18}ms`; b.style.transform = `translate(${Math.cos(a) * R}px, ${Math.sin(a) * R}px) scale(1)`;
+    }));
+    sfx.click();
+  }
+  $('clubBtn').addEventListener('click', () => {
+    ensureAudio();
+    if ($('bar').classList.contains('min')) { $('bar').classList.remove('min'); save.ui.wheelMin = false; persist(); sfx.click(); return; }
+    wheelOpen(!$('bar').classList.contains('open'));
+  });
+  $('cRing').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setClub(+b.dataset.i); wheelOpen(false); });
+  $('cMin').addEventListener('click', () => {
+    ensureAudio(); sfx.click(); wheelOpen(false);
+    const m = !$('bar').classList.contains('min'); $('bar').classList.toggle('min', m); $('cMin').textContent = m ? '+' : '–'; save.ui.wheelMin = m; persist();
+  });
+  if (save.ui.wheelMin) { $('bar').classList.add('min'); $('cMin').textContent = '+'; }
   $('viewBtn').addEventListener('click', () => { if (state !== 'ready') return; viewMode = viewMode === 'overview' ? 'normal' : 'overview'; sfx.click(); });
   $('exitBtn').addEventListener('click', () => { if (confirm('Quit this round? Your progress on this round will be lost.')) showHome(); });
   window.addEventListener('keydown', e => {
@@ -2876,60 +2988,112 @@
     }
     return path;
   }
-  function updateReader() {
-    const playing = hole && (state === 'ready' || state === 'swinging' || state === 'striking') && viewMode === 'normal';
-    const lie = playing ? terrainAt(ball) : '';
-    const show = playing && slopeLie(hole, lie) && CLUBS[clubIdx].putter;
-    $('reader').style.display = show ? '' : 'none';
-    if (!show) { readerKey = ''; return; }
-    const key = `${ball.x.toFixed(2)},${ball.y.toFixed(2)},${aimAng.toFixed(2)},${holeIdx}`;
-    if (key === readerKey) return;
-    readerKey = key;
-    const cv = $('readerCv'), g = cv.getContext('2d'), S = cv.width, a = aimAng;
-    const f = { x: Math.cos(a), y: Math.sin(a) }, rt = { x: -f.y, y: f.x };
-    const pin = hole.pin, d = distToPin(), span = Math.max(6, d * 1.5);
-    const c = { x: (ball.x + pin.x) / 2, y: (ball.y + pin.y) / 2 }, sc = S / span;
-    const toC = p => { const dx = p.x - c.x, dy = p.y - c.y; return [S / 2 + (dx * rt.x + dy * rt.y) * sc, S / 2 - (dx * f.x + dy * f.y) * sc]; };
-    const toW = (X, Y) => { const lx = (X - S / 2) / sc, ly = (S / 2 - Y) / sc; return { x: c.x + rt.x * lx + f.x * ly, y: c.y + rt.y * lx + f.y * ly }; };
-    // height shading
-    const N = 28, cell = S / N, hs = [];
-    let lo = Infinity, hi = -Infinity;
-    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
-      const w = toW((i + 0.5) * cell, (j + 0.5) * cell), on = slopeLie(hole, terrainAt(w)), z = terrainH(hole, w.x, w.y);
-      hs.push(on ? z : null); if (on) { lo = Math.min(lo, z); hi = Math.max(hi, z); }
+  // ---- Side panel: green heat map (blue = low, red = high, arrows run downhill) and an overhead hole map ----
+  save.ui = save.ui || {};
+  if (save.ui.side == null) save.ui.side = innerWidth >= 700;
+  const heat = k => {   // blue → cyan → green → yellow → red
+    const st = [[30, 70, 200], [40, 190, 230], [60, 200, 90], [245, 215, 60], [230, 60, 40]], x = clamp(k, 0, 1) * 4, i = Math.min(3, Math.floor(x)), f = x - i;
+    return st[i].map((v, j) => Math.round(v + (st[i + 1][j] - v) * f));
+  };
+  const greenLie = t => hole.mini ? t === 'green' : (t === 'green' || t === 'fringe');
+  let greenKey = '', mapKey = '';
+  const heatCv = document.createElement('canvas'); heatCv.width = 72; heatCv.height = 51;
+  function drawGreen() {
+    const cv = $('greenCv'), g = cv.getContext('2d'), Wc = cv.width, Hc = cv.height, a = aimAng;
+    const f = { x: Math.cos(a), y: Math.sin(a) }, rt = { x: -f.y, y: f.x }, pin = hole.pin;
+    let c, span;
+    if (hole.mini) { c = { x: (ball.x + pin.x) / 2, y: (ball.y + pin.y) / 2 }; span = Math.max(6, distToPin() * 1.5); }
+    else { const gr = hole.green; c = { x: gr.x, y: gr.y }; span = Math.max(gr.rx, gr.ry) * 2 + 8; }
+    const sc = Wc / span;
+    const toC = p => { const dx = p.x - c.x, dy = p.y - c.y; return [Wc / 2 + (dx * rt.x + dy * rt.y) * sc, Hc / 2 - (dx * f.x + dy * f.y) * sc]; };
+    const toW = (X, Y) => { const lx = (X - Wc / 2) / sc, ly = (Hc / 2 - Y) / sc; return { x: c.x + rt.x * lx + f.x * ly, y: c.y + rt.y * lx + f.y * ly }; };
+    // heat map on a small grid, smoothed up to size
+    const hw = heatCv.width, hh = heatCv.height, hg = heatCv.getContext('2d'), img = hg.createImageData(hw, hh), zs = new Float32Array(hw * hh);
+    let lo = Infinity, hi = -Infinity, maxS = 0;
+    for (let j = 0; j < hh; j++) for (let i = 0; i < hw; i++) {
+      const w = toW((i + 0.5) * Wc / hw, (j + 0.5) * Hc / hh), on = greenLie(terrainAt(w));
+      const z = on ? terrainH(hole, w.x, w.y) : NaN; zs[j * hw + i] = z;
+      if (on) { lo = Math.min(lo, z); hi = Math.max(hi, z); }
     }
-    const rng = Math.max(hi - lo, 0.05);
-    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
-      const z = hs[j * N + i];
-      if (z == null) g.fillStyle = '#3d2a14';
-      else { const k = (z - lo) / rng; g.fillStyle = `rgb(${Math.round(40 + 120 * k)},${Math.round(120 + 105 * k)},${Math.round(50 + 80 * k)})`; }
-      g.fillRect(i * cell, j * cell, cell + 1, cell + 1);
+    const rg = Math.max(hi - lo, 0.04);
+    for (let k = 0; k < zs.length; k++) {
+      const z = zs[k];
+      if (isNaN(z)) { img.data[k * 4 + 3] = 0; continue; }
+      const [r, gg, b] = heat((z - lo) / rg), band = Math.abs(((z - lo) / rg * 8) % 1 - 0.5) < 0.06 ? 0.75 : 1;   // faint contour lines
+      img.data[k * 4] = r * band; img.data[k * 4 + 1] = gg * band; img.data[k * 4 + 2] = b * band; img.data[k * 4 + 3] = 255;
     }
+    hg.putImageData(img, 0, 0);
+    g.clearRect(0, 0, Wc, Hc); g.fillStyle = '#1d2a1c'; g.fillRect(0, 0, Wc, Hc);
+    g.imageSmoothingEnabled = true; g.drawImage(heatCv, 0, 0, Wc, Hc);
     // downhill arrows
-    let maxS = 0.001; const arr = [];
-    for (let j = 0; j < 6; j++) for (let i = 0; i < 6; i++) {
-      const X = (i + 0.5) * S / 6, Y = (j + 0.5) * S / 6, w = toW(X, Y);
-      if (!slopeLie(hole, terrainAt(w))) continue;
+    g.strokeStyle = 'rgba(255,255,255,.9)'; g.fillStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 2;
+    for (let j = 0; j < 5; j++) for (let i = 0; i < 7; i++) {
+      const X = (i + 0.5) * Wc / 7, Y = (j + 0.5) * Hc / 5, w = toW(X, Y);
+      if (!greenLie(terrainAt(w))) continue;
       const gr = slopeGrad(hole, w.x, w.y), m = Math.hypot(gr.x, gr.y); maxS = Math.max(maxS, m);
-      arr.push({ X, Y, dx: -(gr.x * rt.x + gr.y * rt.y), dy: (gr.x * f.x + gr.y * f.y), m });
-    }
-    g.strokeStyle = 'rgba(255,255,255,.85)'; g.fillStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 2.2;
-    for (const A of arr) {
-      const L = 6 + 14 * Math.min(1, A.m / 0.04), mm = Math.hypot(A.dx, A.dy) || 1, ux = A.dx / mm, uy = A.dy / mm;
-      const x0 = A.X - ux * L / 2, y0 = A.Y - uy * L / 2, x1 = A.X + ux * L / 2, y1 = A.Y + uy * L / 2;
-      g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+      if (m < 0.002) continue;
+      const dx = -(gr.x * rt.x + gr.y * rt.y), dy = (gr.x * f.x + gr.y * f.y), mm = Math.hypot(dx, dy), ux = dx / mm, uy = dy / mm, L = 8 + 14 * Math.min(1, m / 0.045);
+      const x1 = X + ux * L / 2, y1 = Y + uy * L / 2;
+      g.beginPath(); g.moveTo(X - ux * L / 2, Y - uy * L / 2); g.lineTo(x1, y1); g.stroke();
       g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - ux * 6 - uy * 4, y1 - uy * 6 + ux * 4); g.lineTo(x1 - ux * 6 + uy * 4, y1 - uy * 6 - ux * 4); g.closePath(); g.fill();
     }
-    // straight line to the cup, and the predicted roll if you hit it straight at the cup
-    const angPin = Math.atan2(pin.y - ball.y, pin.x - ball.x);
+    // flag and (if it's on the map) the ball
+    const P = toC(pin);
+    g.fillStyle = '#111'; g.beginPath(); g.arc(P[0], P[1], 4, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.moveTo(P[0], P[1]); g.lineTo(P[0], P[1] - 24); g.stroke();
+    g.fillStyle = '#e3212f'; g.beginPath(); g.moveTo(P[0], P[1] - 24); g.lineTo(P[0] + 14, P[1] - 19); g.lineTo(P[0], P[1] - 14); g.closePath(); g.fill();
+    const B = toC(ball), onMap = B[0] > 0 && B[0] < Wc && B[1] > 0 && B[1] < Hc;
+    if (onMap) {
+      g.setLineDash([5, 5]); g.strokeStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.moveTo(B[0], B[1]); g.lineTo(P[0], P[1]); g.stroke(); g.setLineDash([]);
+      g.fillStyle = '#fff'; g.strokeStyle = '#111'; g.lineWidth = 1.5; g.beginPath(); g.arc(B[0], B[1], 5, 0, Math.PI * 2); g.fill(); g.stroke();
+    }
+    $('gHead').textContent = hole.mini ? 'Carpet' : 'Green';
+    $('gSlope').textContent = `Max slope ${(maxS * 100).toFixed(1)}%`;
+  }
+  function drawMap() {
+    const cv = $('mapCv'), g = cv.getContext('2d'), Wc = cv.width, Hc = cv.height, P = hole.paint;
+    const c = CLUBS[clubIdx], a = flight ? Math.atan2(flight.ey - flight.sy, flight.ex - flight.sx) : aimAng;
+    const f = { x: Math.cos(a), y: Math.sin(a) }, rt = { x: -f.y, y: f.x };
+    const d = distToPin(), shot = c.putter ? Math.min(stockNow(c), d + 3) : stockNow(c);
+    const need = Math.max(hole.mini ? 6 : 25, Math.max(d, shot) + (hole.mini ? 2 : 12)), s = (Hc * 0.8) / need;
+    const bx = Wc / 2, by = Hc * 0.88;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#20361f'; g.fillRect(0, 0, Wc, Hc);
+    g.setTransform(s * rt.x, -s * f.x, s * rt.y, -s * f.y, bx - s * (rt.x * ball.x + rt.y * ball.y), by + s * (f.x * ball.x + f.y * ball.y));
+    if (P) g.drawImage(P.canvas, P.ox, P.oy, P.W, P.H);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    const toC = p => { const dx = p.x - ball.x, dy = p.y - ball.y; return [bx + (dx * rt.x + dy * rt.y) * s, by - (dx * f.x + dy * f.y) * s]; };
+    const land = { x: ball.x + Math.cos(aimAng) * shot, y: ball.y + Math.sin(aimAng) * shot }, L = toC(land), Pn = toC(hole.pin);
+    if (!flight) {
+      g.strokeStyle = 'rgba(255,255,255,.75)'; g.setLineDash([6, 6]); g.lineWidth = 2; g.beginPath(); g.moveTo(L[0], L[1]); g.lineTo(Pn[0], Pn[1]); g.stroke(); g.setLineDash([]);
+      g.strokeStyle = '#FFE08A'; g.lineWidth = 4; g.beginPath(); g.moveTo(bx, by); g.lineTo(L[0], L[1]); g.stroke();
+      g.strokeStyle = '#fff'; g.lineWidth = 2.5; g.beginPath(); g.arc(L[0], L[1], 9, 0, Math.PI * 2); g.stroke();
+    }
+    g.fillStyle = '#e3212f'; g.strokeStyle = '#fff'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(Pn[0], Pn[1]); g.lineTo(Pn[0], Pn[1] - 22); g.stroke();
+    g.beginPath(); g.moveTo(Pn[0], Pn[1] - 22); g.lineTo(Pn[0] + 13, Pn[1] - 17); g.lineTo(Pn[0], Pn[1] - 12); g.closePath(); g.fill();
+    g.fillStyle = '#fff'; g.strokeStyle = '#111'; g.beginPath(); g.arc(bx, by, 6, 0, Math.PI * 2); g.fill(); g.stroke();
+    const left = Math.hypot(hole.pin.x - land.x, hole.pin.y - land.y), elev = (terrainH(hole, hole.pin.x, hole.pin.y) - terrainH(hole, ball.x, ball.y)) * 3;
+    setText('mmNext', `${Math.round(left)} yds`); setText('mmDist', `${Math.round(shot)} yds`);
+    setText('mmHt', `${elev >= 0 ? '+' : ''}${elev.toFixed(1)} ft`);
+  }
+  function updateReader() {
+    const playing = hole && state !== 'title' && state !== 'finished' && state !== 'card' && viewMode === 'normal';
+    $('side').style.display = playing ? '' : 'none';
+    if (!playing) return;
+    $('side').classList.toggle('closed', !save.ui.side);
+    if (!save.ui.side) return;
+    const ready = state === 'ready' || state === 'swinging' || state === 'striking';
+    const gk = `${holeIdx},${aimAng.toFixed(2)},${ball.x.toFixed(1)},${ball.y.toFixed(1)}`;
+    if (gk !== greenKey && (ready || !greenKey)) { greenKey = gk; drawGreen(); }
+    const mk = `${gk},${clubIdx},${state},${flight ? Math.round(flight.t * 10) : ''}`;
+    if (mk !== mapKey) { mapKey = mk; drawMap(); }
+    // putting: how much it breaks
+    const putting = ready && greenLie(terrainAt(ball)) && CLUBS[clubIdx].putter;
+    $('readerBox').style.display = putting ? '' : 'none';
+    if (!putting || readerKey === gk) return;
+    readerKey = gk;
+    const pin = hole.pin, d = distToPin(), angPin = Math.atan2(pin.y - ball.y, pin.x - ball.x);
     const path = simPutt(angPin, puttSpeed(d + 0.3, angPin));
-    const B = toC(ball), P = toC(pin);
-    g.setLineDash([6, 6]); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2;
-    g.beginPath(); g.moveTo(B[0], B[1]); g.lineTo(P[0], P[1]); g.stroke(); g.setLineDash([]);
-    g.fillStyle = '#111'; g.beginPath(); g.arc(P[0], P[1], Math.max(5, CUP_R * sc), 0, Math.PI * 2); g.fill();
-    g.strokeStyle = '#FFE08A'; g.lineWidth = 2; g.stroke();
-    g.fillStyle = '#fff'; g.beginPath(); g.arc(B[0], B[1], 5, 0, Math.PI * 2); g.fill();
-    // how far it drifts off the line by the time it reaches the hole
     const u = { x: Math.cos(angPin), y: Math.sin(angPin) }, ur = { x: -u.y, y: u.x };
     let lat = 0;
     for (const q of path) { const al = (q.x - ball.x) * u.x + (q.y - ball.y) * u.y; lat = (q.x - ball.x) * ur.x + (q.y - ball.y) * ur.y; if (al >= d) break; }
@@ -2938,10 +3102,26 @@
     $('readerSlope').textContent = (ft < 0.15 ? '' : `Aim ${ft.toFixed(1)} ft ${lat > 0 ? 'left' : 'right'} · `)
       + (Math.abs(rise) < 0.5 ? 'Flat' : `${rise > 0 ? '▲ Uphill' : '▼ Downhill'} ${Math.abs(rise).toFixed(0)} in`);
   }
+  $('sideToggle').addEventListener('click', () => { ensureAudio(); sfx.click(); save.ui.side = !save.ui.side; greenKey = mapKey = readerKey = ''; persist(); });
+  // the floating pin marker over the flag (pinned to the screen edge when the flag is off-screen)
+  const pinV = new THREE.Vector3();
+  function updatePinMark() {
+    const el = $('pinMark');
+    const show = hole && viewMode === 'normal' && introT <= 0 && !ball.inCup && (state === 'ready' || state === 'swinging' || state === 'striking' || state === 'flying' || state === 'rolling');
+    if (!show) { el.style.display = 'none'; return; }
+    pinV.set(hole.pin.x, hole.cupY + 4.3 * (pinGroup ? pinGroup.scale.x : 1), hole.pin.y).project(camera);
+    let x = (pinV.x + 1) / 2 * innerWidth, y = (1 - pinV.y) / 2 * innerHeight;
+    const behind = pinV.z > 1; if (behind) { x = innerWidth - x; y = innerHeight * 0.3; }
+    const top = 205, edge = behind || x < 30 || x > innerWidth - 30 || y < top;
+    x = clamp(x, 30, innerWidth - 30); y = clamp(y, top, innerHeight - 160);
+    el.style.display = 'flex'; el.classList.toggle('edge', edge);
+    el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
+    setText('pinMarkD', `${Math.round(distToPin())} yds`);
+  }
   function updateHud() {
     const playing = hole && state !== 'title' && state !== 'finished';
     ['hud', 'bar', 'viewBtn', 'exitBtn', 'pinBox'].forEach(id => $(id).style.display = playing ? '' : 'none');
-    if (!playing) { $('reader').style.display = 'none'; return; }
+    if (!playing) { $('side').style.display = 'none'; $('pinMark').style.display = 'none'; return; }
     setText('hHole', `${holeIdx + 1}/${HOLES.length}`);
     setText('hPar', String(hole.par));
     setText('hStroke', String(strokes));
@@ -2953,7 +3133,9 @@
     $('windArrow').style.transform = `rotate(${(w.ang - ref) / DEG}deg)`;
     const c = CLUBS[clubIdx], lie = terrainAt(ball);
     setText('clubName', c.name);
+    setText('clubShort', c.short);
     setText('clubStock', `${Math.round(stockNow(c))} yds`);
+    if (state !== 'ready' && $('bar').classList.contains('open')) wheelOpen(false);
     const lieTxt = LIE_NAME[lie] || '';
     const adj = !c.putter && lieMult(c, lie) < 1 ? ` (${lieTxt.toLowerCase()} −${Math.round((1 - lieMult(c, lie)) * 100)}%)` : '';
     setText('clubInfo', `${lieTxt}${adj}`);
@@ -2964,7 +3146,7 @@
     $('viewBtn').classList.toggle('disabled', !ready);
     $('exitBtn').classList.toggle('disabled', !(ready || state === 'flying' || state === 'rolling'));
     setText('viewBtn', viewMode === 'overview' ? 'BACK' : 'MAP');
-    updateReader();
+    updateReader(); updatePinMark();
   }
 
   function resize() {
@@ -3192,17 +3374,27 @@
   let gTab = 'outfit', gPart = 'jacket', bPart = 'body', gLockMsg = null, bLockMsg = null;
   const sameLook = (a, b) => Object.keys(b).every(k => k === 'skin' || k === 'hair' || String(a[k] || '').toLowerCase() === String(b[k]).toLowerCase());
   const swName = (list, c) => { const hit = list.find(x => x[1].toLowerCase() === String(c || '').toLowerCase()); return hit ? hit[0] : 'Custom'; };
-  const swRow = (attr, list, cur, label) => '<div class="sw">' + list.map(([n, c]) =>
-    `<button ${attr}="${c}" title="${n}" aria-label="${label}: ${n}" class="${c.toLowerCase() === String(cur).toLowerCase() ? 'on' : ''}" style="background:${c}"></button>`).join('') + '</div>';
+  const swRow = (attr, list, cur, label, part) => '<div class="sw">' + list.map(([n, c]) => {
+    const own = !part || ownsC(part, c), pr = part ? priceOf(part, c) : 0;
+    return `<button ${attr}="${c}" title="${n}${own ? '' : ' · ' + money(pr)}" aria-label="${label}: ${n}${own ? '' : ', costs ' + money(pr)}" class="${c.toLowerCase() === String(cur).toLowerCase() ? 'on' : ''}${own ? '' : ' buy'}" style="background:${c}">${own ? '' : `<em>${pr >= 1000 ? '$' + (pr / 1000) + 'k' : '$' + pr}</em>`}</button>`;
+  }).join('') + '</div>';
+  // the buy bar shown under the swatches when you pick something you don't own yet
+  let pendingBuy = null;
+  function buyBar() {
+    if (!pendingBuy) return '';
+    const b = pendingBuy, can = save.coins >= b.price;
+    return `<div class="buybar"><span class="bsw" style="background:${b.swatch}"></span><div class="bi"><b>${b.title}</b><span>${money(b.price)} · You have ${money(save.coins)}</span></div>`
+      + `<button class="main sm" data-buy="1"${can ? '' : ' disabled'}>${can ? 'Buy & wear' : `Need ${money(b.price - save.coins)} more`}</button></div>`;
+  }
   function outfitPanel() {
     const L = save.look;
     if (!partShown(gPart, L)) gPart = 'jacket';
     const cards = LOOK_PRESETS.map((p, i) => {
-      const k = p.look, locked = p.lock && !unlocked(p.lock);
+      const k = p.look, locked = p.lock && !unlocked(p.lock), forSale = !locked && !presetOwned(p);
       return `<button class="pcard ${sameLook(L, k) ? 'on' : ''}${locked ? ' locked' : ''}" data-preset="${i}"><span class="mini">` +
         `<i style="background:${k.jacket}"></i><i style="background:linear-gradient(90deg,${k.shirt} 35%,${k.tie} 35% 65%,${k.shirt} 65%)"></i>` +
         `${k.style === 'sweater' ? `<i style="background:linear-gradient(90deg,${k.jacket} 30%,#B3122B 30% 40%,${k.trim} 40% 60%,#B3122B 60% 70%,${k.jacket} 70%);flex:.35"></i>` : ''}<i style="background:${k.pants}"></i>` +
-        `${locked ? '<b class="lk">🔒</b>' : ''}</span>${p.name}${locked ? '<small>LOCKED</small>' : ''}</button>`;
+        `${locked ? '<b class="lk">🔒</b>' : ''}</span>${p.name}${locked ? '<small>LOCKED</small>' : forSale ? `<small>${money(p.price)}</small>` : ''}</button>`;
     }).join('');
     const lockNote = gLockMsg ? `<div class="locknote">🔒 <b>${UNLOCKS[gLockMsg].name}</b> is locked. ${UNLOCKS[gLockMsg].how}</div>` : '';
     const chips = LOOK_PARTS.filter(([k]) => partShown(k, L)).map(([k]) => {
@@ -3213,9 +3405,11 @@
     if (gPart === 'style') pane = `<div class="lh">Top<b>${L.style === 'sweater' ? 'Sweater' : 'Suit jacket'}</b></div><div class="opts">` +
       STYLES.map(([v, n]) => `<button data-style="${v}" class="${L.style === v ? 'on' : ''}">${n}</button>`).join('') + '</div>';
     else pane = `<div class="lh">${partLabel(gPart, L)}<b>${gPart === 'skin' ? '' : swName(SWATCHES[gPart], L[gPart])}</b></div>` +
-      swRow('data-col', SWATCHES[gPart], L[gPart], partLabel(gPart, L));
-    return `<div class="gcard"><div class="sect">OUTFITS</div><div class="pgrid">${cards}</div>${lockNote}</div>` +
-      `<div class="gcard"><div class="sect">CUSTOMIZE</div><div class="chiprow">${chips}</div><div class="swpane">${pane}</div></div>`;
+      swRow('data-col', SWATCHES[gPart], L[gPart], partLabel(gPart, L), PRICES[gPart] ? gPart : null);
+    const presetBuy = pendingBuy && pendingBuy.kind === 'preset' ? buyBar() : '', partBuy = pendingBuy && pendingBuy.kind === 'look' ? buyBar() : '';
+    return `<div class="gcard"><div class="sect" style="display:flex;justify-content:space-between">OUTFITS<span>${money(save.coins)}</span></div><div class="pgrid">${cards}</div>${lockNote}${presetBuy}</div>` +
+      `<div class="gcard"><div class="sect">CUSTOMIZE</div><div class="chiprow">${chips}</div><div class="swpane">${pane}${partBuy}</div>`
+      + `<div class="gnote">Colours with a price tag are for sale. Win money by playing well, then buy them here. Skin tone and hair are free.</div></div>`;
   }
   function bagPanel() {
     const G = save.gbag;
@@ -3233,8 +3427,8 @@
     const pane = bPart === 'logo'
       ? `<div class="lh">Logo<b>${G.logo === 'chaminade' ? 'Chaminade' : 'None'}</b></div><div class="opts">` +
         BAG_LOGOS.map(([v, n]) => `<button data-logo="${v}" class="${G.logo === v ? 'on' : ''}">${n}</button>`).join('') + '</div>'
-      : `<div class="lh">${label}<b>${swName(BAG_SWATCHES[bPart], G[bPart])}</b></div>` + swRow('data-bcol', bPart === 'body' ? bodies : BAG_SWATCHES[bPart], G[bPart], label)
-        + (bPart === 'body' ? `<div class="gnote">Unlock more bag colors by earning achievements (🏆 Awards tab).</div>` : '');
+      : `<div class="lh">${label}<b>${swName(BAG_SWATCHES[bPart], G[bPart])}</b></div>` + swRow('data-bcol', bPart === 'body' ? bodies : BAG_SWATCHES[bPart], G[bPart], label, bPart === 'body' ? null : 'bag-' + bPart)
+        + (bPart === 'body' ? `<div class="gnote">Unlock more bag colors by earning achievements (🏆 Awards tab).</div>` : '') + buyBar();
     return `<div class="gcard"><div class="sect" style="display:flex;justify-content:space-between">GOLF BAGS<span>${openN} / ${BAG_PRESETS.length}</span></div><div class="pgrid">${cards}</div>${lockNote}` +
       `<div class="gnote">Your bag sits on the tee box next to you on every hole. Locked bags unlock with achievements.</div></div>` +
       `<div class="gcard"><div class="sect">CUSTOMIZE</div><div class="chiprow">${chips}</div><div class="swpane">${pane}</div></div>`;
@@ -3250,15 +3444,43 @@
     const b = e.target.closest('button'); if (!b) return;
     ensureAudio(); sfx.click();
     const d = b.dataset; gLockMsg = null; bLockMsg = null;
+    if (d.buy) {
+      const pb = pendingBuy; pendingBuy = null;
+      if (pb && save.coins >= pb.price) {
+        save.coins -= pb.price; pb.grant(); persist(); pb.apply(); sfx.perfect();
+        $('homeCoins').textContent = money(save.coins);
+      }
+      renderGolfer(); return;
+    }
+    pendingBuy = null;
     if (d.gtab) gTab = d.gtab;
-    else if (d.preset != null) { const pr = LOOK_PRESETS[+d.preset]; if (pr.lock && !unlocked(pr.lock)) gLockMsg = pr.lock; else setLook(pr.look); }
+    else if (d.preset != null) {
+      const pr = LOOK_PRESETS[+d.preset];
+      if (pr.lock && !unlocked(pr.lock)) gLockMsg = pr.lock;
+      else if (!presetOwned(pr)) pendingBuy = { kind: 'preset', title: `${pr.name} (full outfit)`, price: pr.price, swatch: pr.look.jacket,
+        grant: () => OUTFIT_PARTS.forEach(k => pr.look[k] && grantC(k, pr.look[k])), apply: () => setLook(pr.look) };
+      else setLook(pr.look);
+    }
     else if (d.gpart) gPart = d.gpart;
     else if (d.style) setLook({ style: d.style, trim: save.look.trim || '#F2C14E' });
-    else if (d.col) setLook({ [gPart]: d.col });
-    else if (d.bpreset != null) { const bp = BAG_PRESETS[+d.bpreset]; if (bagOpen(bp)) setBag(bp.bag); else bLockMsg = bp; }
+    else if (d.col) {
+      const part = gPart, col = d.col;
+      if (PRICES[part] && !ownsC(part, col)) pendingBuy = { kind: 'look', title: `${swName(SWATCHES[part], col)} ${partLabel(part, save.look).toLowerCase()}`, price: priceOf(part, col), swatch: col,
+        grant: () => grantC(part, col), apply: () => setLook({ [part]: col }) };
+      else setLook({ [part]: col });
+    }
+    else if (d.bpreset != null) {
+      const bp = BAG_PRESETS[+d.bpreset];
+      if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(bp.bag); } else bLockMsg = bp;
+    }
     else if (d.bpart) bPart = d.bpart;
     else if (d.logo) setBag({ logo: d.logo });
-    else if (d.bcol) setBag({ [bPart]: d.bcol });
+    else if (d.bcol) {
+      const part = 'bag-' + bPart, col = d.bcol, bp = bPart;
+      if (bPart !== 'body' && !ownsC(part, col)) pendingBuy = { kind: 'bag', title: `${swName(BAG_SWATCHES[bp], col)} ${bp === 'covers' ? 'headcovers' : 'bag trim'}`, price: priceOf(part, col), swatch: col,
+        grant: () => grantC(part, col), apply: () => setBag({ [bp]: col }) };
+      else setBag({ [bPart]: d.bcol });
+    }
     renderGolfer();
   });
   $('gName').addEventListener('input', e => { save.name = e.target.value.trim().slice(0, 14); persist(); });
@@ -3453,7 +3675,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
