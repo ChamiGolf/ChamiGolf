@@ -175,6 +175,14 @@
   .board td:last-child,.board th:last-child{text-align:right}
   .board tr.me td{color:var(--gold-l)}
   .board .rk{width:34px;font:700 16px Oswald,sans-serif;color:var(--gold)}
+  .seg{display:flex;gap:6px;margin:0 0 8px}
+  .seg button{flex:1;padding:8px;border-radius:999px;border:1px solid rgba(242,193,78,.5);background:rgba(69,6,15,.85);color:#f3d7a8;font:800 12px Inter;letter-spacing:.08em;cursor:pointer}
+  .seg button.on{background:var(--gold);color:#45060f;border-color:var(--gold)}
+  .tnote{font-size:12px;color:#f3d7a8;text-align:center;margin:6px 0 0}
+  .tnote b{color:var(--gold-l)}
+  .postBox{font-size:13px;color:#f3d7a8;margin:-8px 0 14px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .postBox input{width:150px;padding:8px 10px;border-radius:10px;border:1px solid rgba(242,193,78,.6);background:rgba(0,0,0,.25);color:#fff;font:600 14px Inter}
+  .postBox button{padding:8px 14px;border-radius:10px;border:0;background:var(--gold);color:#45060f;font:800 13px Inter;cursor:pointer}
   .empty{background:rgba(79,7,18,.85);border:1px dashed rgba(242,193,78,.4);border-radius:14px;padding:14px;font-size:13px;color:#f3d7a8;text-align:center}
   .holes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
   .holes .hm{display:block;height:84px;border-radius:7px;background:#2f6f30 center/contain no-repeat;margin:0 4px 6px}
@@ -319,6 +327,7 @@
     <table id="scoreTable"></table>
     <div class="earn" id="earnBox"></div>
     <div class="best" id="bestLine"></div>
+    <div class="postBox" id="postBox"></div>
     <div class="btns">
       <button class="main" id="againBtn">Play again</button>
       <button class="ghost" id="homeBtn">Home</button>
@@ -1939,11 +1948,14 @@
         <button class="ghost" data-chclubs="1">Change clubs</button></div>
       <div style="font-size:12px;color:#f3d7a8;text-align:center">In your bag: ${bag}</div>
       <div class="sect">THE HOLES</div><div class="holes">${holes}</div>
-      <div class="sect">LEADERBOARD · LOWEST SCORES</div>${boardHtml(c)}`;
+      ${ONLINE ? `<div class="sect">LEADERBOARD</div><div class="seg"><button data-bm="daily" class="${boardMode === 'daily' ? 'on' : ''}">🏆 DAILY TOURNAMENT</button><button data-bm="all" class="${boardMode === 'all' ? 'on' : ''}">ALL-TIME</button></div>`
+        : '<div class="sect">LEADERBOARD · LOWEST SCORES</div>'}<div id="boardBox"></div>`;
+    fillBoard(c);
   }
   $('courseDetail').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     ensureAudio(); sfx.click();
+    if (b.dataset.bm) { boardMode = b.dataset.bm; renderCourse(); return; }
     if (b.dataset.cback) setTab('play');
     else if (b.dataset.tee) startRound(course);
     else if (b.dataset.chclubs) { clubsReturn = course.id; setTab('clubs'); }
@@ -1955,6 +1967,70 @@
     const rank = list.indexOf(entry) + 1;
     save.board[course.id] = list.slice(0, 10); lastEntry = entry;
     return rank <= 10 ? rank : 0;
+  }
+
+  // ================= Online leaderboards (Firebase Firestore, free plan) =================
+  // Paste your Firebase project ID here. Leave '' to keep leaderboards on this device only.
+  const FIREBASE_PROJECT = '';
+  // Optional: shown on the Daily Tournament board, e.g. '$10'. Leave '' to hide.
+  const DAILY_PRIZE = '';
+  const ONLINE = !!FIREBASE_PROJECT;
+  const FS = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents`;
+  const etDay = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+  const prevDay = day => { const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); };
+  const scorePath = (cid, day) => day ? `courses/${cid}/days/${day}` : `courses/${cid}`;
+  async function fetchBoard(cid, day, limit = 10) {
+    const r = await fetch(`${FS}/${scorePath(cid, day)}:runQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'scores' }], orderBy: [{ field: { fieldPath: 'rel' }, direction: 'ASCENDING' }], limit: limit + 15 } }) });
+    if (!r.ok) throw new Error('board ' + r.status);
+    const rows = (await r.json()).filter(x => x.document).map(x => {
+      const f = x.document.fields;
+      return { name: f.name.stringValue, rel: +f.rel.integerValue, strokes: +f.strokes.integerValue, date: Date.parse(f.t.timestampValue) };
+    });
+    rows.sort((a, b) => a.rel - b.rel || a.date - b.date);   // ties: whoever posted first ranks higher
+    return rows.slice(0, limit);
+  }
+  async function postOnline(cid, entry) {
+    const day = etDay(new Date(entry.date));
+    const doc = { fields: { name: { stringValue: entry.name }, rel: { integerValue: String(entry.rel) }, strokes: { integerValue: String(entry.strokes) },
+      day: { stringValue: day }, t: { timestampValue: new Date(entry.date).toISOString() } } };
+    const send = path => fetch(`${FS}/${path}/scores`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc) })
+      .then(r => { if (!r.ok) throw new Error('post ' + r.status); });
+    await Promise.all([send(scorePath(cid)), send(scorePath(cid, day))]);
+    const today = await fetchBoard(cid, day, 50);
+    const i = today.findIndex(r => r.date === entry.date && r.name === entry.name);
+    return i >= 0 ? i + 1 : 0;
+  }
+  function rowsHtml(rows, emptyMsg) {
+    if (!rows.length) return `<div class="empty">${emptyMsg}</div>`;
+    return `<table class="board"><tr><th></th><th>GOLFER</th><th>STROKES</th><th>SCORE</th></tr>` + rows.map((r, i) =>
+      `<tr class="${lastEntry && r.date === lastEntry.date && r.name === lastEntry.name ? 'me' : ''}"><td class="rk">${i + 1}</td><td>${esc(r.name)}<div style="font-size:11px;color:#c9a98a">${fmtDate(r.date)}</div></td><td>${r.strokes}</td><td><b>${fmtRel(r.rel)}</b></td></tr>`).join('') + '</table>';
+  }
+  function resetsIn() {
+    const now = new Date(), et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const mins = 24 * 60 - (et.getHours() * 60 + et.getMinutes());
+    return `${Math.floor(mins / 60)}h ${mins % 60}m`;
+  }
+  let boardMode = 'daily';
+  async function fillBoard(c) {
+    const box = $('boardBox'); if (!box) return;
+    if (!ONLINE) { box.innerHTML = boardHtml(c); return; }
+    const mode = boardMode, day = etDay();
+    box.innerHTML = '<div class="empty">Loading leaderboard…</div>';
+    try {
+      let html;
+      if (mode === 'daily') {
+        const [today, yest] = await Promise.all([fetchBoard(c.id, day), fetchBoard(c.id, prevDay(day), 1)]);
+        html = rowsHtml(today, 'No rounds today yet. Finish a round to take the lead!')
+          + `<div class="tnote">${DAILY_PRIZE ? `Today's winner takes <b>${esc(DAILY_PRIZE)}</b> · ` : ''}Resets at midnight ET (in ${resetsIn()})</div>`
+          + (yest.length ? `<div class="tnote">Yesterday's winner: <b>${esc(yest[0].name)}</b> (${fmtRel(yest[0].rel)})</div>` : '');
+      } else {
+        html = rowsHtml(await fetchBoard(c.id), 'No rounds yet. Finish a round here to post the first score.');
+      }
+      if (course.id === c.id && boardMode === mode && $('boardBox') === box) box.innerHTML = html;
+    } catch (e) {
+      if ($('boardBox') === box) box.innerHTML = `<div class="empty">Couldn't reach the online leaderboard. Your best here: ${save.stats.bestBy[c.id] == null ? '—' : fmtRel(save.stats.bestBy[c.id])}</div>`;
+    }
   }
 
   // ---- Golfer page ----
@@ -2258,7 +2334,28 @@
     if (newly.length) line += ` · 🔓 ${newly.map(c => c.name).join(', ')} unlocked!`;
     persist();
     $('bestLine').textContent = `${line} · Bank: ${money(save.coins)}`;
+    showPostBox(course, lastEntry);
     $('final').classList.remove('hidden');
+  }
+
+  function showPostBox(c, entry) {
+    const box = $('postBox');
+    if (!ONLINE) { box.innerHTML = ''; return; }
+    const post = async () => {
+      box.textContent = 'Posting to the online leaderboard…';
+      try {
+        const rank = await postOnline(c.id, entry);
+        box.innerHTML = rank ? `🏆 You're <b style="color:var(--gold-l)">#${rank}</b> in today's ${esc(c.name)} tournament!` : 'Score posted online.';
+      } catch (e) { box.innerHTML = 'Couldn\'t post online. <button id="retryPost">Retry</button>'; $('retryPost').onclick = post; }
+    };
+    if (save.name && save.name !== 'Player') { post(); return; }
+    box.innerHTML = '<input id="postName" maxlength="14" placeholder="Your name" autocomplete="off" spellcheck="false"><button id="postBtn">Post score</button>';
+    const inp = $('postName');
+    inp.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('postBtn').click(); });
+    $('postBtn').onclick = () => {
+      const n = inp.value.trim().slice(0, 14); if (!n) { inp.focus(); return; }
+      save.name = n; entry.name = n; persist(); post();
+    };
   }
 
   $('againBtn').addEventListener('click', () => startRound(course));
