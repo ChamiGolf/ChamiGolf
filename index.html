@@ -753,6 +753,13 @@
   }
   const ownsC = (part, hex) => priceOf(part, hex) === 0 || !!save.ownedLook[ckey(part, hex)];
   const grantC = (part, hex) => { save.ownedLook[ckey(part, hex)] = 1; };
+  // one-time switch for everyone: the Classic Outfit is the new starter, and Red & Gold has to be bought
+  if (!save.migClassic) {
+    save.migClassic = 1;
+    const sk = save.look.skin, hr = save.look.hair;
+    save.look = Object.assign({}, LOOK_PRESETS[0].look, sk ? { skin: sk } : {}, hr ? { hair: hr } : {});
+    delete save.ownedLook[ckey('jacket', '#B3122B')]; delete save.ownedLook[ckey('tie', '#F2C14E')];
+  }
   // you keep whatever you're already wearing, plus the starter outfit and the Chaminade bag
   ['jacket', 'shirt', 'tie', 'pants', 'shoes', 'trim'].forEach(k => { grantC(k, LOOK_PRESETS[0].look[k]); if (save.look[k]) grantC(k, save.look[k]); });
   ['trim', 'covers'].forEach(k => { grantC('bag-' + k, BAG_PRESETS[0].bag[k]); if (save.gbag[k]) grantC('bag-' + k, save.gbag[k]); });
@@ -1599,11 +1606,6 @@
     const pk = part(new THREE.SphereGeometry(1, 28, 18), m.trim, 0.135, 0.36, 0, bag); pk.scale.set(0.05, 0.19, 0.1);
     const zip = part(new THREE.TorusGeometry(0.075, 0.004, 6, 24, Math.PI), m.dark, 0.182, 0.36, 0, bag); zip.rotation.y = Math.PI / 2; zip.scale.set(1, 2.1, 1);
     const pk2 = part(new THREE.SphereGeometry(1, 24, 14), m.trim, -0.13, 0.55, 0.02, bag); pk2.scale.set(0.045, 0.1, 0.075);     // small valuables pocket
-    // padded backpack straps
-    for (const sx of [-1, 1]) {
-      const curve = new THREE.CatmullRomCurve3([V3(sx * 0.05, 0.78, -0.15), V3(sx * 0.055, 0.74, -0.27), V3(sx * 0.06, 0.55, -0.3), V3(sx * 0.055, 0.38, -0.25), V3(sx * 0.05, 0.32, -0.15)]);
-      const st = part(new THREE.TubeGeometry(curve, 24, 0.016, 8, false), m.dark, 0, 0, 0, bag); st.scale.x = 1;
-    }
     const handle = part(new THREE.TorusGeometry(0.05, 0.012, 8, 20, Math.PI), m.dark, -0.155, 0.7, 0, bag); handle.rotation.set(0, Math.PI / 2, Math.PI / 2);
     // clubs: three woods in knit headcovers at the back, irons and wedges hanging sole-up at the front, a covered putter
     const tops = [[-0.075, -0.06, 0.2, 1], [0.0, -0.085, 0.24, 1], [0.075, -0.055, 0.19, 1]];
@@ -1629,9 +1631,6 @@
       root.add(limb(hinge, foot, 0.011, 0.009, m.dark));
       const cap = new THREE.Mesh(new THREE.SphereGeometry(0.02, 12, 10), m.metal); cap.position.copy(hinge); root.add(cap);
       const ft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.02, 0.035, 12), m.rubber); ft.position.copy(foot).setY(0.017); root.add(ft);
-      // the linkage rod from the base that kicks the leg out
-      const mid = hinge.clone().lerp(foot, 0.62);
-      root.add(limb(toRoot(V3(sx * 0.07, 0.1, -0.13)), mid, 0.006, 0.006, m.metal));
     }
     root.traverse(o => { if (o.isMesh) o.castShadow = true; });
     return root;
@@ -3804,7 +3803,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
