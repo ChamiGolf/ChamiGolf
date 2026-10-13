@@ -335,6 +335,15 @@
   </div>
 </div>
 
+<!-- ===== Daily tournament winnings ===== -->
+<div id="prize" class="overlay hidden">
+  <div class="card">
+    <h2>Tournament winnings! 🏆</h2>
+    <div class="sub" id="prizeBody"></div>
+    <div class="btns"><button class="main" id="prizeOk">Collect</button></div>
+  </div>
+</div>
+
 <script>
 (() => {
   'use strict';
@@ -454,6 +463,8 @@
   STARTER_BAG.forEach(id => { if (!save.owned.includes(id)) save.owned.push(id); });
   save.look = Object.assign({}, LOOK_PRESETS[0].look, save.look || {});
   if (!save.board) save.board = {};
+  if (!save.pid) save.pid = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
+  if (!save.tourney) save.tourney = {};   // { 'YYYY-MM-DD': { courseId: true } } days this device entered, prize not yet checked
   function loadBag() { CLUBS.length = 0; save.bag.forEach(id => CLUBS.push(modelById(id))); }
   loadBag();
   function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} }
@@ -1972,8 +1983,8 @@
   // ================= Online leaderboards (Firebase Firestore, free plan) =================
   // Paste your Firebase project ID here. Leave '' to keep leaderboards on this device only.
   const FIREBASE_PROJECT = '';
-  // Optional: shown on the Daily Tournament board, e.g. '$10'. Leave '' to hide.
-  const DAILY_PRIZE = '';
+  // In-game money paid to the top 3 of each course's Daily Tournament, collected the next time they open the game.
+  const DAILY_PRIZES = [1000, 500, 250];
   const ONLINE = !!FIREBASE_PROJECT;
   const FS = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents`;
   const etDay = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
@@ -1985,22 +1996,55 @@
     if (!r.ok) throw new Error('board ' + r.status);
     const rows = (await r.json()).filter(x => x.document).map(x => {
       const f = x.document.fields;
-      return { name: f.name.stringValue, rel: +f.rel.integerValue, strokes: +f.strokes.integerValue, date: Date.parse(f.t.timestampValue) };
+      return { name: f.name.stringValue, pid: f.pid ? f.pid.stringValue : '', rel: +f.rel.integerValue, strokes: +f.strokes.integerValue, date: Date.parse(f.t.timestampValue) };
     });
     rows.sort((a, b) => a.rel - b.rel || a.date - b.date);   // ties: whoever posted first ranks higher
     return rows.slice(0, limit);
   }
   async function postOnline(cid, entry) {
     const day = etDay(new Date(entry.date));
-    const doc = { fields: { name: { stringValue: entry.name }, rel: { integerValue: String(entry.rel) }, strokes: { integerValue: String(entry.strokes) },
+    const doc = { fields: { name: { stringValue: entry.name }, pid: { stringValue: save.pid }, rel: { integerValue: String(entry.rel) }, strokes: { integerValue: String(entry.strokes) },
       day: { stringValue: day }, t: { timestampValue: new Date(entry.date).toISOString() } } };
     const send = path => fetch(`${FS}/${path}/scores`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc) })
       .then(r => { if (!r.ok) throw new Error('post ' + r.status); });
     await Promise.all([send(scorePath(cid)), send(scorePath(cid, day))]);
+    (save.tourney[day] || (save.tourney[day] = {}))[cid] = true; persist();
     const today = await fetchBoard(cid, day, 50);
     const i = today.findIndex(r => r.date === entry.date && r.name === entry.name);
     return i >= 0 ? i + 1 : 0;
   }
+  // After a day ends, pay out any top-3 finishes this device had in that day's tournaments.
+  let claiming = false;
+  async function claimPrizes() {
+    if (!ONLINE || claiming) return;
+    const today = etDay(), days = Object.keys(save.tourney).filter(d => d < today);
+    if (!days.length) return;
+    claiming = true;
+    const wins = [];
+    try {
+      for (const day of days) {
+        for (const cid of Object.keys(save.tourney[day])) {
+          const top = await fetchBoard(cid, day, 3);
+          const place = top.findIndex(r => r.pid === save.pid);
+          if (place >= 0) wins.push({ day, c: courseById(cid), place, prize: DAILY_PRIZES[place], rel: top[place].rel });
+          delete save.tourney[day][cid];
+        }
+        if (!Object.keys(save.tourney[day]).length) delete save.tourney[day];
+      }
+    } catch (e) {}
+    if (wins.length) {
+      const total = wins.reduce((a, w) => a + w.prize, 0);
+      save.coins += total; save.stats.earnedTotal += total;
+      const medal = ['🥇 1st', '🥈 2nd', '🥉 3rd'];
+      $('prizeBody').innerHTML = wins.map(w => `${medal[w.place]} at ${esc(w.c ? w.c.name : 'a course')} (${fmtRel(w.rel)}) · ${w.day.slice(5).replace('-', '/')} · <b>+${money(w.prize)}</b>`).join('<br>')
+        + `<br><br>Total: <b>+${money(total)}</b>`;
+      $('prize').classList.remove('hidden');
+    }
+    persist(); $('homeCoins').textContent = money(save.coins);
+    claiming = false;
+  }
+  $('prizeOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('prize').classList.add('hidden'); });
+
   function rowsHtml(rows, emptyMsg) {
     if (!rows.length) return `<div class="empty">${emptyMsg}</div>`;
     return `<table class="board"><tr><th></th><th>GOLFER</th><th>STROKES</th><th>SCORE</th></tr>` + rows.map((r, i) =>
@@ -2022,7 +2066,8 @@
       if (mode === 'daily') {
         const [today, yest] = await Promise.all([fetchBoard(c.id, day), fetchBoard(c.id, prevDay(day), 1)]);
         html = rowsHtml(today, 'No rounds today yet. Finish a round to take the lead!')
-          + `<div class="tnote">${DAILY_PRIZE ? `Today's winner takes <b>${esc(DAILY_PRIZE)}</b> · ` : ''}Resets at midnight ET (in ${resetsIn()})</div>`
+          + `<div class="tnote">Top 3 win 🥇 <b>${money(DAILY_PRIZES[0])}</b> · 🥈 <b>${money(DAILY_PRIZES[1])}</b> · 🥉 <b>${money(DAILY_PRIZES[2])}</b></div>`
+          + `<div class="tnote">Resets at midnight ET (in ${resetsIn()})</div>`
           + (yest.length ? `<div class="tnote">Yesterday's winner: <b>${esc(yest[0].name)}</b> (${fmtRel(yest[0].rel)})</div>` : '');
       } else {
         html = rowsHtml(await fetchBoard(c.id), 'No rounds yet. Finish a round here to post the first score.');
@@ -2264,7 +2309,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, pid: save.pid, tourney: save.tourney }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
@@ -2362,6 +2407,8 @@
   $('homeBtn').addEventListener('click', () => { showHome(); setTab('course'); });
 
   showHome();
+  claimPrizes();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('home').classList.contains('hidden')) claimPrizes(); });
 
   // ================= Loop =================
   let last = performance.now(), acc = 0;
