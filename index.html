@@ -1161,7 +1161,11 @@
   }
   const SAND_DETAIL = sandDetail();
 
-  // ---- Bunkers with real depth: a hollowed bowl with a raised grass lip ----
+  // ================= Terrain: rolling hills shaped around each hole =================
+  // Purely visual: the ball, golfer, trees, flag and camera sit on it, while the game's physics stay flat.
+  const HILL = { pines: 1.2, coast: 0.6, meribah: 1.7, hollow: 0.55, valley: 1.2 };   // how hilly each course is
+  const LINKS = { hollow: 1 };                                                         // lots of small humps and hollows
+  const sm01 = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
   const LIP_Q = 1.28;
   const bunkerDepth = e => clamp(Math.min(e.rx, e.ry) * 0.13, 0.55, 1.2);
   function bowlHeight(e, q) {
@@ -1170,27 +1174,58 @@
     const t = clamp((1 - q) / 0.32, 0, 1), sm = t * t * (3 - 2 * t);
     return -bunkerDepth(e) * sm;                                                   // wall then flat floor
   }
-  function surfY(x, y) {
-    if (!hole || !hole.bowls) return 0;
-    for (const e of hole.bowls) {
+  function setupTerrain(h, course, ox, oy, W, Hh) {
+    const r = makeRng(h.yds * 13 + h.par * 7 + 5), hill = HILL[course.id] == null ? 1 : HILL[course.id];
+    const lam = [150, 95, 60, 36, 22], amp = [2.6, 1.7, 1.0, 0.5, 0.25];
+    const waves = lam.map((L, k) => { const a = r() * Math.PI * 2; return { cx: Math.cos(a) / L * 6.283, cy: Math.sin(a) / L * 6.283, ph: r() * 6.283, amp: amp[k] * hill }; });
+    if (LINKS[course.id]) [14, 11, 9].forEach(L => { const a = r() * Math.PI * 2; waves.push({ cx: Math.cos(a) / L * 6.283, cy: Math.sin(a) / L * 6.283, ph: r() * 6.283, amp: 0.45 }); });
+    const T = { waves, hill, ox, oy, W, Hh, teeH: 0, greenH: 0 };
+    h.terr = T;
+    const nearWater = p => h.water.some(e => inEl(p, e, 30));
+    T.teeH = rawH(h, h.tee.x, h.tee.y) + 0.35;
+    T.greenH = rawH(h, h.pin.x, h.pin.y) + 0.2;
+    if (nearWater(h.pin)) T.greenH = Math.max(T.greenH, 0.5);
+    if (nearWater(h.tee)) T.teeH = Math.max(T.teeH, 0.6);
+    return T;
+  }
+  function rawH(h, x, y) {
+    const T = h.terr, b = h.bounds;
+    let z = 0;
+    for (const w of T.waves) z += w.amp * Math.sin(x * w.cx + y * w.cy + w.ph);
+    // softer where you play (so hills never hide the green), bigger and rising away from the hole,
+    // so each hole sits in its own valley framed by hills
+    const dx = Math.max(b.x - x, 0, x - (b.x + b.w)), dy = Math.max(b.y - y, 0, y - (b.y + b.h)), out = Math.hypot(dx, dy);
+    z *= 0.4 + 0.6 * sm01(out / 35);
+    z += Math.min(out * 0.1, 6) * (0.6 + T.hill * 0.4);
+    return z;
+  }
+  function terrainH(h, x, y) {
+    const T = h.terr; if (!T) return 0;
+    let z = rawH(h, x, y);
+    // water: banks slope down to the water line
+    for (const e of h.water) {
       const q = Math.sqrt(((x - e.x) / e.rx) ** 2 + ((y - e.y) / e.ry) ** 2);
-      if (q < LIP_Q) return bowlHeight(e, q);
+      const w = 1 - sm01((q - 1) * Math.min(e.rx, e.ry) / 14);
+      if (w > 0) z = z + (-1 + 1.3 * sm01((q - 0.8) / 0.2) - z) * w;
     }
-    return 0;
+    // tee box: a flat raised pad
+    const t = h.tee, dT = Math.max(Math.abs(x - t.x) - 7, Math.abs(y - t.y) - 4.5, 0), wt = 1 - sm01(dT / 9);
+    if (wt > 0) z += (T.teeH - z) * wt;
+    // green: flat, blending into the surrounding slopes
+    const g = h.green, qg = Math.sqrt(((x - g.x) / (g.rx + 3)) ** 2 + ((y - g.y) / (g.ry + 3)) ** 2), wg = 1 - sm01((qg - 1) * Math.min(g.rx, g.ry) / 11);
+    if (wg > 0) z += (T.greenH - z) * wg;
+    // bunkers dug into the slope
+    let lo = 0, hi = 0;
+    for (const e of h.bunkers) {
+      const q = Math.sqrt(((x - e.x) / e.rx) ** 2 + ((y - e.y) / e.ry) ** 2);
+      if (q < LIP_Q) { const c = bowlHeight(e, q); lo = Math.min(lo, c); hi = Math.max(hi, c); }
+    }
+    z += lo < 0 ? lo : hi;
+    // fade down at the very edge of the modelled ground so it meets the distant land
+    const edge = Math.min(x - T.ox, T.ox + T.W - x, y - T.oy, T.oy + T.Hh - y);
+    return -1.4 + (z + 1.4) * sm01(edge / 24);
   }
-  // only bunkers whose lips don't touch other bunkers, water, the cup or the hole's edge get dug out
-  function pickBowls(h, ox, oy, W, Hh) {
-    const big = e => ({ x: e.x, y: e.y, rx: e.rx * LIP_Q + 0.5, ry: e.ry * LIP_Q + 0.5 });
-    const ring = e => [...Array(24)].map((_, i) => ({ x: e.x + Math.cos(i / 24 * 6.283) * e.rx, y: e.y + Math.sin(i / 24 * 6.283) * e.ry })).concat([e]);
-    const touch = (a, b) => ring(a).some(p => inEl(p, b)) || ring(b).some(p => inEl(p, a));
-    return h.bunkers.filter((e, i) => {
-      const A = big(e);
-      if (A.x - A.rx < ox + 1 || A.x + A.rx > ox + W - 1 || A.y - A.ry < oy + 1 || A.y + A.ry > oy + Hh - 1) return false;
-      if (inEl(h.pin, A, 1)) return false;
-      if (h.water.some(w => touch(A, w))) return false;
-      return !h.bunkers.some((o, j) => j !== i && touch(A, big(o)));
-    });
-  }
+  function surfY(x, y) { return hole && hole.terr ? terrainH(hole, x, y) : 0; }
 
   let holeGroup = null, flagMesh = null, pinGroup = null, pinT = 0, pinPulled = false, disposables = [];
   function buildHole(h, course, maxPx = 2600) {
@@ -1200,20 +1235,19 @@
     const { canvas, ox, oy, W, H: Hh } = paintHole(h, pal, maxPx);
     const tex = new THREE.CanvasTexture(canvas);
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    const gcx = ox + W / 2, gcz = oy + Hh / 2, SEG = 64;
-    h.bowls = pickBowls(h, ox, oy, W, Hh);
-    const ringPt = (e, q, i) => { const a = i / SEG * Math.PI * 2; return [e.x + Math.cos(a) * e.rx * q, e.y + Math.sin(a) * e.ry * q]; };
-    // flat ground with a cut-out for each dug-out bunker
-    const shape = new THREE.Shape();
-    shape.moveTo(-W / 2, -Hh / 2); shape.lineTo(W / 2, -Hh / 2); shape.lineTo(W / 2, Hh / 2); shape.lineTo(-W / 2, Hh / 2); shape.lineTo(-W / 2, -Hh / 2);
-    for (const e of h.bowls) {
-      const path = new THREE.Path();
-      for (let i = 0; i < SEG; i++) { const [x, y] = ringPt(e, LIP_Q, i); i ? path.lineTo(x - gcx, gcz - y) : path.moveTo(x - gcx, gcz - y); }
-      shape.holes.push(path);
-    }
-    const gGeo = new THREE.ShapeGeometry(shape);
-    { const pos = gGeo.attributes.position, uv = gGeo.attributes.uv;
-      for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) + W / 2) / W, (pos.getY(i) + Hh / 2) / Hh); }
+    const gcx = ox + W / 2, gcz = oy + Hh / 2;
+    setupTerrain(h, course, ox, oy, W, Hh);
+    // a fine grid (about a yard apart) lifted into hills, with bunkers dug in
+    const step = Math.max(0.9, Math.sqrt(W * Hh / 170000)), nx = Math.ceil(W / step), ny = Math.ceil(Hh / step);
+    const gGeo = new THREE.PlaneGeometry(W, Hh, nx, ny);
+    { const pos = gGeo.attributes.position, K = new Float32Array(pos.count);
+      for (let i = 0; i < pos.count; i++) {
+        const x = gcx + pos.getX(i), y = gcz - pos.getY(i);
+        pos.setZ(i, terrainH(h, x, y));
+        K[i] = h.bunkers.some(e => inEl({ x, y }, e)) ? 1 : 0;
+      }
+      gGeo.setAttribute('sandK', new THREE.BufferAttribute(K, 1));
+      gGeo.computeVertexNormals(); }
     const gMat = new THREE.MeshLambertMaterial({ map: tex });
     // fine grass-blade detail tiled every ~3 yards (plus a coarser layer so it doesn't look tiled);
     // inside bunkers (sandK = 1) a sand-grain detail is used instead
@@ -1228,43 +1262,11 @@
         + '  float gm = (0.85 + 0.30 * gd) * (0.93 + 0.14 * gd2);\n'
         + (bowl ? '  float sd = texture2D(sandMap, vUv * detailRep * 1.6).r;\n  diffuseColor.rgb *= mix(gm, 0.8 + 0.4 * sd, vSandK);' : '  diffuseColor.rgb *= gm;'));
     };
-    gMat.onBeforeCompile = sh => detailShader(sh, false);
+    gMat.onBeforeCompile = sh => detailShader(sh, true);
     disposables.push(tex, gGeo, gMat);
     const ground = new THREE.Mesh(gGeo, gMat);
     ground.rotation.x = -Math.PI / 2; ground.position.set(gcx, 0, gcz); ground.receiveShadow = true;
     holeGroup.add(ground);
-
-    // the bunker bowls themselves, sharing the painted course texture
-    if (h.bowls.length) {
-      const QS = [0, 0.2, 0.4, 0.55, 0.64, 0.7, 0.75, 0.8, 0.85, 0.89, 0.93, 0.96, 0.98, 1, 1.03, 1.08, 1.14, 1.21, LIP_Q];
-      const P = [], U = [], K = [], I = [];
-      for (const e of h.bowls) {
-        const base = P.length / 3;
-        QS.forEach((q, r) => {
-          const n = r === 0 ? 1 : SEG;
-          for (let i = 0; i < n; i++) {
-            const [x, y] = r === 0 ? [e.x, e.y] : ringPt(e, q, i);
-            P.push(x, bowlHeight(e, q), y); U.push((x - ox) / W, 1 - (y - oy) / Hh); K.push(q <= 1 ? 1 : 0);
-          }
-        });
-        const at = (r, i) => base + (r === 0 ? 0 : 1 + (r - 1) * SEG + (i % SEG));
-        for (let i = 0; i < SEG; i++) I.push(at(0, 0), at(1, i + 1), at(1, i));
-        for (let r = 1; r < QS.length - 1; r++) for (let i = 0; i < SEG; i++) {
-          I.push(at(r, i), at(r, i + 1), at(r + 1, i + 1), at(r, i), at(r + 1, i + 1), at(r + 1, i));
-        }
-      }
-      const bGeo = new THREE.BufferGeometry();
-      bGeo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
-      bGeo.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
-      bGeo.setAttribute('sandK', new THREE.Float32BufferAttribute(K, 1));
-      bGeo.setIndex(I); bGeo.computeVertexNormals();
-      const bMat = new THREE.MeshLambertMaterial({ map: tex });
-      bMat.onBeforeCompile = sh => detailShader(sh, true);
-      bMat.customProgramCacheKey = () => 'bowl';
-      disposables.push(bGeo, bMat);
-      const bowls = new THREE.Mesh(bGeo, bMat); bowls.receiveShadow = true;
-      holeGroup.add(bowls);
-    }
 
     // water (with a cut-out when the green sits inside it)
     for (const e of h.water) {
@@ -1295,10 +1297,11 @@
     h.allTrees.forEach((t, i) => {
       t.top = pine ? 3 + t.r * 2.2 : 4 + t.r * 2;
       const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-      trunk.position.set(t.x, 0, t.y); trunk.castShadow = true;
+      const ty = terrainH(h, t.x, t.y) - 0.3;
+      trunk.position.set(t.x, ty, t.y); trunk.castShadow = true;
       const leaf = new THREE.Mesh(pine ? pineGeo : roundGeo, leafMats[i % 3]);
-      if (pine) { leaf.scale.set(t.r * 0.85, t.r * 2.2, t.r * 0.85); leaf.position.set(t.x, 3 + t.r * 1.1, t.y); }
-      else { leaf.scale.set(t.r, t.r * 1.05, t.r); leaf.position.set(t.x, 4 + t.r, t.y); }
+      if (pine) { leaf.scale.set(t.r * 0.85, t.r * 2.2, t.r * 0.85); leaf.position.set(t.x, ty + 3 + t.r * 1.1, t.y); }
+      else { leaf.scale.set(t.r, t.r * 1.05, t.r); leaf.position.set(t.x, ty + 4 + t.r, t.y); }
       leaf.rotation.y = i * 1.7; leaf.castShadow = true;
       holeGroup.add(trunk, leaf);
     });
@@ -1306,7 +1309,7 @@
     // tee markers
     const tmGeo = new THREE.SphereGeometry(0.45, 12, 8), tmMat = new THREE.MeshStandardMaterial({ color: 0xF2C14E, metalness: 0.5, roughness: 0.35 });
     disposables.push(tmGeo, tmMat);
-    [-5, 5].forEach(dx => { const m = new THREE.Mesh(tmGeo, tmMat); m.position.set(h.tee.x + dx, 0.4, h.tee.y - 2); holeGroup.add(m); });
+    [-5, 5].forEach(dx => { const m = new THREE.Mesh(tmGeo, tmMat); m.position.set(h.tee.x + dx, h.terr.teeH + 0.4, h.tee.y - 2); holeGroup.add(m); });
 
     // cup: a real hole cut into the green. A stencil mask marks the opening, then the
     // cup's liner, dirt walls and bottom are drawn "through" the ground inside it.
@@ -1326,14 +1329,14 @@
     const flagGeo = new THREE.PlaneGeometry(1.7, 1.05, 8, 1); flagGeo.translate(0.85, 0, 0);
     const flagMat = new THREE.MeshLambertMaterial({ map: FLAG_TEX, side: THREE.DoubleSide });
     disposables.push(maskGeo, maskMat, wallGeo, wallMat, botGeo, botMat, lipGeo, lipMat, poleGeo, poleMat, knobGeo, knobMat, flagGeo, flagMat);
-    const mask = new THREE.Mesh(maskGeo, maskMat); mask.rotation.x = -Math.PI / 2; mask.position.set(h.pin.x, 0.004, h.pin.y); mask.renderOrder = 1;
-    const bottom = new THREE.Mesh(botGeo, botMat); bottom.rotation.x = -Math.PI / 2; bottom.position.set(h.pin.x, -CUP_D, h.pin.y); bottom.renderOrder = 2;
-    const wall = new THREE.Mesh(wallGeo, wallMat); wall.position.set(h.pin.x, -CUP_D / 2, h.pin.y); wall.renderOrder = 3;
-    const lip = new THREE.Mesh(lipGeo, lipMat); lip.rotation.x = -Math.PI / 2; lip.position.set(h.pin.x, 0.006, h.pin.y);
+    const mask = new THREE.Mesh(maskGeo, maskMat); mask.rotation.x = -Math.PI / 2; mask.position.set(h.pin.x, h.terr.greenH + 0.004, h.pin.y); mask.renderOrder = 1;
+    const bottom = new THREE.Mesh(botGeo, botMat); bottom.rotation.x = -Math.PI / 2; bottom.position.set(h.pin.x, h.terr.greenH - CUP_D, h.pin.y); bottom.renderOrder = 2;
+    const wall = new THREE.Mesh(wallGeo, wallMat); wall.position.set(h.pin.x, h.terr.greenH - CUP_D / 2, h.pin.y); wall.renderOrder = 3;
+    const lip = new THREE.Mesh(lipGeo, lipMat); lip.rotation.x = -Math.PI / 2; lip.position.set(h.pin.x, h.terr.greenH + 0.006, h.pin.y);
     const pole = new THREE.Mesh(poleGeo, poleMat); pole.position.set(0, (4.2 - CUP_D) / 2, 0); pole.castShadow = true; pole.renderOrder = 4;
     const knob = new THREE.Mesh(knobGeo, knobMat); knob.position.set(0, 4.25, 0);
     flagMesh = new THREE.Mesh(flagGeo, flagMat); flagMesh.position.set(0, 3.6, 0); flagMesh.castShadow = true;
-    pinGroup = new THREE.Group(); pinGroup.position.set(h.pin.x, 0, h.pin.y); pinGroup.add(pole, knob, flagMesh);
+    pinGroup = new THREE.Group(); pinGroup.position.set(h.pin.x, h.terr.greenH, h.pin.y); pinGroup.add(pole, knob, flagMesh);
     pinT = 0; pinPulled = false;
     holeGroup.add(mask, bottom, wall, lip, pinGroup);
     renderer.shadowMap.needsUpdate = true;
@@ -1487,8 +1490,13 @@
     return barTopPx || innerHeight * 0.88;
   }
   const aimBallY = () => barTop() - pullPx() - 36;   // finger at full pull stays 36px above the bar
+  let camLift = 0; const liftLook = new THREE.Vector3();
   function placeCamera(dt) {
-    camera.position.copy(camPos); camera.position.y = Math.max(0.6, camera.position.y); camera.lookAt(camLook);
+    const gl = surfY(ball.x, ball.y);
+    camLift = dt == null ? gl : camLift + (gl - camLift) * (1 - Math.exp(-dt * 3));
+    camera.position.copy(camPos); camera.position.y += camLift;
+    camera.position.y = Math.max(surfY(camera.position.x, camera.position.z) + 1.2, camera.position.y);
+    camera.lookAt(liftLook.copy(camLook).setY(camLook.y + camLift));
     // only once the camera has settled in behind the ball (not while it swoops down from the map)
     const want = (state === 'ready' || state === 'swinging' || state === 'striking') && viewMode === 'normal' && introT <= 0 && !ball.inCup
       && camPos.distanceTo(dPos) < 2 ? 1 : 0;
@@ -1496,7 +1504,7 @@
     camera.clearViewOffset();
     if (frameK < 0.002) return;
     camera.updateMatrixWorld();
-    frameV.set(ball.x, (ball.z || 0) + 0.1, ball.y).project(camera);
+    frameV.set(ball.x, (ball.z || 0) + 0.1 + surfY(ball.x, ball.y), ball.y).project(camera);
     const shift = clamp((1 - frameV.y) / 2 * innerHeight - aimBallY(), 0, innerHeight * 0.4) * frameK;
     if (shift > 0.5) camera.setViewOffset(innerWidth, innerHeight, 0, shift, innerWidth, innerHeight);
   }
@@ -1505,12 +1513,12 @@
   const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2(), groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitP = new THREE.Vector3();
   function rayGround(e) {
     ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
-    raycaster.setFromCamera(ndc, camera);
+    raycaster.setFromCamera(ndc, camera); groundPlane.constant = -surfY(ball.x, ball.y);
     return raycaster.ray.intersectPlane(groundPlane, hitP);
   }
   const ballV = new THREE.Vector3();
   function ballScreen() {
-    ballV.set(ball.x, (flight ? flight.hgt : (ball.z || 0)) + 0.1, ball.y).project(camera);
+    ballV.set(ball.x, (flight ? flight.hgt : (ball.z || 0)) + 0.1 + surfY(ball.x, ball.y), ball.y).project(camera);
     return { x: (ballV.x + 1) / 2 * innerWidth, y: (1 - ballV.y) / 2 * innerHeight, behind: ballV.z > 1 };
   }
 
@@ -1839,7 +1847,7 @@
     if (swingAnim) swingAnim.t += dt;
     if (pinPulled && pinT < 1) pinT = Math.min(1, pinT + dt / 1.1);
     if (!pinPulled && lastPutt && (state === 'rolling' || state === 'sinking') && distToPin() < 6) pinPulled = true;
-    if (state === 'flying') { fly(dt); if (flight) trailPush(ball.x, flight.hgt + 0.1, ball.y); }
+    if (state === 'flying') { fly(dt); if (flight) trailPush(ball.x, flight.hgt + 0.1 + surfY(ball.x, ball.y), ball.y); }
     else if (state === 'rolling') roll(dt);
     else if (state === 'sinking') {
       sinkT += dt;
@@ -1868,8 +1876,8 @@
     for (let i = 0; i <= AIM_N; i++) {
       const s = i / AIM_N, k = cv * s * s;
       p[i * 3] = ball.x + dx * dist * s - dy * k;
-      p[i * 3 + 1] = c.putter ? 0.05 : hMax * 4 * s * (1 - s) + 0.15;
       p[i * 3 + 2] = ball.y + dy * dist * s + dx * k;
+      p[i * 3 + 1] = (c.putter ? 0.05 : hMax * 4 * s * (1 - s) + 0.15) + surfY(p[i * 3], p[i * 3 + 2]);
     }
     aimGeo.attributes.position.needsUpdate = true;
     aimMat.dashSize = c.putter ? 0.25 : 1.6; aimMat.gapSize = c.putter ? 0.18 : 1.1;
@@ -1884,10 +1892,10 @@
     const by = h - (ball.overCup ? ball.dip || 0 : 0);
     const camD = camera.position.distanceTo(ballV.set(ball.x, h, ball.y));
     const r = ball.inCup ? BALL_R : clamp(camD * 0.0065, 0.07, 0.9);
-    const sy = ball.inCup ? 0 : surfY(ball.x, ball.y);
+    const sy = surfY(ball.x, ball.y);
     ballMesh.scale.setScalar(r); ballMesh.position.set(ball.x, by + r + sy, ball.y);
     ballMesh.visible = !(state === 'penalty' && splash);
-    blob.position.set(ball.x, 0.04 + sy, ball.y); blob.scale.setScalar(r * (1.1 + h * 0.01));
+    blob.position.set(ball.x, 0.07 + sy, ball.y); blob.scale.setScalar(r * (1.1 + h * 0.01));
     blob.material.opacity = 0.32 * clamp(1 - h / 50, 0.15, 1);
     blob.visible = ballMesh.visible && !ball.inCup;
 
@@ -1900,11 +1908,11 @@
       const cv = state === 'swinging' ? curveOf(swing.lat, live) : 0;
       setArc(live, c, cv);
       const sz = d => c.putter ? 0.4 : clamp(d * 0.028, 1.4, 7);
-      fullTarget.position.set(ball.x + dx * full, 0.07, ball.y + dy * full);
+      fullTarget.position.set(ball.x + dx * full, 0.07 + surfY(ball.x + dx * full, ball.y + dy * full), ball.y + dy * full);
       fullTarget.scale.setScalar(sz(full) * (state === 'ready' ? 1 + Math.sin(time * 4) * 0.04 : 1));
       fullTarget.userData.ring.material.opacity = state === 'swinging' ? 0.45 : 0.95;
       if (state === 'swinging') {
-        liveTarget.position.set(ball.x + dx * live - dy * cv, 0.08, ball.y + dy * live + dx * cv);
+        liveTarget.position.set(ball.x + dx * live - dy * cv, 0.08 + surfY(ball.x + dx * live - dy * cv, ball.y + dy * live + dx * cv), ball.y + dy * live + dx * cv);
         liveTarget.scale.setScalar(sz(Math.max(live, 1)) * 0.85);
       }
     }
@@ -1932,12 +1940,12 @@
     // flagstick: lifted out of the cup and laid on the green when a putt gets close
     if (pinGroup) {
       const k = pinT;
-      if (k < 0.5) { const u = easeOut(k / 0.5); pinGroup.position.y = u * (4.3 + CUP_D) * 0.55; pinGroup.rotation.z = 0; pinGroup.position.x = hole.pin.x; }
+      if (k < 0.5) { const u = easeOut(k / 0.5); pinGroup.position.y = hole.terr.greenH + u * (4.3 + CUP_D) * 0.55; pinGroup.rotation.z = 0; pinGroup.position.x = hole.pin.x; }
       else {
         const u = easeOut((k - 0.5) / 0.5);
         pinGroup.rotation.z = -u * Math.PI / 2;
         pinGroup.position.x = hole.pin.x + u * 2.2;
-        pinGroup.position.y = (1 - u) * (4.3 + CUP_D) * 0.55 + u * 0.08;
+        pinGroup.position.y = hole.terr.greenH + (1 - u) * (4.3 + CUP_D) * 0.55 + u * 0.08;
       }
     }
 
@@ -2478,7 +2486,8 @@
   // ================= Home slideshow =================
   // Snapshots of real holes, rendered one at a time (only when the player isn't touching the screen),
   // then cycled with a slow pan/zoom and crossfade. Cached so later visits don't render anything.
-  const SLIDE_VER = 'cg-slides-1', SLIDE_MS = 8000;
+  const SLIDE_VER = 'cg-slides-2', SLIDE_MS = 8000;
+  try { localStorage.removeItem('cg-slides-1'); } catch (e) {}
   const SHOTS = [];
   COURSES.forEach((c, ci) => {
     const n = c.holes.length, picks = n > 9 ? [2, 7, 12, 16] : [1, 3, 5];
@@ -2493,9 +2502,11 @@
     applyCourseLook(c); buildHole(h, c, 1300);
     const tee = h.tee, pin = h.pin, L = Math.hypot(pin.x - tee.x, pin.y - tee.y) || 1, dx = (pin.x - tee.x) / L, dy = (pin.y - tee.y) / L;
     if (s.view === 0) {   // from behind the tee, down the hole
-      camera.position.set(tee.x - dx * 28, 16, tee.y - dy * 28); camera.lookAt(tee.x + dx * L * 0.55, 0, tee.y + dy * L * 0.55);
+      const cx = tee.x - dx * 28, cz = tee.y - dy * 28, lx = tee.x + dx * L * 0.55, lz = tee.y + dy * L * 0.55;
+      camera.position.set(cx, 16 + terrainH(h, cx, cz), cz); camera.lookAt(lx, terrainH(h, lx, lz), lz);
     } else {              // approach shot view of the green, from the side
-      camera.position.set(pin.x - dx * 75 - dy * 22, 13, pin.y - dy * 75 + dx * 22); camera.lookAt(pin.x, 0, pin.y);
+      const cx = pin.x - dx * 75 - dy * 22, cz = pin.y - dy * 75 + dx * 22;
+      camera.position.set(cx, 13 + Math.max(terrainH(h, cx, cz), h.terr.greenH), cz); camera.lookAt(pin.x, h.terr.greenH, pin.y);
     }
     const vis = [golfer.root, ballMesh, blob, aimLine, fullTarget, liveTarget].map(o => [o, o.visible]);
     vis.forEach(([o]) => o.visible = false);
