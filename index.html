@@ -260,6 +260,14 @@
   .sw button.buy em{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);font:800 8.5px Inter;font-style:normal;color:#45060f;background:var(--gold);
                      border-radius:999px;padding:1px 4px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.4)}
   .sw{row-gap:12px}
+  .logoEd{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+  .logoEd label{font:800 10px Inter;letter-spacing:.14em;color:var(--gold);text-transform:uppercase}
+  .logoEd input[type=text],.logoEd #logoText{display:block;width:100%;margin-top:6px;padding:10px 12px;border-radius:12px;border:2px solid rgba(242,193,78,.55);background:var(--red-dd);
+                 color:#fff;font:700 17px Oswald,sans-serif;letter-spacing:.05em;text-transform:uppercase;-webkit-user-select:text;user-select:text;touch-action:auto}
+  .logoBtns{display:flex;gap:8px;flex-wrap:wrap}
+  .logoEd .upl{position:relative;display:inline-flex;align-items:center;cursor:pointer;color:var(--gold-l);border:2px solid var(--gold);border-radius:999px;padding:6px 14px;
+               font:700 14px Oswald,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+  .logoEd .upl input{position:absolute;inset:0;opacity:0;cursor:pointer}
   .buybar{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--gold)}
   .buybar .bsw{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.6);flex:none}
   .buybar .bi{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -496,9 +504,9 @@
         <div class="tiles" id="statTiles"></div>
         <div class="sect">BEST ROUNDS</div>
         <div class="rows" id="bestRows"></div>
+        <div id="howBody"></div>
         <button class="reset" id="resetBtn">Reset all progress</button>
       </section>
-      <section id="tab-how" class="hidden"><div id="howBody"></div></section>
     </div>
   </main>
   <div class="disclaim" style="flex:none;padding:6px 0">Not affiliated with Chaminade High School in any way.</div>
@@ -508,7 +516,6 @@
     <button data-tab="clubs"><span class="ic">🏌️</span>Clubs</button>
     <button data-tab="awards"><span class="ic">🏆</span>Awards</button>
     <button data-tab="stats"><span class="ic">📊</span>Stats</button>
-    <button data-tab="how"><span class="ic">❓</span>How</button>
   </nav>
 </div>
 
@@ -703,7 +710,8 @@
     trim: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['White', '#eeeeea'], ['Black', '#111113'], ['Navy', '#1f2c4d'], ['Silver', '#b8bcc4']],
     covers: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['Black', '#111113'], ['White', '#eeeeea'], ['Navy', '#1f2c4d'], ['Green', '#1f5a34']],
   };
-  const BAG_LOGOS = [['chaminade', 'Chaminade'], ['none', 'No logo']];
+  const BAG_LOGOS = [['chaminade', 'Chaminade'], ['none', 'No logo'], ['custom', 'Custom logo']];
+  const CUSTOM_LOGO_PRICE = 10000;
   const BAG_PARTS = [['body', 'Bag color'], ['trim', 'Trim'], ['covers', 'Headcovers'], ['logo', 'Logo']];
 
   // ================= Save data =================
@@ -1377,8 +1385,8 @@
   function lookMats() {
     const m = {};
     ['jacket', 'shirt', 'tie', 'pants', 'shoes', 'skin', 'hair'].forEach(k => m[k] = new THREE.MeshLambertMaterial({ color: 0xffffff }));
-    m.metal = new THREE.MeshStandardMaterial({ color: 0xd4d8de, metalness: 0.75, roughness: 0.3 });
-    m.dark = new THREE.MeshStandardMaterial({ color: 0x1d1d22, metalness: 0.5, roughness: 0.35 });
+    m.metal = new THREE.MeshPhongMaterial({ color: 0xc9cdd3, specular: 0xffffff, shininess: 90 });
+    m.dark = new THREE.MeshPhongMaterial({ color: 0x1d1d22, specular: 0x777777, shininess: 70 });
     m.grip = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
     m.glove = new THREE.MeshLambertMaterial({ color: 0xf5f5f0 });
     m.trim = new THREE.MeshLambertMaterial({ color: 0xF2C14E });
@@ -1404,6 +1412,33 @@
   }
   function part(geo, mat, x, y, z, parent) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; parent.add(m); return m; }
 
+  // ---- club heads (shared by the golfer and the clubs in the bag) ----
+  // Origin = where the shaft meets the hosel. Toe points +z (away from the golfer), the face points +x (at the target), sole is 0.03 below.
+  const IRON_GEO = (() => {
+    const sh = new THREE.Shape();
+    sh.moveTo(0, 0.004); sh.quadraticCurveTo(0.002, 0, 0.012, 0); sh.lineTo(0.068, 0); sh.quadraticCurveTo(0.082, 0.001, 0.083, 0.018);
+    sh.quadraticCurveTo(0.083, 0.044, 0.066, 0.047); sh.lineTo(0.016, 0.033); sh.quadraticCurveTo(0.002, 0.03, 0, 0.02); sh.closePath();
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: 0.012, bevelEnabled: true, bevelThickness: 0.003, bevelSize: 0.003, bevelSegments: 2, curveSegments: 8 });
+    geo.translate(0, 0, -0.006); return geo;
+  })();
+  const WOOD_GEO = new THREE.SphereGeometry(0.062, 28, 18), HOSEL_GEO = new THREE.CylinderGeometry(0.0065, 0.008, 0.034, 10);
+  const PUTTER_GEO = new THREE.BoxGeometry(0.024, 0.024, 0.1, 1, 1, 1), FACE_GEO = new THREE.BoxGeometry(0.003, 0.04, 0.08);
+  function clubHead(kind, m) {
+    const g = new THREE.Group();
+    const hosel = new THREE.Mesh(HOSEL_GEO, kind === 'wood' ? m.dark : m.metal); hosel.position.set(0, -0.013, 0); g.add(hosel);
+    if (kind === 'wood') {
+      const h = new THREE.Mesh(WOOD_GEO, m.dark); h.scale.set(0.92, 0.56, 1); h.position.set(-0.028, 0.004, 0.05); g.add(h);
+      const face = new THREE.Mesh(FACE_GEO, m.metal); face.position.set(0.026, 0.003, 0.05); g.add(face);
+    } else if (kind === 'putter') {
+      const h = new THREE.Mesh(PUTTER_GEO, m.metal); h.position.set(0, -0.018, 0.045); g.add(h);
+      const line = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.002, 0.004), m.glove); line.position.set(-0.002, -0.0055, 0.045); g.add(line);
+    } else {
+      const h = new THREE.Mesh(IRON_GEO, m.metal); h.rotation.y = -Math.PI / 2; h.position.set(0, -0.03, -0.012);
+      h.rotation.z = kind === 'wedge' ? 0 : 0; g.add(h);
+    }
+    g.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    return g;
+  }
   function makeGolfer(m) {
     const root = new THREE.Group();
     for (const sx of [-1, 1]) {
@@ -1456,11 +1491,7 @@
       const g = new THREE.Group(), dir = head.clone().normalize();
       g.add(limb(dir.clone().multiplyScalar(-0.06), dir.clone().multiplyScalar(0.22), 0.02, 0.02, m.grip));
       g.add(limb(dir.clone().multiplyScalar(0.2), head, 0.011, 0.011, m.metal));
-      let hm;
-      if (k === 'wood') { hm = part(new THREE.SphereGeometry(0.07, 14, 10), m.dark, 0, 0, 0, g); hm.scale.set(1.5, 0.65, 1.15); }
-      else if (k === 'putter') hm = part(new THREE.BoxGeometry(0.15, 0.035, 0.05), m.metal, 0, 0, 0, g);
-      else hm = part(new THREE.BoxGeometry(0.1, 0.06, 0.022), m.metal, 0, 0, 0, g);
-      hm.position.copy(head).add(V3(0.04, 0.0, 0));
+      const hm = clubHead(k, m); hm.position.copy(head).add(V3(0, 0.03, -0.02)); g.add(hm);
       g.visible = false; hinge.add(g); clubs[k] = g;
       // swing plane holds the target line (x) and the line from the shoulders to the ball
       const sball = V3(0, 0.03 - (HIP_Y + SHOULDER.y), B[k] - SHOULDER.z).normalize();
@@ -1489,15 +1520,41 @@
   // ================= Golf bag (stands on the tee box, customizable in Golfer) =================
   function bagMats() {
     const cv = document.createElement('canvas'); cv.width = 256; cv.height = 512;
-    const tex = new THREE.CanvasTexture(cv);
+    const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4;
     return { cv, tex,
-      body: new THREE.MeshLambertMaterial({ map: tex }),
-      trim: new THREE.MeshLambertMaterial({ color: 0xF2C14E }),
+      body: new THREE.MeshPhongMaterial({ map: tex, specular: 0x2a2a2a, shininess: 28 }),
+      trim: new THREE.MeshPhongMaterial({ color: 0xF2C14E, specular: 0x333333, shininess: 30 }),
       covers: new THREE.MeshLambertMaterial({ color: 0xF2C14E }),
-      dark: new THREE.MeshLambertMaterial({ color: 0x1b1b1f }),
-      metal: new THREE.MeshStandardMaterial({ color: 0xd4d8de, metalness: 0.75, roughness: 0.3 }) };
+      dark: new THREE.MeshPhongMaterial({ color: 0x1b1b1f, specular: 0x444444, shininess: 40 }),
+      rubber: new THREE.MeshLambertMaterial({ color: 0x111111 }),
+      glove: new THREE.MeshLambertMaterial({ color: 0xf5f5f0 }),
+      metal: new THREE.MeshPhongMaterial({ color: 0xc9cdd3, specular: 0xffffff, shininess: 90 }) };
   }
   // the bag's skin: body color plus a vertical CHAMINADE logo down the front (u = 0.5 faces front)
+  // ---- custom bag logo: your own picture and/or words, bought for $10,000 ----
+  let logoImg = null, logoSrc = '';
+  function customLogo() { return save.customLogo || (save.customLogo = { img: '', text: '' }); }
+  function drawCustomLogo(g, W, H, b) {
+    const cl = customLogo(), ink = b.trim.toLowerCase() === b.body.toLowerCase() ? '#ffffff' : b.trim;
+    if (cl.img && cl.img !== logoSrc) {
+      logoSrc = cl.img; logoImg = new Image();
+      logoImg.onload = () => { applyBag(playerBagMats, save.gbag); if (typeof previewBagMats !== 'undefined') applyBag(previewBagMats, save.gbag); };
+      logoImg.src = cl.img;
+    }
+    const hasImg = cl.img && logoImg && logoImg.complete && logoImg.naturalWidth, text = (cl.text || '').toUpperCase();
+    if (hasImg) {
+      const S = 74, y = text ? H * 0.2 : H * 0.4;
+      g.fillStyle = 'rgba(255,255,255,.92)'; g.beginPath(); g.arc(W / 2, y + S / 2, S / 2 + 4, 0, Math.PI * 2); g.fill();
+      g.save(); g.beginPath(); g.arc(W / 2, y + S / 2, S / 2, 0, Math.PI * 2); g.clip(); g.drawImage(logoImg, W / 2 - S / 2, y, S, S); g.restore();
+    }
+    if (text) {
+      g.save(); g.translate(W / 2, hasImg ? H * 0.62 : H * 0.47); g.rotate(-Math.PI / 2);
+      const size = Math.min(52, Math.floor((hasImg ? 280 : 400) / Math.max(4, text.length) * 1.6));
+      g.font = `700 ${size}px Oswald, Impact, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText(text, 0, 2); g.fillStyle = ink; g.fillText(text, 0, 0);
+      g.restore();
+    }
+  }
   function applyBag(m, b) {
     const g = m.cv.getContext('2d'), W = m.cv.width, H = m.cv.height;
     g.fillStyle = b.body; g.fillRect(0, 0, W, H);
@@ -1506,6 +1563,7 @@
     [0.25, 0.75].forEach(u => { g.beginPath(); g.moveTo(u * W, 0); g.lineTo(u * W, H); g.stroke(); });
     // trim stripes beside the logo
     g.fillStyle = b.trim; g.fillRect(W * 0.5 - 46, 0, 6, H); g.fillRect(W * 0.5 + 40, 0, 6, H);
+    if (b.logo === 'custom') drawCustomLogo(g, W, H, b);
     if (b.logo === 'chaminade') {
       g.save(); g.translate(W / 2, H * 0.47); g.rotate(-Math.PI / 2);
       g.font = '700 50px Oswald, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -1516,29 +1574,61 @@
     m.tex.needsUpdate = true;
     m.trim.color.set(b.trim); m.covers.color.set(b.covers);
   }
+  // A stand bag: a smooth padded body, rounded collar, side pocket, backpack straps, two legs that kick out the back,
+  // and real-looking clubs (knit headcovers on the woods, iron heads hanging sole-up, putter cover).
+  const HC_GEO = new THREE.LatheGeometry([[0.001, 0.235], [0.04, 0.226], [0.06, 0.2], [0.068, 0.16], [0.066, 0.12], [0.05, 0.08], [0.028, 0.04], [0.024, 0]].reverse()
+    .map(([x, y]) => new THREE.Vector2(x, y)), 28);
   function makeBag(m) {
     const root = new THREE.Group(), bag = new THREE.Group(); root.add(bag);
-    bag.rotation.x = -0.28;                                                    // leans back on its stand
-    const body = part(new THREE.CylinderGeometry(0.15, 0.14, 0.82, 24), m.body, 0, 0.45, 0, bag); body.rotation.y = Math.PI;
-    part(new THREE.CylinderGeometry(0.165, 0.16, 0.11, 24), m.trim, 0, 0.88, 0, bag);           // top cuff
-    part(new THREE.CylinderGeometry(0.15, 0.15, 0.03, 24), m.dark, 0, 0.94, 0, bag);             // divider top
-    part(new THREE.CylinderGeometry(0.152, 0.155, 0.08, 24), m.trim, 0, 0.04, 0, bag);           // base
-    part(new THREE.BoxGeometry(0.07, 0.3, 0.17), m.trim, 0.15, 0.32, 0, bag);                       // side pocket (keeps the logo clear)
-    part(new THREE.BoxGeometry(0.075, 0.012, 0.14), m.dark, 0.152, 0.42, 0, bag);                  // zipper
-    // carry strap on the back
-    const strap = part(new THREE.TorusGeometry(0.2, 0.018, 6, 16, Math.PI), m.dark, 0, 0.55, -0.16, bag); strap.rotation.y = Math.PI / 2;
-    // clubs sticking out: headcovers on the woods, irons poking up
-    [[-0.06, 0.06], [0.06, 0.06], [0, -0.04]].forEach(([x, z], i) => {
-      part(new THREE.CylinderGeometry(0.012, 0.012, 0.16, 6), m.dark, x, 1.0, z, bag);
-      const hc = part(new THREE.SphereGeometry(0.065, 12, 10), m.covers, x, 1.11 + i * 0.02, z, bag); hc.scale.set(1, 1.25, 0.95);
-      part(new THREE.SphereGeometry(0.02, 8, 6), m.trim, x, 1.2 + i * 0.02, z, bag);              // pom-pom
+    const A = -0.28; bag.rotation.x = A;                                            // leans back on its stand
+    const prof = [[0, 0.012], [0.11, 0.012], [0.138, 0.025], [0.148, 0.06], [0.15, 0.2], [0.153, 0.5], [0.156, 0.78], [0.158, 0.84]].map(([x, y]) => new THREE.Vector2(x, y));
+    const body = part(new THREE.LatheGeometry(prof, 48), m.body, 0, 0, 0, bag); body.rotation.y = Math.PI;
+    // rounded top collar and cuff
+    const cuff = part(new THREE.CylinderGeometry(0.164, 0.16, 0.1, 48, 1, true), m.trim, 0, 0.83, 0, bag);
+    const roll = part(new THREE.TorusGeometry(0.158, 0.022, 14, 48), m.trim, 0, 0.88, 0, bag); roll.rotation.x = Math.PI / 2;
+    part(new THREE.CircleGeometry(0.15, 40), m.dark, 0, 0.87, 0, bag).rotation.x = -Math.PI / 2;     // dark opening
+    for (const r of [0, Math.PI / 2]) { const dv = part(new THREE.BoxGeometry(0.29, 0.02, 0.012), m.dark, 0, 0.885, 0, bag); dv.rotation.y = r; }
+    // rubber base ring
+    const base = part(new THREE.TorusGeometry(0.142, 0.018, 12, 48), m.rubber, 0, 0.02, 0, bag); base.rotation.x = Math.PI / 2;
+    part(new THREE.CylinderGeometry(0.152, 0.152, 0.06, 48, 1, true), m.trim, 0, 0.055, 0, bag);
+    // pillow-shaped side pocket with a zip
+    const pk = part(new THREE.SphereGeometry(1, 28, 18), m.trim, 0.135, 0.36, 0, bag); pk.scale.set(0.05, 0.19, 0.1);
+    const zip = part(new THREE.TorusGeometry(0.075, 0.004, 6, 24, Math.PI), m.dark, 0.182, 0.36, 0, bag); zip.rotation.y = Math.PI / 2; zip.scale.set(1, 2.1, 1);
+    const pk2 = part(new THREE.SphereGeometry(1, 24, 14), m.trim, -0.13, 0.55, 0.02, bag); pk2.scale.set(0.045, 0.1, 0.075);     // small valuables pocket
+    // padded backpack straps
+    for (const sx of [-1, 1]) {
+      const curve = new THREE.CatmullRomCurve3([V3(sx * 0.05, 0.78, -0.15), V3(sx * 0.055, 0.74, -0.27), V3(sx * 0.06, 0.55, -0.3), V3(sx * 0.055, 0.38, -0.25), V3(sx * 0.05, 0.32, -0.15)]);
+      const st = part(new THREE.TubeGeometry(curve, 24, 0.016, 8, false), m.dark, 0, 0, 0, bag); st.scale.x = 1;
+    }
+    const handle = part(new THREE.TorusGeometry(0.05, 0.012, 8, 20, Math.PI), m.dark, -0.155, 0.7, 0, bag); handle.rotation.set(0, Math.PI / 2, Math.PI / 2);
+    // clubs: three woods in knit headcovers at the back, irons and wedges hanging sole-up at the front, a covered putter
+    const tops = [[-0.075, -0.06, 0.2, 1], [0.0, -0.085, 0.24, 1], [0.075, -0.055, 0.19, 1]];
+    tops.forEach(([x, z, h], i) => {
+      const c = new THREE.Group(); c.position.set(x, 0.86, z); c.rotation.set(-0.12 - i * 0.04, 0, (x > 0 ? -1 : x < 0 ? 1 : 0) * 0.18); bag.add(c);
+      const sh = part(new THREE.CylinderGeometry(0.0065, 0.0065, h, 8), m.dark, 0, h / 2, 0, c);
+      const hc = part(HC_GEO, m.covers, 0, h - 0.02, 0, c); hc.rotation.z = (i - 1) * 0.15;
+      part(new THREE.CylinderGeometry(0.028, 0.026, 0.03, 20), m.trim, 0, h - 0.005, 0, c);              // ribbed cuff
+      if (i === 1) part(new THREE.SphereGeometry(0.026, 12, 10), m.trim, 0, h + 0.225, 0, c);           // pom-pom on the driver
     });
-    [[-0.08, -0.07], [-0.02, -0.09], [0.04, -0.09], [0.09, -0.05]].forEach(([x, z], i) => {
-      part(new THREE.CylinderGeometry(0.009, 0.009, 0.24, 6), m.metal, x, 1.04 + (i % 2) * 0.03, z, bag);
-      part(new THREE.BoxGeometry(0.06, 0.035, 0.018), m.metal, x + 0.02, 1.16 + (i % 2) * 0.03, z, bag);
+    [[-0.1, 0.03, 0.12], [-0.05, 0.075, 0.15], [0.0, 0.09, 0.17], [0.05, 0.075, 0.14], [0.1, 0.035, 0.13], [-0.02, 0.02, 0.18]].forEach(([x, z, h], i) => {
+      const c = new THREE.Group(); c.position.set(x, 0.86, z); c.rotation.set(0.1 + (i % 2) * 0.06, i * 0.9, x * -1.2); bag.add(c);
+      part(new THREE.CylinderGeometry(0.0055, 0.006, h, 8), m.metal, 0, h / 2, 0, c);
+      const hd = clubHead('iron', m); hd.position.y = h + 0.0; hd.rotation.x = Math.PI; c.add(hd);
     });
-    // stand legs
-    for (const sx of [-1, 1]) root.add(limb(V3(sx * 0.07, 0.62, -0.18), V3(sx * 0.2, 0, -0.44), 0.012, 0.012, m.dark));
+    { const c = new THREE.Group(); c.position.set(0.11, 0.86, -0.02); c.rotation.set(-0.05, 0.4, -0.25); bag.add(c);
+      part(new THREE.CylinderGeometry(0.006, 0.006, 0.12, 8), m.metal, 0, 0.06, 0, c);
+      const pc = part(new THREE.SphereGeometry(1, 20, 12), m.covers, 0, 0.14, 0.04, c); pc.scale.set(0.022, 0.035, 0.065); }
+    // stand: two carbon legs hinged under the collar, kicking out behind, with rubber feet
+    const toRoot = v => { const c = Math.cos(A), sn = Math.sin(A); return V3(v.x, v.y * c - v.z * sn, v.y * sn + v.z * c); };
+    for (const sx of [-1, 1]) {
+      const hinge = toRoot(V3(sx * 0.085, 0.78, -0.135)), foot = V3(sx * 0.25, 0.015, -0.6);
+      root.add(limb(hinge, foot, 0.011, 0.009, m.dark));
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(0.02, 12, 10), m.metal); cap.position.copy(hinge); root.add(cap);
+      const ft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.02, 0.035, 12), m.rubber); ft.position.copy(foot).setY(0.017); root.add(ft);
+      // the linkage rod from the base that kicks the leg out
+      const mid = hinge.clone().lerp(foot, 0.62);
+      root.add(limb(toRoot(V3(sx * 0.07, 0.1, -0.13)), mid, 0.006, 0.006, m.metal));
+    }
     root.traverse(o => { if (o.isMesh) o.castShadow = true; });
     return root;
   }
@@ -3163,16 +3253,15 @@
     tab = t;
     const navTab = t === 'course' ? 'play' : t;
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === navTab));
-    ['play', 'course', 'golfer', 'clubs', 'awards', 'stats', 'how'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
+    ['play', 'course', 'golfer', 'clubs', 'awards', 'stats'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
     if (t === 'play') renderCourses();
     if (t === 'course') renderCourse();
     if (t === 'golfer') renderGolfer();
     document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer');
     $('miniBtn').classList.toggle('hidden', t !== 'play');
     if (t === 'clubs') renderClubs();
-    if (t === 'stats') renderStats();
+    if (t === 'stats') { renderStats(); renderHow(); }
     if (t === 'awards') renderAwards();
-    if (t === 'how') renderHow();
     $('homeCoins').textContent = money(save.coins);
     document.querySelector('.hbody').scrollTop = 0;
   }
@@ -3428,9 +3517,16 @@
     const lockNote = bLockMsg ? (() => { const a = AWARDS.find(x => x.id === bLockMsg.award); return `<div class="locknote">🔒 <b>${bLockMsg.name}</b> bag is locked. Earn the <b>${a.icon} ${a.name}</b> achievement: ${a.how}.</div>`; })() : '';
     const chips = BAG_PARTS.map(([k, n]) => `<button data-bpart="${k}" class="${k === bPart ? 'on' : ''}">${k === 'logo' ? '🏷️ ' : `<i style="background:${G[k]}"></i>`}${n}</button>`).join('');
     const label = BAG_PARTS.find(x => x[0] === bPart)[1];
+    const ownLogo = !!save.ownedLook['bag-logo:custom'], cl = customLogo();
     const pane = bPart === 'logo'
-      ? `<div class="lh">Logo<b>${G.logo === 'chaminade' ? 'Chaminade' : 'None'}</b></div><div class="opts">` +
-        BAG_LOGOS.map(([v, n]) => `<button data-logo="${v}" class="${G.logo === v ? 'on' : ''}">${n}</button>`).join('') + '</div>'
+      ? `<div class="lh">Logo<b>${(BAG_LOGOS.find(x => x[0] === G.logo) || ['', 'None'])[1]}</b></div><div class="opts">` +
+        BAG_LOGOS.map(([v, n]) => `<button data-logo="${v}" class="${G.logo === v ? 'on' : ''}">${n}${v === 'custom' && !ownLogo ? `<br><small style="font:800 10px Inter;color:var(--gold)">${money(CUSTOM_LOGO_PRICE)}</small>` : ''}</button>`).join('') + '</div>'
+        + (G.logo === 'custom' && ownLogo ? `<div class="logoEd">
+            <label>Words on your bag<input id="logoText" maxlength="12" placeholder="e.g. YOUR NAME" value="${esc(cl.text || '')}" autocomplete="off" spellcheck="false"></label>
+            <div class="logoBtns"><label class="ghost sm upl">📷 ${cl.img ? 'Change picture' : 'Upload picture'}<input type="file" id="logoFile" accept="image/*"></label>
+            ${cl.img ? '<button class="ghost sm" data-logoclear="1">Remove picture</button>' : ''}</div>
+            <div class="gnote">Your picture goes in a round badge on the front of the bag, with your words running down it.</div></div>` : '')
+        + buyBar()
       : `<div class="lh">${label}<b>${swName(BAG_SWATCHES[bPart], G[bPart])}</b></div>` + swRow('data-bcol', bPart === 'body' ? bodies : BAG_SWATCHES[bPart], G[bPart], label, bPart === 'body' ? null : 'bag-' + bPart)
         + (bPart === 'body' ? `<div class="gnote">Unlock more bag colors by earning achievements (🏆 Awards tab).</div>` : '') + buyBar();
     return `<div class="gcard"><div class="sect" style="display:flex;justify-content:space-between">GOLF BAGS<span>${openN} / ${BAG_PRESETS.length}</span></div><div class="pgrid">${cards}</div>${lockNote}` +
@@ -3478,7 +3574,12 @@
       if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(bp.bag); } else bLockMsg = bp;
     }
     else if (d.bpart) bPart = d.bpart;
-    else if (d.logo) setBag({ logo: d.logo });
+    else if (d.logoclear) { customLogo().img = ''; logoSrc = ''; persist(); setBag({}); }
+    else if (d.logo) {
+      if (d.logo === 'custom' && !save.ownedLook['bag-logo:custom']) pendingBuy = { kind: 'bag', title: 'Custom bag logo', price: CUSTOM_LOGO_PRICE, swatch: save.gbag.trim,
+        grant: () => { save.ownedLook['bag-logo:custom'] = 1; }, apply: () => setBag({ logo: 'custom' }) };
+      else setBag({ logo: d.logo });
+    }
     else if (d.bcol) {
       const part = 'bag-' + bPart, col = d.bcol, bp = bPart;
       if (bPart !== 'body' && !ownsC(part, col)) pendingBuy = { kind: 'bag', title: `${swName(BAG_SWATCHES[bp], col)} ${bp === 'covers' ? 'headcovers' : 'bag trim'}`, price: priceOf(part, col), swatch: col,
@@ -3486,6 +3587,25 @@
       else setBag({ [bPart]: d.bcol });
     }
     renderGolfer();
+  });
+  $('gPanel').addEventListener('input', e => {
+    if (e.target.id !== 'logoText') return;
+    customLogo().text = e.target.value.replace(/[<>]/g, '').slice(0, 12); persist(); setBag({});
+  });
+  $('gPanel').addEventListener('keydown', e => { if (e.target.id === 'logoText') { e.stopPropagation(); if (e.key === 'Enter') e.target.blur(); } });
+  $('gPanel').addEventListener('change', e => {
+    if (e.target.id !== 'logoFile' || !e.target.files || !e.target.files[0]) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      const im = new Image();
+      im.onload = () => {   // square crop, shrunk to 200px so it fits in the save
+        const c = document.createElement('canvas'); c.width = c.height = 200; const g = c.getContext('2d'), m = Math.min(im.width, im.height);
+        g.drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, 200, 200);
+        customLogo().img = c.toDataURL('image/jpeg', 0.85); persist(); setBag({}); renderGolfer();
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(e.target.files[0]);
   });
   $('gName').addEventListener('input', e => { save.name = e.target.value.trim().slice(0, 14); persist(); });
   $('gName').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); e.stopPropagation(); });
@@ -3498,6 +3618,7 @@
       return `<tr><td><b>${n}</b></td><td>${ms.map(m => `${m.name} (${m.carry}${m.putter ? ' roll' : ''})`).join('<br>')}</td></tr>`;
     }).join('');
     $('howBody').innerHTML = `
+      <div class="sect" style="margin-top:28px;font-size:16px;color:var(--gold-l)">❓ HOW TO PLAY</div>
       <div class="sect">THE SWING</div>
       <div class="howcard">
         <p><b>1. Aim.</b> Swipe left or right anywhere away from the ball. <b>MAP</b> shows the whole hole and you can tap it to aim.</p>
