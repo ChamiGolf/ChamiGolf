@@ -279,7 +279,61 @@
   .howlist{background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.35);border-radius:14px;padding:6px 16px 6px 34px;margin:0;font-size:14px;line-height:1.55;color:var(--cream)}
   .howlist li{margin:8px 0}
   .howlist b{color:var(--gold-l)}
+  .awbar{height:10px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden;margin:0 2px 12px}
+  .awbar b{display:block;height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
+  .awlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+  .aw{display:flex;gap:10px;align-items:flex-start;background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.25);border-radius:14px;padding:10px 12px;opacity:.82}
+  .aw.done{border-color:var(--gold);background:linear-gradient(180deg,rgba(142,15,34,.95),rgba(79,7,18,.95));opacity:1}
+  .aw .ai{font-size:28px;width:36px;text-align:center;flex:none;line-height:1.1}
+  .aw .ab{flex:1;min-width:0}
+  .aw .an{font:700 16px/1.15 Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.03em}
+  .aw:not(.done) .an{color:#e6cfa4}
+  .aw .ad{font-size:12px;color:#f3d7a8;margin-top:2px;line-height:1.3}
+  .aw .ap{display:flex;align-items:center;gap:8px;margin-top:6px;font:700 11px Inter;color:#fff}
+  .aw .ap i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden;display:block}
+  .aw .ap i b{display:block;height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
+  .aw .ar{font:700 11px Inter;color:#FFE08A;margin-top:5px}
   .reset{margin:20px auto 0;display:block;background:none;border:0;color:#c79a7a;font-size:12px;text-decoration:underline;cursor:pointer}
+
+  /* scorecard between holes */
+  #scOv{background:rgba(20,2,6,.55);z-index:11}
+  .scard{width:calc(100% - 20px);max-width:none;border-radius:18px;overflow:hidden;background:#f4f2ee;border:3px solid #111;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .schead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 18px;background:linear-gradient(90deg,#7A0C1D,#B3122B);border-bottom:3px solid var(--gold)}
+  .sct{font:700 26px/1 Oswald,sans-serif;color:var(--gold-l);letter-spacing:.08em}
+  .scc{font:700 12px Inter;color:#f6dcb0;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+  .sctot{font:700 30px/1 Oswald,sans-serif;color:#fff;white-space:nowrap}
+  .sctot span{font-size:18px;color:var(--gold-l);margin-left:4px}
+  .scin{background:#fff;margin:10px;border-radius:12px;padding:8px 10px 10px}
+  .scsub{font:700 18px Inter,sans-serif;color:#222;margin:2px 4px 6px}
+  .scrow{display:grid;align-items:center;justify-items:center;row-gap:6px;padding:8px 0}
+  .scrow + .scrow{border-top:1px solid #e3e0da}
+  .scrow .hn,.scrow .pr{font:600 clamp(13px,2.2vw,20px) Inter,sans-serif;color:#555}
+  .scrow .hn.cur{color:#B3122B;font-weight:800}
+  .scrow .tl{font:800 clamp(13px,2.2vw,20px) Inter,sans-serif;color:#222}
+  .m{display:inline-flex;align-items:center;justify-content:center;width:clamp(24px,4.2vw,40px);height:clamp(24px,4.2vw,40px);font:600 clamp(13px,2.2vw,20px) Inter,sans-serif;color:#222;box-sizing:border-box}
+  .m.b1{border:2px solid #2d6fb3;border-radius:50%}
+  .m.b2{border:2px solid #2d6fb3;border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 0 4px #2d6fb3}
+  .m.o1{border:2px solid #d9a520}
+  .m.o2{border:2px solid #8b4a2b;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px #8b4a2b}
+  .m.ace{background:var(--gold);border-radius:50%;border:2px solid #B3122B;font-weight:800}
+  .sclegend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:6px;font:600 11px Inter;color:#666}
+  .sclegend span{display:flex;align-items:center;gap:5px}
+  .sclegend .m{width:16px;height:16px}
+  .sclegend .m.b2{box-shadow:0 0 0 1px #fff,0 0 0 2.5px #2d6fb3}
+  .scfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px 14px}
+  .scnext{font:700 14px Inter;color:#333}
+  .scfoot button{flex:none;white-space:nowrap}
+  @media (max-width:560px){.sct{font-size:20px}.sctot{font-size:24px}.scfoot button{padding:10px 16px;font-size:15px}}
+
+  /* achievement toast */
+  .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 92px);z-index:30;display:flex;align-items:center;gap:12px;min-width:260px;max-width:calc(100% - 32px);
+         padding:10px 18px 10px 12px;border-radius:16px;border:2px solid var(--gold-l);background:linear-gradient(135deg,#C9962B,#7A0C1D 60%);
+         box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:none;opacity:0;transform:translate(-50%,-20px);transition:opacity .3s,transform .3s}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast .ti{font-size:34px;line-height:1}
+  .toast .tl{font:800 9px Inter;letter-spacing:.18em;color:var(--gold-l)}
+  .toast .tn{font:700 20px/1.1 Oswald,sans-serif;color:#fff;text-transform:uppercase;letter-spacing:.03em}
+  .toast .ts{font:700 12px Inter;color:#FFE08A;margin-top:2px}
 
   /* end-of-round card */
   .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:12;background:radial-gradient(ellipse at top,rgba(122,12,29,.6),rgba(30,3,8,.88))}
@@ -375,6 +429,7 @@
       <section id="tab-clubs" class="hidden">
         <div id="clubList"></div>
       </section>
+      <section id="tab-awards" class="hidden"><div id="awardsBody"></div></section>
       <section id="tab-stats" class="hidden">
         <div class="sect">CAREER</div>
         <div class="tiles" id="statTiles"></div>
@@ -390,9 +445,25 @@
     <button data-tab="play" class="on"><span class="ic">⛳</span>Play</button>
     <button data-tab="golfer"><span class="ic">👔</span>Golfer</button>
     <button data-tab="clubs"><span class="ic">🏌️</span>Clubs</button>
+    <button data-tab="awards"><span class="ic">🏆</span>Awards</button>
     <button data-tab="stats"><span class="ic">📊</span>Stats</button>
     <button data-tab="how"><span class="ic">❓</span>How</button>
   </nav>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- ===== Scorecard between holes ===== -->
+<div id="scOv" class="overlay hidden">
+  <div class="scard">
+    <div class="schead"><div><div class="sct">CHAMI GOLF TEAM</div><div class="scc" id="scCourse"></div></div><div class="sctot" id="scTot"></div></div>
+    <div class="scin">
+      <div class="scsub">Scorecard</div>
+      <div id="scBody"></div>
+      <div class="sclegend"><span><i class="m b2"></i>Eagle+</span><span><i class="m b1"></i>Birdie</span><span><i class="m"></i>Par</span><span><i class="m o1"></i>Bogey</span><span><i class="m o2"></i>Double+</span></div>
+    </div>
+    <div class="scfoot"><div class="scnext" id="scNext"></div><button class="main" id="scGo">Next hole ▶</button></div>
+  </div>
 </div>
 
 <!-- ===== End of round ===== -->
@@ -539,15 +610,24 @@
   const partShown = (k, look) => (k !== 'trim' || look.style === 'sweater') && (k !== 'style' || unlocked('senior'));
 
   // ================= Golf bag looks =================
+  // Every bag but the Chaminade bag is locked behind an achievement (see AWARDS).
   const BAG_PRESETS = [
     { name: 'Chaminade', bag: { body: '#B3122B', trim: '#F2C14E', covers: '#F2C14E', logo: 'chaminade' } },
-    { name: 'Tour Black', bag: { body: '#111113', trim: '#B3122B', covers: '#111113', logo: 'none' } },
-    { name: 'Navy Staff', bag: { body: '#1f2c4d', trim: '#eeeeea', covers: '#B3122B', logo: 'none' } },
-    { name: 'White & Gold', bag: { body: '#eeeeea', trim: '#C9962B', covers: '#B3122B', logo: 'chaminade' } },
+    { name: 'Tour Black', award: 'birdie1', bag: { body: '#111113', trim: '#B3122B', covers: '#111113', logo: 'none' } },
+    { name: 'Navy Staff', award: 'underpar1', bag: { body: '#1f2c4d', trim: '#eeeeea', covers: '#B3122B', logo: 'none' } },
+    { name: 'Royal Blue', award: 'chip1', bag: { body: '#2747a8', trim: '#eeeeea', covers: '#F2C14E', logo: 'none' } },
+    { name: 'Eagle Gold', award: 'eagle1', bag: { body: '#C9962B', trim: '#B3122B', covers: '#B3122B', logo: 'chaminade' } },
+    { name: 'White & Gold', award: 'ace1', bag: { body: '#eeeeea', trim: '#C9962B', covers: '#B3122B', logo: 'chaminade' } },
+    { name: 'Maroon Classic', award: 'rounds25', bag: { body: '#6b0f1e', trim: '#F2C14E', covers: '#6b0f1e', logo: 'chaminade' } },
+    { name: 'Silver Bullet', award: 'drive300', bag: { body: '#7d8088', trim: '#B3122B', covers: '#111113', logo: 'none' } },
+    { name: 'Green Jacket', award: 'explorer', bag: { body: '#1f5a34', trim: '#F2C14E', covers: '#1f5a34', logo: 'none' } },
+    { name: 'Desert Tan', award: 'sand1', bag: { body: '#b9a47c', trim: '#5a3b24', covers: '#5a3b24', logo: 'none' } },
+    { name: 'Gold Star', award: 'mini1', bag: { body: '#F2C14E', trim: '#B3122B', covers: '#B3122B', logo: 'chaminade' } },
+    { name: 'Black & Gold', award: 'birdie100', bag: { body: '#111113', trim: '#F2C14E', covers: '#F2C14E', logo: 'chaminade' } },
   ];
   const BAG_SWATCHES = {
     body: [['Red', '#B3122B'], ['Maroon', '#6b0f1e'], ['Black', '#111113'], ['Navy', '#1f2c4d'], ['Royal', '#2747a8'], ['Green', '#1f5a34'],
-           ['Gray', '#7d8088'], ['Tan', '#b9a47c'], ['Gold', '#C9962B'], ['White', '#eeeeea']],
+           ['Gray', '#7d8088'], ['Tan', '#b9a47c'], ['Gold', '#C9962B'], ['Bright gold', '#F2C14E'], ['White', '#eeeeea']],
     trim: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['White', '#eeeeea'], ['Black', '#111113'], ['Navy', '#1f2c4d'], ['Silver', '#b8bcc4']],
     covers: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['Black', '#111113'], ['White', '#eeeeea'], ['Navy', '#1f2c4d'], ['Green', '#1f5a34']],
   };
@@ -557,7 +637,8 @@
   // ================= Save data =================
   const SAVE_KEY = 'fairwayclub-save';
   const freshStats = () => ({ rounds: 0, holes: 0, aces: 0, eagles: 0, birdies: 0, pars: 0, shots: 0, perfects: 0,
-    longest: 0, earnedTotal: 0, strokesTotal: 0, parTotal: 0, roundsBy: {}, bestBy: {} });
+    longest: 0, earnedTotal: 0, strokesTotal: 0, parTotal: 0, roundsBy: {}, bestBy: {},
+    albatross: 0, chipIns: 0, sandHoles: 0, longPutts: 0, underPar: 0, miniAces: 0 });
   const freshSave = () => ({ coins: 0, lv: {}, ball: 0, course: 'pines', stats: freshStats(), bag: STARTER_BAG.slice(), owned: STARTER_BAG.slice(),
     name: 'Player', look: Object.assign({}, LOOK_PRESETS[0].look), gbag: Object.assign({}, BAG_PRESETS[0].bag), board: {} });
   let save = freshSave();
@@ -580,6 +661,50 @@
   save.unlocks = save.unlocks || {};
   if (save.look.style !== 'sweater' || !save.unlocks.senior) save.look.style = 'suit';
   save.gbag = Object.assign({}, BAG_PRESETS[0].bag, save.gbag || {});
+  save.awards = save.awards || {};
+
+  // ================= Achievements =================
+  // [id, icon, name, how, progress(stats) → [have, need], reward money]
+  const st$ = () => save.stats;
+  const AWARDS = [
+    ['round1', '⛳', 'First Round', 'Finish your first round', s => [s.rounds, 1], 100],
+    ['rounds25', '🏌️', 'Grinder', 'Finish 25 rounds', s => [s.rounds, 25], 500],
+    ['rounds100', '🦾', 'Iron Man', 'Finish 100 rounds', s => [s.rounds, 100], 2000],
+    ['holes500', '🚶', 'Long Walk', 'Play 500 holes', s => [s.holes, 500], 1000],
+    ['par100', '📋', 'Par Machine', 'Make 100 pars', s => [s.pars, 100], 600],
+    ['birdie1', '🐦', 'Birdie Hunter', 'Make a birdie', s => [s.birdies, 1], 100],
+    ['birdie25', '🐤', 'Birdie Machine', 'Make 25 birdies', s => [s.birdies, 25], 400],
+    ['birdie100', '🦜', 'Century of Birdies', 'Make 100 birdies', s => [s.birdies, 100], 1500],
+    ['eagle1', '🦅', 'Eagle Eye', 'Make an eagle', s => [s.eagles, 1], 300],
+    ['eagle10', '🪽', 'Eagle Squadron', 'Make 10 eagles', s => [s.eagles, 10], 1000],
+    ['eagle50', '👑', 'Golden Eagles', 'Make 50 eagles', s => [s.eagles, 50], 5000],
+    ['albatross', '🕊️', 'Albatross', 'Make an albatross (3 under on a hole)', s => [s.albatross, 1], 2500],
+    ['ace1', '🎯', 'Hole in One!', 'Make a hole in one', s => [s.aces, 1], 1000],
+    ['ace5', '💎', 'Ace Collector', 'Make 5 holes in one', s => [s.aces, 5], 4000],
+    ['chip1', '🪄', 'Chip In', 'Hole out from off the green (not a putt)', s => [s.chipIns, 1], 300],
+    ['chip10', '🧙', 'Chip Wizard', 'Hole out from off the green 10 times', s => [s.chipIns, 10], 1500],
+    ['sand1', '🏖️', 'Sand Magic', 'Hole out from a bunker', s => [s.sandHoles, 1], 800],
+    ['putt10', '🎳', 'Long Bomb', 'Hole a putt from 10+ yards', s => [s.longPutts, 1], 300],
+    ['putt10x', '🔭', 'Putting Pro', 'Hole 10 putts from 10+ yards', s => [s.longPutts, 10], 1200],
+    ['drive250', '💪', 'Big Hitter', 'Hit a 250-yard drive', s => [s.longest, 250], 200],
+    ['drive300', '🚀', 'Long Drive Champ', 'Hit a 300-yard drive', s => [s.longest, 300], 1000],
+    ['perfect100', '✨', 'Pure Striker', 'Hit 100 PERFECT shots', s => [s.perfects, 100], 400],
+    ['perfect1000', '🌟', 'Flushed It', 'Hit 1,000 PERFECT shots', s => [s.perfects, 1000], 3000],
+    ['underpar1', '🔴', 'Red Numbers', 'Finish a round under par', s => [s.underPar, 1], 500],
+    ['underpar10', '🔥', 'On Fire', 'Finish 10 rounds under par', s => [s.underPar, 10], 2500],
+    ['explorer', '🗺️', 'Course Explorer', 'Finish a round on all 5 courses', s => [COURSES.filter(c => s.roundsBy[c.id]).length, COURSES.length], 1500],
+    ['valley', '🌊', 'Valley Conqueror', 'Shoot even par or better at Deans Valley', s => [s.bestBy.valley != null && s.bestBy.valley <= 0 ? 1 : 0, 1], 5000],
+    ['earn10k', '💰', 'Big Earner', 'Earn $10,000 in total', s => [s.earnedTotal, 10000], 0],
+    ['earn100k', '🏦', 'Tour Money', 'Earn $100,000 in total', s => [s.earnedTotal, 100000], 0],
+    ['stiff', '📍', 'Stiff!', `Hit it within ${5} feet in the Daily Closest to the Pin (unlocks the Senior Sweater)`, s => [save.unlocks.senior ? 1 : 0, 1], 0],
+    ['mini1', '⭐', 'Mini Champ', 'Finish Gold Star Mini Golf', s => [s.roundsBy.mini || 0, 1], 200],
+    ['miniace', '🌠', 'Mini Ace', 'Make a hole in one at Gold Star Mini Golf', s => [s.miniAces, 1], 150],
+    ['miniunder', '🏆', 'Mini Master', 'Finish Gold Star Mini Golf under par', s => [s.bestBy.mini != null && s.bestBy.mini < 0 ? 1 : 0, 1], 600],
+  ].map(([id, icon, name, how, prog, pay]) => ({ id, icon, name, how, prog, pay }));
+  const awardDone = a => { const [h, n] = a.prog(st$()); return h >= n; };
+  const hasAward = id => !!save.awards[id];
+  const bagOpen = p => !p.award || hasAward(p.award);
+
   if (!save.board) save.board = {};
   if (!save.pid) save.pid = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
   if (!save.tourney) save.tourney = {};   // { 'YYYY-MM-DD': { courseId: true } } days this device entered, prize not yet checked
@@ -2208,6 +2333,7 @@
 
     prev = { x: ball.x, y: ball.y };
     if (course.ctp) { ctpState().tries++; persist(); }
+    lastShot = { lie, dist: distToPin(), putter: !!c.putter };
     strokes++; firstShot = false; trailReset(); swing = null; lastClub = clubIdx;
     ball.z = 0; ball.vz = 0; ball.spin = 0;
     const lieErr = lie === 'rough' ? 1.4 : lie === 'sand' ? 1.6 : 1;
@@ -2386,7 +2512,7 @@
     ball.z = 0; ball.vz = 0; ball.spin = 0;
     if (lastClub === 0) {
       const d = Math.round(Math.hypot(ball.x - prev.x, ball.y - prev.y));
-      if (d > save.stats.longest) { save.stats.longest = d; showRating(`LONGEST DRIVE · ${d} YDS`, '#FFE08A'); }
+      if (d > save.stats.longest) { save.stats.longest = d; showRating(`LONGEST DRIVE · ${d} YDS`, '#FFE08A'); checkAwards(); }
     }
     lastClub = -1;
     if (course.ctp) return ctpDone(Math.hypot(ball.x - hole.pin.x, ball.y - hole.pin.y));
@@ -2430,6 +2556,29 @@
     ball.settle = still ? ball.settle + dt : 0;
     if (ball.settle > 0.45 || sinkT > 3) finishHole();
   }
+  let lastShot = null;
+  // ---- Achievements: grant, pay, and pop a toast for each new one ----
+  const toastQ = []; let toastBusy = false;
+  function checkAwards() {
+    let changed = false;
+    for (const a of AWARDS) {
+      if (save.awards[a.id] || !awardDone(a)) continue;
+      save.awards[a.id] = Date.now(); changed = true;
+      if (a.pay) { save.coins += a.pay; save.stats.earnedTotal += a.pay; }
+      const bag = BAG_PRESETS.find(p => p.award === a.id);
+      toastQ.push({ a, bag });
+    }
+    if (changed) { persist(); nextToast(); }
+  }
+  function nextToast() {
+    if (toastBusy || !toastQ.length) return;
+    const { a, bag } = toastQ.shift(), t = $('toast');
+    toastBusy = true;
+    t.innerHTML = `<span class="ti">${a.icon}</span><div><div class="tl">ACHIEVEMENT UNLOCKED</div><div class="tn">${a.name}</div>`
+      + `<div class="ts">${a.pay ? `+${money(a.pay)}` : ''}${a.pay && bag ? ' · ' : ''}${bag ? `🎒 ${bag.name} bag unlocked` : ''}</div></div>`;
+    t.classList.add('show'); try { sfx.perfect(); } catch (e) {}
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => { toastBusy = false; nextToast(); }, 400); }, 3200);
+  }
   const maxStrokes = () => hole && hole.mini ? 7 : MAX_STROKES;
   function finishHole() {
     if (course.ctp) return ctpDone(0);
@@ -2438,11 +2587,14 @@
     if (!course.mini) {
       st.holes++;
       if (strokes === 1) st.aces++; else if (d <= -2) st.eagles++; else if (d === -1) st.birdies++; else if (d === 0) st.pars++;
-    }
+      if (d <= -3) st.albatross++;
+      if (lastShot && !lastShot.putter && strokes > 1 && lastShot.lie !== 'green') { st.chipIns++; if (lastShot.lie === 'sand') st.sandHoles++; showRating(lastShot.lie === 'sand' ? 'HOLED FROM THE SAND!' : 'CHIP IN!', '#FFE08A'); }
+      if (lastShot && lastShot.putter && lastShot.dist >= 10) st.longPutts++;
+    } else if (strokes === 1) st.miniAces++;
     const pay = course.mini ? (MINI_PAY[String(Math.max(-2, d))] || 0) : payFor(strokes, hole.par); earned[holeIdx] = pay;
     showBanner(term(strokes, hole.par), `${strokes} stroke${strokes === 1 ? '' : 's'}${pay ? ` · +${money(pay)}` : ''}`, 2.3);
     if (d <= -1 || strokes === 1) burst(140);
-    persist();
+    persist(); checkAwards();
     state = 'holeDone'; doneT = 2.4;
   }
   function pickUp() {
@@ -2450,6 +2602,38 @@
     showBanner('Picked up', `Max ${maxStrokes()} strokes`, 2); state = 'holeDone'; doneT = 2.1;
   }
   function nextHole() { if (holeIdx + 1 < HOLES.length) loadHole(holeIdx + 1); else showFinal(); }
+  // Between holes: the team scorecard, nine holes to a row, with circles for birdies and squares for bogeys
+  function scoreMark(sc, par) {
+    if (sc == null) return '<span class="m"></span>';
+    const d = sc - par, cls = sc === 1 ? 'ace' : d <= -2 ? 'b2' : d === -1 ? 'b1' : d === 1 ? 'o1' : d >= 2 ? 'o2' : '';
+    return `<span class="m ${cls}">${sc}</span>`;
+  }
+  function scorecardHtml() {
+    const n = HOLES.length, rows = [];
+    for (let a = 0; a < n; a += 9) {
+      const idx = HOLES.slice(a, Math.min(n, a + 9)).map((_, j) => a + j);
+      const label = n <= 9 ? 'Tot' : a === 0 ? 'Out' : 'In';
+      const par = idx.reduce((t, i) => t + HOLES[i].par, 0), played = idx.filter(i => scores[i] != null);
+      const tot = played.reduce((t, i) => t + scores[i], 0);
+      const cols = `grid-template-columns:repeat(${idx.length + 1},1fr)`;
+      rows.push(`<div class="scrow" style="${cols}">`
+        + idx.map(i => `<div class="hn${i === holeIdx ? ' cur' : ''}">${i + 1}</div>`).join('') + `<div class="hn">${label}</div>`
+        + idx.map(i => `<div class="pr">${HOLES[i].par}</div>`).join('') + `<div class="pr">${par}</div>`
+        + idx.map(i => `<div>${scoreMark(scores[i], HOLES[i].par)}</div>`).join('') + `<div class="tl">${played.length ? tot : ''}</div></div>`);
+    }
+    return rows.join('');
+  }
+  function showScorecard() {
+    state = 'card';
+    const tot = scores.reduce((t, v) => t + (v || 0), 0), rel = relTotal();
+    $('scCourse').textContent = `${course.name} · Thru ${holeIdx + 1}`;
+    $('scTot').innerHTML = `${tot}<span>${fmtRel(rel)}</span>`;
+    $('scBody').innerHTML = scorecardHtml();
+    const nx = HOLES[holeIdx + 1];
+    $('scNext').textContent = `Next: Hole ${holeIdx + 2}${nx.name ? ' · ' + nx.name : ''} · Par ${nx.par} · ${nx.yds} yds`;
+    $('scOv').classList.remove('hidden');
+  }
+  $('scGo').addEventListener('click', () => { ensureAudio(); sfx.click(); $('scOv').classList.add('hidden'); if (state === 'card') nextHole(); });
 
   // ================= Update =================
   function update(dt) {
@@ -2487,7 +2671,7 @@
         ball = { x: prev.x, y: prev.y, vx: 0, vy: 0 }; splash = null; trailReset();
         if (strokes >= maxStrokes()) pickUp(); else readyForShot();
       }
-    } else if (state === 'holeDone') { doneT -= dt; if (doneT <= 0) nextHole(); }
+    } else if (state === 'holeDone') { doneT -= dt; if (doneT <= 0) { if (holeIdx + 1 < HOLES.length) showScorecard(); else nextHole(); } }
     for (const p of confetti) { p.life -= dt; p.vy += 900 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.99; p.r += dt * 8; }
     confetti = confetti.filter(p => p.life > 0 && p.y < innerHeight + 20);
   }
@@ -2797,7 +2981,7 @@
     tab = t;
     const navTab = t === 'course' ? 'play' : t;
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === navTab));
-    ['play', 'course', 'golfer', 'clubs', 'stats', 'how'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
+    ['play', 'course', 'golfer', 'clubs', 'awards', 'stats', 'how'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
     if (t === 'play') renderCourses();
     if (t === 'course') renderCourse();
     if (t === 'golfer') renderGolfer();
@@ -2805,6 +2989,7 @@
     $('miniBtn').classList.toggle('hidden', t !== 'play');
     if (t === 'clubs') renderClubs();
     if (t === 'stats') renderStats();
+    if (t === 'awards') renderAwards();
     if (t === 'how') renderHow();
     $('homeCoins').textContent = money(save.coins);
     document.querySelector('.hbody').scrollTop = 0;
@@ -3004,7 +3189,7 @@
     Object.assign(save.look, look); persist();
     applyLook(playerMats, save.look); applyLook(previewMats, save.look);
   }
-  let gTab = 'outfit', gPart = 'jacket', bPart = 'body', gLockMsg = null;
+  let gTab = 'outfit', gPart = 'jacket', bPart = 'body', gLockMsg = null, bLockMsg = null;
   const sameLook = (a, b) => Object.keys(b).every(k => k === 'skin' || k === 'hair' || String(a[k] || '').toLowerCase() === String(b[k]).toLowerCase());
   const swName = (list, c) => { const hit = list.find(x => x[1].toLowerCase() === String(c || '').toLowerCase()); return hit ? hit[0] : 'Custom'; };
   const swRow = (attr, list, cur, label) => '<div class="sw">' + list.map(([n, c]) =>
@@ -3035,18 +3220,23 @@
   function bagPanel() {
     const G = save.gbag;
     const cards = BAG_PRESETS.map((p, i) => {
-      const k = p.bag;
-      return `<button class="pcard ${sameLook(G, k) ? 'on' : ''}" data-bpreset="${i}"><span class="mini">` +
-        `<i style="background:${k.covers};flex:.6"></i><i style="background:${k.trim};flex:.3"></i><i style="background:${k.body}"></i><i style="background:${k.trim};flex:.3"></i></span>${p.name}</button>`;
+      const k = p.bag, locked = !bagOpen(p);
+      return `<button class="pcard ${sameLook(G, k) ? 'on' : ''}${locked ? ' locked' : ''}" data-bpreset="${i}"><span class="mini">` +
+        `<i style="background:${k.covers};flex:.6"></i><i style="background:${k.trim};flex:.3"></i><i style="background:${k.body}"></i><i style="background:${k.trim};flex:.3"></i>` +
+        `${locked ? '<b class="lk">🔒</b>' : ''}</span>${p.name}${locked ? '<small>LOCKED</small>' : ''}</button>`;
     }).join('');
+    const bodies = BAG_SWATCHES.body.filter(([, c]) => BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === c.toLowerCase()));
+    const openN = BAG_PRESETS.filter(bagOpen).length;
+    const lockNote = bLockMsg ? (() => { const a = AWARDS.find(x => x.id === bLockMsg.award); return `<div class="locknote">🔒 <b>${bLockMsg.name}</b> bag is locked. Earn the <b>${a.icon} ${a.name}</b> achievement: ${a.how}.</div>`; })() : '';
     const chips = BAG_PARTS.map(([k, n]) => `<button data-bpart="${k}" class="${k === bPart ? 'on' : ''}">${k === 'logo' ? '🏷️ ' : `<i style="background:${G[k]}"></i>`}${n}</button>`).join('');
     const label = BAG_PARTS.find(x => x[0] === bPart)[1];
     const pane = bPart === 'logo'
       ? `<div class="lh">Logo<b>${G.logo === 'chaminade' ? 'Chaminade' : 'None'}</b></div><div class="opts">` +
         BAG_LOGOS.map(([v, n]) => `<button data-logo="${v}" class="${G.logo === v ? 'on' : ''}">${n}</button>`).join('') + '</div>'
-      : `<div class="lh">${label}<b>${swName(BAG_SWATCHES[bPart], G[bPart])}</b></div>` + swRow('data-bcol', BAG_SWATCHES[bPart], G[bPart], label);
-    return `<div class="gcard"><div class="sect">GOLF BAGS</div><div class="pgrid">${cards}</div>` +
-      `<div class="gnote">Your bag sits on the tee box next to you on every hole.</div></div>` +
+      : `<div class="lh">${label}<b>${swName(BAG_SWATCHES[bPart], G[bPart])}</b></div>` + swRow('data-bcol', bPart === 'body' ? bodies : BAG_SWATCHES[bPart], G[bPart], label)
+        + (bPart === 'body' ? `<div class="gnote">Unlock more bag colors by earning achievements (🏆 Awards tab).</div>` : '');
+    return `<div class="gcard"><div class="sect" style="display:flex;justify-content:space-between">GOLF BAGS<span>${openN} / ${BAG_PRESETS.length}</span></div><div class="pgrid">${cards}</div>${lockNote}` +
+      `<div class="gnote">Your bag sits on the tee box next to you on every hole. Locked bags unlock with achievements.</div></div>` +
       `<div class="gcard"><div class="sect">CUSTOMIZE</div><div class="chiprow">${chips}</div><div class="swpane">${pane}</div></div>`;
   }
   function renderGolfer() {
@@ -3059,13 +3249,13 @@
   $('tab-golfer').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     ensureAudio(); sfx.click();
-    const d = b.dataset; gLockMsg = null;
+    const d = b.dataset; gLockMsg = null; bLockMsg = null;
     if (d.gtab) gTab = d.gtab;
     else if (d.preset != null) { const pr = LOOK_PRESETS[+d.preset]; if (pr.lock && !unlocked(pr.lock)) gLockMsg = pr.lock; else setLook(pr.look); }
     else if (d.gpart) gPart = d.gpart;
     else if (d.style) setLook({ style: d.style, trim: save.look.trim || '#F2C14E' });
     else if (d.col) setLook({ [gPart]: d.col });
-    else if (d.bpreset != null) setBag(BAG_PRESETS[+d.bpreset].bag);
+    else if (d.bpreset != null) { const bp = BAG_PRESETS[+d.bpreset]; if (bagOpen(bp)) setBag(bp.bag); else bLockMsg = bp; }
     else if (d.bpart) bPart = d.bpart;
     else if (d.logo) setBag({ logo: d.logo });
     else if (d.bcol) setBag({ [bPart]: d.bcol });
@@ -3233,6 +3423,19 @@
     persist(); renderClubs(); $('homeCoins').textContent = money(save.coins);
   });
 
+  function renderAwards() {
+    const got = AWARDS.filter(a => hasAward(a.id)).length;
+    const rows = AWARDS.map(a => {
+      const [h, n] = a.prog(st$()), done = hasAward(a.id), bag = BAG_PRESETS.find(p => p.award === a.id);
+      const pct = Math.min(100, Math.round(Math.min(h, n) / n * 100));
+      const prog = n > 1 ? `${Math.min(h, n).toLocaleString()} / ${n.toLocaleString()}` : (done ? 'Done' : 'Not yet');
+      const reward = [a.pay ? money(a.pay) : '', bag ? `🎒 ${bag.name} bag` : '', a.id === 'stiff' ? '👔 Senior Sweater' : ''].filter(Boolean).join(' · ');
+      return `<div class="aw${done ? ' done' : ''}"><div class="ai">${done ? a.icon : '🔒'}</div><div class="ab"><div class="an">${a.name}</div><div class="ad">${a.how}</div>
+        <div class="ap"><i><b style="width:${done ? 100 : pct}%"></b></i><span>${prog}</span></div>${reward ? `<div class="ar">Reward: ${reward}</div>` : ''}</div></div>`;
+    }).join('');
+    $('awardsBody').innerHTML = `<div class="sect" style="display:flex;justify-content:space-between">ACHIEVEMENTS<span>${got} / ${AWARDS.length}</span></div>
+      <div class="awbar"><b style="width:${Math.round(got / AWARDS.length * 100)}%"></b></div><div class="awlist">${rows}</div>`;
+  }
   function renderStats() {
     const s = save.stats;
     const avg = s.rounds ? fmtRel(Math.round((s.strokesTotal - s.parTotal) / s.rounds * 10) / 10) : '—';
@@ -3338,7 +3541,7 @@
   }
 
   function showHome() {
-    $('final').classList.add('hidden'); $('ctpEnd').classList.add('hidden'); closeSheet();
+    $('final').classList.add('hidden'); $('ctpEnd').classList.add('hidden'); $('scOv').classList.add('hidden'); closeSheet();
     if (course.ctp) course = courseById(save.course);
     if (!isUnlocked(course)) course = COURSES[0];
     previewCourse(course);
@@ -3393,7 +3596,7 @@
 
     const wasLocked = COURSES.filter(c => !isUnlocked(c)).map(c => c.id);
     save.coins += total; s.earnedTotal += total;
-    if (!course.mini) { s.rounds++; s.strokesTotal += ts; s.parTotal += tp; }
+    if (!course.mini) { s.rounds++; s.strokesTotal += ts; s.parTotal += tp; if (rel < 0) s.underPar++; }
     s.roundsBy[course.id] = (s.roundsBy[course.id] || 0) + 1;
     let line;
     const best = s.bestBy[course.id];
@@ -3406,6 +3609,7 @@
     persist();
     $('bestLine').textContent = `${line} · Bank: ${money(save.coins)}`;
     showPostBox(course, lastEntry);
+    checkAwards();
     $('final').classList.remove('hidden');
   }
 
@@ -3448,6 +3652,7 @@
     let unlockLine = '';
     if (ft != null && ft <= CTP_UNLOCK_FT && !unlocked('senior')) { save.unlocks.senior = true; unlockLine = '🔓 You unlocked the Senior Sweater! Wear it from the Golfer tab.'; }
     persist();
+    checkAwards();
     const left = CTP_TRIES - st.tries;
     $('ctpTitle').textContent = yd == null ? 'No score' : yd === 0 ? 'HOLE IN ONE! ⛳' : ft <= CTP_UNLOCK_FT ? 'Stiff! 🎯' : ft <= 30 ? 'Nice shot' : 'Keep trying';
     $('ctpSub').textContent = `${hole.name} · ${hole.yds} yds`;
@@ -3479,6 +3684,12 @@
   $('againBtn').addEventListener('click', () => startRound(course));
   $('homeBtn').addEventListener('click', () => { showHome(); setTab('course'); });
 
+  // anything already earned by older saves is granted quietly
+  AWARDS.forEach(a => { if (!save.awards[a.id] && awardDone(a)) save.awards[a.id] = Date.now(); });
+  if (!BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === String(save.gbag.body).toLowerCase())) {
+    save.gbag = Object.assign({}, BAG_PRESETS[0].bag); applyBag(playerBagMats, save.gbag);
+  }
+  persist();
   showHome();
   claimPrizes();
   document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('home').classList.contains('hidden')) claimPrizes(); });
