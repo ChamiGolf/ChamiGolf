@@ -696,7 +696,9 @@
   // ================= Golf bag looks =================
   // Every bag but the Chaminade bag is locked behind an achievement (see AWARDS).
   const BAG_PRESETS = [
-    { name: 'Chaminade', bag: { body: '#B3122B', trim: '#F2C14E', covers: '#F2C14E', logo: 'chaminade' } },
+    // the real Chaminade team bag: white with black trim and pockets, a red front panel with gold CHAMINADE lettering
+    { name: 'Chaminade Team', bag: { body: '#eeeeea', trim: '#111113', covers: '#eeeeea', logo: 'chaminade', panel: '#B3122B' } },
+    { name: 'Red & Gold', award: 'round1', bag: { body: '#B3122B', trim: '#F2C14E', covers: '#F2C14E', logo: 'chaminade', panel: '' } },
     { name: 'Tour Black', award: 'birdie1', bag: { body: '#111113', trim: '#B3122B', covers: '#111113', logo: 'none' } },
     { name: 'Navy Staff', award: 'underpar1', bag: { body: '#1f2c4d', trim: '#eeeeea', covers: '#B3122B', logo: 'none' } },
     { name: 'Royal Blue', award: 'chip1', bag: { body: '#2747a8', trim: '#eeeeea', covers: '#F2C14E', logo: 'none' } },
@@ -745,7 +747,7 @@
   save.look = Object.assign({}, LOOK_PRESETS[0].look, save.look || {});
   save.unlocks = save.unlocks || {};
   if (save.look.style !== 'sweater' || !save.unlocks.senior) save.look.style = 'suit';
-  save.gbag = Object.assign({}, BAG_PRESETS[0].bag, save.gbag || {});
+  save.gbag = Object.assign({}, BAG_PRESETS[0].bag, save.gbag && !('panel' in save.gbag) ? { panel: '' } : {}, save.gbag || {});
   save.awards = save.awards || {};
   // ---- Shop: which colours you own ----
   save.ownedLook = save.ownedLook || {};
@@ -759,6 +761,10 @@
   const ownsC = (part, hex) => priceOf(part, hex) === 0 || !!save.ownedLook[ckey(part, hex)];
   const grantC = (part, hex) => { save.ownedLook[ckey(part, hex)] = 1; };
   // one-time switch for everyone: the Classic Outfit is the new starter, and Red & Gold has to be bought
+  if (!save.migSchoolBag) {   // one-time: everyone on the old red default bag gets the real team bag
+    save.migSchoolBag = 1;
+    if (!save.gbag.panel && String(save.gbag.body).toLowerCase() === '#b3122b') save.gbag = Object.assign({}, BAG_PRESETS[0].bag, { logo: save.gbag.logo || 'chaminade' });
+  }
   if (!save.migClassic) {
     save.migClassic = 1;
     const sk = save.look.skin, hr = save.look.hair;
@@ -1618,13 +1624,20 @@
     g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = 3;
     [0.25, 0.75].forEach(u => { g.beginPath(); g.moveTo(u * W, 0); g.lineTo(u * W, H); g.stroke(); });
     // trim stripes beside the logo
-    g.fillStyle = b.trim; g.fillRect(W * 0.5 - 46, 0, 6, H); g.fillRect(W * 0.5 + 40, 0, 6, H);
+    if (b.panel) {
+      // red front panel with gold piping, coming to a point near the top like the team bag
+      const x0 = W * 0.5 - 30, x1 = W * 0.5 + 30, yTop = H * 0.06, yBot = H * 0.97;
+      const shape = () => { g.beginPath(); g.moveTo(x0, yBot); g.lineTo(x0, yTop + 30); g.lineTo(W * 0.5, yTop); g.lineTo(x1, yTop + 30); g.lineTo(x1, yBot); g.closePath(); };
+      shape(); g.fillStyle = b.panel; g.fill();
+      g.lineWidth = 5; g.strokeStyle = '#F2C14E'; shape(); g.stroke();
+      g.lineWidth = 2; g.strokeStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.moveTo(x0 - 4, 0); g.lineTo(x0 - 4, H); g.moveTo(x1 + 4, 0); g.lineTo(x1 + 4, H); g.stroke();
+    } else { g.fillStyle = b.trim; g.fillRect(W * 0.5 - 46, 0, 6, H); g.fillRect(W * 0.5 + 40, 0, 6, H); }
     if (b.logo === 'custom') drawCustomLogo(g, W, H, b);
     if (b.logo === 'chaminade') {
       g.save(); g.translate(W / 2, H * 0.5); g.rotate(-Math.PI / 2);
-      g.font = '700 50px Oswald, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = `700 ${b.panel ? 42 : 50}px Oswald, Impact, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
       g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText('CHAMINADE', 0, 2);
-      g.fillStyle = b.trim.toLowerCase() === b.body.toLowerCase() ? '#ffffff' : b.trim; g.fillText('CHAMINADE', 0, 0);
+      g.fillStyle = b.panel ? '#F2C14E' : b.trim.toLowerCase() === b.body.toLowerCase() ? '#ffffff' : b.trim; g.fillText('CHAMINADE', 0, 0);
       g.restore();
     }
     m.tex.needsUpdate = true;
@@ -3586,7 +3599,7 @@
     const cards = byCost(BAG_PRESETS.map((p, i) => [p, i]), ([p]) => bagCost(p)).map(([p, i]) => {
       const k = p.bag, locked = !bagOpen(p);
       return `<button class="pcard ${sameLook(G, k) ? 'on' : ''}${locked ? ' locked' : ''}" data-bpreset="${i}"><span class="mini">` +
-        `<i style="background:${k.covers};flex:.6"></i><i style="background:${k.trim};flex:.3"></i><i style="background:${k.body}"></i><i style="background:${k.trim};flex:.3"></i>` +
+        `<i style="background:${k.covers};flex:.6"></i><i style="background:${k.trim};flex:.3"></i><i style="background:${k.panel ? `linear-gradient(90deg,${k.body} 28%,#F2C14E 28% 32%,${k.panel} 32% 68%,#F2C14E 68% 72%,${k.body} 72%)` : k.body}"></i><i style="background:${k.trim};flex:.3"></i>` +
         `${locked ? '<b class="lk">🔒</b>' : ''}</span>${p.name}${locked ? '<small>LOCKED</small>' : ''}</button>`;
     }).join('');
     const bodies = byCost(BAG_SWATCHES.body, ([, c]) => { const bp = BAG_PRESETS.find(p => p.bag.body.toLowerCase() === c.toLowerCase()); return bp ? bagCost(bp) : 0; }).filter(([, c]) => BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === c.toLowerCase()));
@@ -3678,7 +3691,7 @@
     }
     else if (d.bpreset != null) {
       const bp = BAG_PRESETS[+d.bpreset];
-      if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(bp.bag); } else bLockMsg = bp;
+      if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(Object.assign({ panel: '' }, bp.bag)); } else bLockMsg = bp;
     }
     else if (d.bpart) bPart = d.bpart;
     else if (d.ballc) {
@@ -3919,7 +3932,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic, ballLook: save.ballLook }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic, migSchoolBag: save.migSchoolBag, ballLook: save.ballLook }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
