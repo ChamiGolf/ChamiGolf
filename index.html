@@ -776,7 +776,7 @@
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0008;
   scene.add(sun); scene.add(sun.target);
   const farGround = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshLambertMaterial({ color: 0x2f6f30 }));
-  farGround.rotation.x = -Math.PI / 2; farGround.position.y = -0.1; scene.add(farGround);
+  farGround.rotation.x = -Math.PI / 2; farGround.position.y = -1.6; scene.add(farGround);   // sits below the deepest bunker floor
 
   let skyTex = null;
   function applyCourseLook(course) {
@@ -963,6 +963,17 @@
     clumps(g, Math.min(area / 30, cap / 900), 2, 9, 'rgba(15,45,5,.05)', 'rgba(200,245,150,.035)');
     clumps(g, Math.min(area / 10, cap / 300), 0.6, 2, 'rgba(15,45,5,.06)', 'rgba(200,245,150,.04)');
     grain(g, Math.min(area / 3, cap / 30), 'rgba(15,45,5,.09)', 'rgba(190,235,140,.05)', 0.6);
+    // rough tufts: short grass blades drawn in two batched passes (shadow side + sunlit tips)
+    const tufts = (gg, n, len, col, wdt) => {
+      gg.strokeStyle = col; gg.lineWidth = wdt; gg.lineCap = 'round'; gg.beginPath();
+      for (let i = 0; i < n; i++) {
+        const x = ox + rng() * W, y = oy + rng() * Hh, l = len * (0.5 + rng()), an = -Math.PI / 2 + (rng() - 0.5) * 1.6;
+        gg.moveTo(x, y); gg.lineTo(x + Math.cos(an) * l, y + Math.sin(an) * l);
+      }
+      gg.stroke();
+    };
+    tufts(g, Math.min(area / 4, cap / 90), 0.9, 'rgba(10,40,5,.16)', 0.28);
+    tufts(g, Math.min(area / 6, cap / 130), 0.7, 'rgba(210,250,150,.09)', 0.2);
 
     g.lineCap = 'round'; g.lineJoin = 'round';
     const strokeFair = (gg, extra) => {
@@ -1020,9 +1031,43 @@
     blit(g, G);
 
     for (const e of h.bunkers) {
+      // grass lip: darker, shaggier turf rolling over the edge
+      ell(g, e, 1.6); g.fillStyle = 'rgba(10,40,5,.16)'; g.fill();
       ell(g, e, 0.9); g.fillStyle = pal.sandRim; g.fill();
-      ell(g, e); g.fillStyle = pal.sand; g.fill();
-      ell(g, { x: e.x - e.rx * 0.1, y: e.y - e.ry * 0.1, rx: e.rx * 0.65, ry: e.ry * 0.65 }); g.fillStyle = 'rgba(255,255,255,.18)'; g.fill();
+      const S = mk(); ell(S, e); S.fillStyle = pal.sand; S.fill();
+      S.globalCompositeOperation = 'source-atop';
+      const bx = e.x - e.rx - 1, by = e.y - e.ry - 1, bw = e.rx * 2 + 2, bh = e.ry * 2 + 2, ba = bw * bh;
+      // soft lumps and hollows
+      for (let i = 0; i < ba / 6; i++) {
+        S.fillStyle = rng() < 0.5 ? 'rgba(120,90,40,.06)' : 'rgba(255,250,235,.07)';
+        S.beginPath(); S.ellipse(bx + rng() * bw, by + rng() * bh, 0.6 + rng() * 2, 0.4 + rng() * 1.4, rng() * 3, 0, Math.PI * 2); S.fill();
+      }
+      // rake marks: gently wavy parallel grooves, each with a shadow and a lit edge
+      const ra = rng() * Math.PI, rc = Math.cos(ra), rs = Math.sin(ra), R = Math.max(e.rx, e.ry) + 1, wob = rng() * 9;
+      for (let d = -R; d < R; d += 0.55) {
+        for (const [off, col] of [[0, 'rgba(110,80,35,.26)'], [0.18, 'rgba(255,252,240,.22)']]) {
+          S.strokeStyle = col; S.lineWidth = 0.16; S.beginPath();
+          for (let t = -R; t <= R; t += 0.5) {
+            const w = d + off + Math.sin(t * 0.35 + d * 0.8 + wob) * 0.12;
+            const x = e.x + rc * t - rs * w, y = e.y + rs * t + rc * w;
+            t === -R ? S.moveTo(x, y) : S.lineTo(x, y);
+          }
+          S.stroke();
+        }
+      }
+      // footprints / ball marks
+      for (let i = 0; i < Math.min(8, ba / 60); i++) {
+        const fx = e.x + (rng() - 0.5) * e.rx * 1.2, fy = e.y + (rng() - 0.5) * e.ry * 1.2;
+        S.fillStyle = 'rgba(110,80,35,.14)'; S.beginPath(); S.ellipse(fx, fy, 0.22, 0.4, rng() * 3, 0, Math.PI * 2); S.fill();
+        S.fillStyle = 'rgba(255,252,240,.12)'; S.beginPath(); S.ellipse(fx + 0.06, fy - 0.08, 0.18, 0.3, rng() * 3, 0, Math.PI * 2); S.fill();
+      }
+      // fine grains
+      grain(S, Math.min(ba * 40, cap / 40), 'rgba(110,80,35,.22)', 'rgba(255,255,250,.28)', 0.12, bx, by, bw, bh);
+      // shade toward the walls so the bunker reads as a hollow
+      const sg = S.createRadialGradient(e.x, e.y, 0, e.x, e.y, 1);
+      sg.addColorStop(0, 'rgba(255,250,235,.10)'); sg.addColorStop(0.6, 'rgba(255,250,235,0)'); sg.addColorStop(0.88, 'rgba(90,65,30,.12)'); sg.addColorStop(1, 'rgba(70,50,20,.32)');
+      S.save(); S.translate(e.x, e.y); S.scale(e.rx, e.ry); S.translate(-e.x, -e.y); S.fillStyle = sg; S.fillRect(e.x - 1, e.y - 1, 2, 2); S.restore();
+      blit(g, S);
     }
     g.setLineDash([3, 3]); g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 0.7;
     g.strokeRect(b.x, b.y, b.w, b.h); g.setLineDash([]);
@@ -1073,9 +1118,9 @@
     for (let i = 0; i < d.length; i += 4) { const v = 128 + (r() - 0.5) * 70; d[i] = d[i + 1] = d[i + 2] = v; }
     g.putImageData(img, 0, 0);
     g.lineCap = 'round';
-    for (let i = 0; i < 2600; i++) {
-      const x = r() * N, y = r() * N, len = 3 + r() * 6, an = -Math.PI / 2 + (r() - 0.5) * 0.9, v = r() < 0.5 ? 70 : 190;
-      g.strokeStyle = `rgba(${v},${v},${v},.45)`; g.lineWidth = 1 + r() * 0.8;
+    for (let i = 0; i < 5200; i++) {
+      const x = r() * N, y = r() * N, len = 3 + r() * 7, an = -Math.PI / 2 + (r() - 0.5) * 1.1, v = r() < 0.5 ? 55 : 200;
+      g.strokeStyle = `rgba(${v},${v},${v},.5)`; g.lineWidth = 0.8 + r() * 0.9;
       for (const [dx, dy] of [[0, 0], [N, 0], [-N, 0], [0, N], [0, -N]]) {
         g.beginPath(); g.moveTo(x + dx, y + dy); g.lineTo(x + dx + Math.cos(an) * len, y + dy + Math.sin(an) * len); g.stroke();
       }
@@ -1085,6 +1130,53 @@
     return t;
   }
   const GRASS_DETAIL = grassDetail();
+  // tileable sand detail: fine grains + soft ripples, averaging 0.5
+  function sandDetail() {
+    const N = 256, c = document.createElement('canvas'); c.width = N; c.height = N;
+    const g = c.getContext('2d'), r = makeRng(777);
+    const img = g.createImageData(N, N), d = img.data;
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const i = (y * N + x) * 4, rip = Math.sin((x + Math.sin(y / N * Math.PI * 4) * 6) / N * Math.PI * 16) * 10;
+      const v = 128 + rip + (r() - 0.5) * 90 + (r() < 0.03 ? -60 : r() < 0.03 ? 70 : 0);
+      d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return t;
+  }
+  const SAND_DETAIL = sandDetail();
+
+  // ---- Bunkers with real depth: a hollowed bowl with a raised grass lip ----
+  const LIP_Q = 1.28;
+  const bunkerDepth = e => clamp(Math.min(e.rx, e.ry) * 0.13, 0.55, 1.2);
+  function bowlHeight(e, q) {
+    if (q >= LIP_Q) return 0;
+    if (q > 1) return 0.16 * Math.sin(Math.PI * (q - 1) / (LIP_Q - 1));          // lip
+    const t = clamp((1 - q) / 0.32, 0, 1), sm = t * t * (3 - 2 * t);
+    return -bunkerDepth(e) * sm;                                                   // wall then flat floor
+  }
+  function surfY(x, y) {
+    if (!hole || !hole.bowls) return 0;
+    for (const e of hole.bowls) {
+      const q = Math.sqrt(((x - e.x) / e.rx) ** 2 + ((y - e.y) / e.ry) ** 2);
+      if (q < LIP_Q) return bowlHeight(e, q);
+    }
+    return 0;
+  }
+  // only bunkers whose lips don't touch other bunkers, water, the cup or the hole's edge get dug out
+  function pickBowls(h, ox, oy, W, Hh) {
+    const big = e => ({ x: e.x, y: e.y, rx: e.rx * LIP_Q + 0.5, ry: e.ry * LIP_Q + 0.5 });
+    const ring = e => [...Array(24)].map((_, i) => ({ x: e.x + Math.cos(i / 24 * 6.283) * e.rx, y: e.y + Math.sin(i / 24 * 6.283) * e.ry })).concat([e]);
+    const touch = (a, b) => ring(a).some(p => inEl(p, b)) || ring(b).some(p => inEl(p, a));
+    return h.bunkers.filter((e, i) => {
+      const A = big(e);
+      if (A.x - A.rx < ox + 1 || A.x + A.rx > ox + W - 1 || A.y - A.ry < oy + 1 || A.y + A.ry > oy + Hh - 1) return false;
+      if (inEl(h.pin, A, 1)) return false;
+      if (h.water.some(w => touch(A, w))) return false;
+      return !h.bunkers.some((o, j) => j !== i && touch(A, big(o)));
+    });
+  }
 
   let holeGroup = null, flagMesh = null, pinGroup = null, pinT = 0, pinPulled = false, disposables = [];
   function buildHole(h, course, maxPx = 2600) {
@@ -1094,18 +1186,71 @@
     const { canvas, ox, oy, W, H: Hh } = paintHole(h, pal, maxPx);
     const tex = new THREE.CanvasTexture(canvas);
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    const gGeo = new THREE.PlaneGeometry(W, Hh), gMat = new THREE.MeshLambertMaterial({ map: tex });
-    // fine grass-blade detail tiled every ~3 yards so the turf has texture up close
-    gMat.onBeforeCompile = sh => {
+    const gcx = ox + W / 2, gcz = oy + Hh / 2, SEG = 64;
+    h.bowls = pickBowls(h, ox, oy, W, Hh);
+    const ringPt = (e, q, i) => { const a = i / SEG * Math.PI * 2; return [e.x + Math.cos(a) * e.rx * q, e.y + Math.sin(a) * e.ry * q]; };
+    // flat ground with a cut-out for each dug-out bunker
+    const shape = new THREE.Shape();
+    shape.moveTo(-W / 2, -Hh / 2); shape.lineTo(W / 2, -Hh / 2); shape.lineTo(W / 2, Hh / 2); shape.lineTo(-W / 2, Hh / 2); shape.lineTo(-W / 2, -Hh / 2);
+    for (const e of h.bowls) {
+      const path = new THREE.Path();
+      for (let i = 0; i < SEG; i++) { const [x, y] = ringPt(e, LIP_Q, i); i ? path.lineTo(x - gcx, gcz - y) : path.moveTo(x - gcx, gcz - y); }
+      shape.holes.push(path);
+    }
+    const gGeo = new THREE.ShapeGeometry(shape);
+    { const pos = gGeo.attributes.position, uv = gGeo.attributes.uv;
+      for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) + W / 2) / W, (pos.getY(i) + Hh / 2) / Hh); }
+    const gMat = new THREE.MeshLambertMaterial({ map: tex });
+    // fine grass-blade detail tiled every ~3 yards (plus a coarser layer so it doesn't look tiled);
+    // inside bunkers (sandK = 1) a sand-grain detail is used instead
+    const detailShader = (sh, bowl) => {
       sh.uniforms.detailMap = { value: GRASS_DETAIL };
+      sh.uniforms.sandMap = { value: SAND_DETAIL };
       sh.uniforms.detailRep = { value: new THREE.Vector2(W / 3, Hh / 3) };
-      sh.fragmentShader = 'uniform sampler2D detailMap;\nuniform vec2 detailRep;\n' + sh.fragmentShader.replace('#include <map_fragment>',
-        '#include <map_fragment>\n  float gd = texture2D(detailMap, vUv * detailRep).r;\n  diffuseColor.rgb *= 0.88 + 0.24 * gd;');
+      if (bowl) sh.vertexShader = 'attribute float sandK;\nvarying float vSandK;\n' + sh.vertexShader.replace('#include <uv_vertex>', '#include <uv_vertex>\n  vSandK = sandK;');
+      sh.fragmentShader = 'uniform sampler2D detailMap;\nuniform sampler2D sandMap;\nuniform vec2 detailRep;\n' + (bowl ? 'varying float vSandK;\n' : '')
+        + sh.fragmentShader.replace('#include <map_fragment>',
+        '#include <map_fragment>\n  float gd = texture2D(detailMap, vUv * detailRep).r;\n  float gd2 = texture2D(detailMap, vUv * detailRep * 0.21 + 0.37).g;\n'
+        + '  float gm = (0.85 + 0.30 * gd) * (0.93 + 0.14 * gd2);\n'
+        + (bowl ? '  float sd = texture2D(sandMap, vUv * detailRep * 1.6).r;\n  diffuseColor.rgb *= mix(gm, 0.8 + 0.4 * sd, vSandK);' : '  diffuseColor.rgb *= gm;'));
     };
+    gMat.onBeforeCompile = sh => detailShader(sh, false);
     disposables.push(tex, gGeo, gMat);
     const ground = new THREE.Mesh(gGeo, gMat);
-    ground.rotation.x = -Math.PI / 2; ground.position.set(ox + W / 2, 0, oy + Hh / 2); ground.receiveShadow = true;
+    ground.rotation.x = -Math.PI / 2; ground.position.set(gcx, 0, gcz); ground.receiveShadow = true;
     holeGroup.add(ground);
+
+    // the bunker bowls themselves, sharing the painted course texture
+    if (h.bowls.length) {
+      const QS = [0, 0.2, 0.4, 0.55, 0.64, 0.7, 0.75, 0.8, 0.85, 0.89, 0.93, 0.96, 0.98, 1, 1.03, 1.08, 1.14, 1.21, LIP_Q];
+      const P = [], U = [], K = [], I = [];
+      for (const e of h.bowls) {
+        const base = P.length / 3;
+        QS.forEach((q, r) => {
+          const n = r === 0 ? 1 : SEG;
+          for (let i = 0; i < n; i++) {
+            const [x, y] = r === 0 ? [e.x, e.y] : ringPt(e, q, i);
+            P.push(x, bowlHeight(e, q), y); U.push((x - ox) / W, 1 - (y - oy) / Hh); K.push(q <= 1 ? 1 : 0);
+          }
+        });
+        const at = (r, i) => base + (r === 0 ? 0 : 1 + (r - 1) * SEG + (i % SEG));
+        for (let i = 0; i < SEG; i++) I.push(at(0, 0), at(1, i + 1), at(1, i));
+        for (let r = 1; r < QS.length - 1; r++) for (let i = 0; i < SEG; i++) {
+          I.push(at(r, i), at(r, i + 1), at(r + 1, i + 1), at(r, i), at(r + 1, i + 1), at(r + 1, i));
+        }
+      }
+      const bGeo = new THREE.BufferGeometry();
+      bGeo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+      bGeo.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
+      bGeo.setAttribute('sandK', new THREE.Float32BufferAttribute(K, 1));
+      bGeo.setIndex(I); bGeo.computeVertexNormals();
+      const bMat = new THREE.MeshLambertMaterial({ map: tex });
+      bMat.onBeforeCompile = sh => detailShader(sh, true);
+      bMat.customProgramCacheKey = () => 'bowl';
+      disposables.push(bGeo, bMat);
+      const bowls = new THREE.Mesh(bGeo, bMat); bowls.receiveShadow = true;
+      holeGroup.add(bowls);
+    }
 
     // water (with a cut-out when the green sits inside it)
     for (const e of h.water) {
@@ -1725,9 +1870,10 @@
     const by = h - (ball.overCup ? ball.dip || 0 : 0);
     const camD = camera.position.distanceTo(ballV.set(ball.x, h, ball.y));
     const r = ball.inCup ? BALL_R : clamp(camD * 0.0065, 0.07, 0.9);
-    ballMesh.scale.setScalar(r); ballMesh.position.set(ball.x, by + r, ball.y);
+    const sy = ball.inCup ? 0 : surfY(ball.x, ball.y);
+    ballMesh.scale.setScalar(r); ballMesh.position.set(ball.x, by + r + sy, ball.y);
     ballMesh.visible = !(state === 'penalty' && splash);
-    blob.position.set(ball.x, 0.04, ball.y); blob.scale.setScalar(r * (1.1 + h * 0.01));
+    blob.position.set(ball.x, 0.04 + sy, ball.y); blob.scale.setScalar(r * (1.1 + h * 0.01));
     blob.material.opacity = 0.32 * clamp(1 - h / 50, 0.15, 1);
     blob.visible = ballMesh.visible && !ball.inCup;
 
@@ -1754,7 +1900,7 @@
     golfer.root.visible = viewMode !== 'overview' || state !== 'ready';
     if (gReady) {
       const c = CLUBS[clubIdx], kind = clubKind(c), dx = Math.cos(aimAng), dz = Math.sin(aimAng), B = golfer.B[kind];
-      golfer.root.position.set(ball.x + dz * B, 0, ball.y - dx * B);
+      golfer.root.position.set(ball.x + dz * B, Math.min(surfY(ball.x + dz * B, ball.y - dx * B), surfY(ball.x, ball.y) + 0.1), ball.y - dx * B);
       golfer.root.rotation.y = Math.atan2(-dz, dx);
       let pose = { a: Math.sin(time * 1.7) * 0.025, h: 0, t: 0 };
       if (state === 'swinging' && swing) pose = backPose(!!c.putter, swing.power);
