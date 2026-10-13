@@ -3374,7 +3374,9 @@
   let gTab = 'outfit', gPart = 'jacket', bPart = 'body', gLockMsg = null, bLockMsg = null;
   const sameLook = (a, b) => Object.keys(b).every(k => k === 'skin' || k === 'hair' || String(a[k] || '').toLowerCase() === String(b[k]).toLowerCase());
   const swName = (list, c) => { const hit = list.find(x => x[1].toLowerCase() === String(c || '').toLowerCase()); return hit ? hit[0] : 'Custom'; };
-  const swRow = (attr, list, cur, label, part) => '<div class="sw">' + list.map(([n, c]) => {
+  // everything in the shop is listed cheapest first (stable, so equal prices keep their order)
+  const byCost = (arr, cost) => arr.map((x, i) => ({ x, i, c: cost(x) })).sort((a, b) => a.c - b.c || a.i - b.i).map(o => o.x);
+  const swRow = (attr, list, cur, label, part) => '<div class="sw">' + (part ? byCost(list, ([, c]) => priceOf(part, c)) : list).map(([n, c]) => {
     const own = !part || ownsC(part, c), pr = part ? priceOf(part, c) : 0;
     return `<button ${attr}="${c}" title="${n}${own ? '' : ' · ' + money(pr)}" aria-label="${label}: ${n}${own ? '' : ', costs ' + money(pr)}" class="${c.toLowerCase() === String(cur).toLowerCase() ? 'on' : ''}${own ? '' : ' buy'}" style="background:${c}">${own ? '' : `<em>${pr >= 1000 ? '$' + (pr / 1000) + 'k' : '$' + pr}</em>`}</button>`;
   }).join('') + '</div>';
@@ -3389,7 +3391,8 @@
   function outfitPanel() {
     const L = save.look;
     if (!partShown(gPart, L)) gPart = 'jacket';
-    const cards = LOOK_PRESETS.map((p, i) => {
+    const presetCost = p => p.lock ? Infinity : (p.price || 0);
+    const cards = byCost(LOOK_PRESETS.map((p, i) => [p, i]), ([p]) => presetCost(p)).map(([p, i]) => {
       const k = p.look, locked = p.lock && !unlocked(p.lock), forSale = !locked && !presetOwned(p);
       return `<button class="pcard ${sameLook(L, k) ? 'on' : ''}${locked ? ' locked' : ''}" data-preset="${i}"><span class="mini">` +
         `<i style="background:${k.jacket}"></i><i style="background:linear-gradient(90deg,${k.shirt} 35%,${k.tie} 35% 65%,${k.shirt} 65%)"></i>` +
@@ -3413,13 +3416,14 @@
   }
   function bagPanel() {
     const G = save.gbag;
-    const cards = BAG_PRESETS.map((p, i) => {
+    const bagCost = p => p.award ? ((AWARDS.find(a => a.id === p.award) || {}).pay || 0) + 1 : 0;   // harder achievement = later in the list
+    const cards = byCost(BAG_PRESETS.map((p, i) => [p, i]), ([p]) => bagCost(p)).map(([p, i]) => {
       const k = p.bag, locked = !bagOpen(p);
       return `<button class="pcard ${sameLook(G, k) ? 'on' : ''}${locked ? ' locked' : ''}" data-bpreset="${i}"><span class="mini">` +
         `<i style="background:${k.covers};flex:.6"></i><i style="background:${k.trim};flex:.3"></i><i style="background:${k.body}"></i><i style="background:${k.trim};flex:.3"></i>` +
         `${locked ? '<b class="lk">🔒</b>' : ''}</span>${p.name}${locked ? '<small>LOCKED</small>' : ''}</button>`;
     }).join('');
-    const bodies = BAG_SWATCHES.body.filter(([, c]) => BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === c.toLowerCase()));
+    const bodies = byCost(BAG_SWATCHES.body, ([, c]) => { const bp = BAG_PRESETS.find(p => p.bag.body.toLowerCase() === c.toLowerCase()); return bp ? bagCost(bp) : 0; }).filter(([, c]) => BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === c.toLowerCase()));
     const openN = BAG_PRESETS.filter(bagOpen).length;
     const lockNote = bLockMsg ? (() => { const a = AWARDS.find(x => x.id === bLockMsg.award); return `<div class="locknote">🔒 <b>${bLockMsg.name}</b> bag is locked. Earn the <b>${a.icon} ${a.name}</b> achievement: ${a.how}.</div>`; })() : '';
     const chips = BAG_PARTS.map(([k, n]) => `<button data-bpart="${k}" class="${k === bPart ? 'on' : ''}">${k === 'logo' ? '🏷️ ' : `<i style="background:${G[k]}"></i>`}${n}</button>`).join('');
