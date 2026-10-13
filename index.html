@@ -789,8 +789,8 @@
   const sun = new THREE.DirectionalLight(0xfff0d0, 0.85);
   sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0008;
   scene.add(sun); scene.add(sun.target);
-  const farGround = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshLambertMaterial({ color: 0x2f6f30 }));
-  farGround.rotation.x = -Math.PI / 2; farGround.position.y = -1.6; scene.add(farGround);   // sits below the deepest bunker floor
+  const farGround = new THREE.Mesh(new THREE.RingGeometry(690, 6000, 64, 1), new THREE.MeshLambertMaterial({ color: 0x2f6f30 }));
+  farGround.rotation.x = -Math.PI / 2; farGround.position.y = -1.6; scene.add(farGround);   // horizon ring around each hole's countryside
 
   let skyTex = null;
   function applyCourseLook(course) {
@@ -1221,11 +1221,19 @@
       if (q < LIP_Q) { const c = bowlHeight(e, q); lo = Math.min(lo, c); hi = Math.max(hi, c); }
     }
     z += lo < 0 ? lo : hi;
-    // fade down at the very edge of the modelled ground so it meets the distant land
-    const edge = Math.min(x - T.ox, T.ox + T.W - x, y - T.oy, T.oy + T.Hh - y);
-    return -1.4 + (z + 1.4) * sm01(edge / 24);
+    return z;
   }
   function surfY(x, y) { return hole && hole.terr ? terrainH(hole, x, y) : 0; }
+  // Ground height used for drawing the ball. In the air it glides on a straight line from the launch
+  // spot to the landing spot (so the arc doesn't wobble over every bump), then settles onto the real ground.
+  function ballGround() {
+    if (!flight) return surfY(ball.x, ball.y);
+    const f = flight;
+    if (f.g0 == null) { f.g0 = surfY(f.sx, f.sy); f.g1 = surfY(f.ex, f.ey); }
+    const L = Math.hypot(f.ex - f.sx, f.ey - f.sy) || 1, k = clamp(Math.hypot(ball.x - f.sx, ball.y - f.sy) / L, 0, 1);
+    const line = f.g0 + (f.g1 - f.g0) * k;
+    return line + (surfY(ball.x, ball.y) - line) * sm01((k - 0.85) / 0.15);
+  }
 
   let holeGroup = null, flagMesh = null, pinGroup = null, pinT = 0, pinPulled = false, disposables = [];
   function buildHole(h, course, maxPx = 2600) {
@@ -1264,6 +1272,25 @@
     };
     gMat.onBeforeCompile = sh => detailShader(sh, true);
     disposables.push(tex, gGeo, gMat);
+    // surrounding countryside: a coarser continuation of the same hills out to the horizon,
+    // tucked under the detailed ground where they overlap, so there's no visible edge or cliff
+    { const R = 1500, n = 150, LAND = 4;
+      const lGeo = new THREE.PlaneGeometry(R, R, n, n), pos = lGeo.attributes.position, col = new Float32Array(pos.count * 3);
+      const cOut = new THREE.Color(pal.outer), cFar = new THREE.Color(pal.far), cc = new THREE.Color();
+      const inset = R / n * 1.5;
+      for (let i = 0; i < pos.count; i++) {
+        const x = gcx + pos.getX(i), y = gcz - pos.getY(i);
+        const inside = x > ox + inset && x < ox + W - inset && y > oy + inset && y < oy + Hh - inset;
+        const d = Math.max(Math.abs(x - gcx) - W / 2, Math.abs(y - gcz) - Hh / 2, 0), f = sm01((d - 120) / 350);
+        pos.setZ(i, inside ? -8 : rawH(h, x, y) + (LAND - rawH(h, x, y)) * f - 0.25);
+        cc.copy(cOut).lerp(cFar, sm01(d / 300)).multiplyScalar(0.9); col[i * 3] = cc.r; col[i * 3 + 1] = cc.g; col[i * 3 + 2] = cc.b;
+      }
+      lGeo.setAttribute('color', new THREE.BufferAttribute(col, 3)); lGeo.computeVertexNormals();
+      const lMat = new THREE.MeshLambertMaterial({ vertexColors: true });
+      disposables.push(lGeo, lMat);
+      const land = new THREE.Mesh(lGeo, lMat); land.rotation.x = -Math.PI / 2; land.position.set(gcx, 0, gcz); land.receiveShadow = true;
+      holeGroup.add(land);
+      farGround.position.set(gcx, LAND - 0.3, gcz); }
     const ground = new THREE.Mesh(gGeo, gMat);
     ground.rotation.x = -Math.PI / 2; ground.position.set(gcx, 0, gcz); ground.receiveShadow = true;
     holeGroup.add(ground);
@@ -1297,7 +1324,7 @@
     h.allTrees.forEach((t, i) => {
       t.top = pine ? 3 + t.r * 2.2 : 4 + t.r * 2;
       const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-      const ty = terrainH(h, t.x, t.y) - 0.3;
+      const ty = Math.min(terrainH(h, t.x, t.y), terrainH(h, t.x + 1.2, t.y), terrainH(h, t.x - 1.2, t.y), terrainH(h, t.x, t.y + 1.2), terrainH(h, t.x, t.y - 1.2)) - 0.3;
       trunk.position.set(t.x, ty, t.y); trunk.castShadow = true;
       const leaf = new THREE.Mesh(pine ? pineGeo : roundGeo, leafMats[i % 3]);
       if (pine) { leaf.scale.set(t.r * 0.85, t.r * 2.2, t.r * 0.85); leaf.position.set(t.x, ty + 3 + t.r * 1.1, t.y); }
@@ -1490,12 +1517,15 @@
     return barTopPx || innerHeight * 0.88;
   }
   const aimBallY = () => barTop() - pullPx() - 36;   // finger at full pull stays 36px above the bar
-  let camLift = 0; const liftLook = new THREE.Vector3();
+  let camLift = 0, camFloor = 0; const liftLook = new THREE.Vector3();
   function placeCamera(dt) {
-    const gl = surfY(ball.x, ball.y);
-    camLift = dt == null ? gl : camLift + (gl - camLift) * (1 - Math.exp(-dt * 3));
+    const gl = ballGround();
+    camLift = dt == null ? gl : camLift + (gl - camLift) * (1 - Math.exp(-dt * 2));
     camera.position.copy(camPos); camera.position.y += camLift;
-    camera.position.y = Math.max(surfY(camera.position.x, camera.position.z) + 1.2, camera.position.y);
+    // keep clear of hills, easing up and down instead of popping
+    const floor = surfY(camera.position.x, camera.position.z) + 1.5 - camera.position.y;
+    camFloor = dt == null ? Math.max(0, floor) : camFloor + (Math.max(0, floor) - camFloor) * (1 - Math.exp(-dt * 4));
+    camera.position.y += camFloor;
     camera.lookAt(liftLook.copy(camLook).setY(camLook.y + camLift));
     // only once the camera has settled in behind the ball (not while it swoops down from the map)
     const want = (state === 'ready' || state === 'swinging' || state === 'striking') && viewMode === 'normal' && introT <= 0 && !ball.inCup
@@ -1504,7 +1534,7 @@
     camera.clearViewOffset();
     if (frameK < 0.002) return;
     camera.updateMatrixWorld();
-    frameV.set(ball.x, (ball.z || 0) + 0.1 + surfY(ball.x, ball.y), ball.y).project(camera);
+    frameV.set(ball.x, (ball.z || 0) + 0.1 + ballGround(), ball.y).project(camera);
     const shift = clamp((1 - frameV.y) / 2 * innerHeight - aimBallY(), 0, innerHeight * 0.4) * frameK;
     if (shift > 0.5) camera.setViewOffset(innerWidth, innerHeight, 0, shift, innerWidth, innerHeight);
   }
@@ -1513,12 +1543,12 @@
   const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2(), groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitP = new THREE.Vector3();
   function rayGround(e) {
     ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
-    raycaster.setFromCamera(ndc, camera); groundPlane.constant = -surfY(ball.x, ball.y);
+    raycaster.setFromCamera(ndc, camera); groundPlane.constant = -ballGround();
     return raycaster.ray.intersectPlane(groundPlane, hitP);
   }
   const ballV = new THREE.Vector3();
   function ballScreen() {
-    ballV.set(ball.x, (flight ? flight.hgt : (ball.z || 0)) + 0.1 + surfY(ball.x, ball.y), ball.y).project(camera);
+    ballV.set(ball.x, (flight ? flight.hgt : (ball.z || 0)) + 0.1 + ballGround(), ball.y).project(camera);
     return { x: (ballV.x + 1) / 2 * innerWidth, y: (1 - ballV.y) / 2 * innerHeight, behind: ballV.z > 1 };
   }
 
@@ -1847,7 +1877,7 @@
     if (swingAnim) swingAnim.t += dt;
     if (pinPulled && pinT < 1) pinT = Math.min(1, pinT + dt / 1.1);
     if (!pinPulled && lastPutt && (state === 'rolling' || state === 'sinking') && distToPin() < 6) pinPulled = true;
-    if (state === 'flying') { fly(dt); if (flight) trailPush(ball.x, flight.hgt + 0.1 + surfY(ball.x, ball.y), ball.y); }
+    if (state === 'flying') { fly(dt); if (flight) trailPush(ball.x, flight.hgt + 0.1 + ballGround(), ball.y); }
     else if (state === 'rolling') roll(dt);
     else if (state === 'sinking') {
       sinkT += dt;
@@ -1873,11 +1903,12 @@
   function setArc(dist, c, cv = 0) {
     const p = aimGeo.attributes.position.array, dx = Math.cos(aimAng), dy = Math.sin(aimAng);
     const hMax = c.putter ? 0 : apexOf(c, dist / Math.max(1, stockNow(c)), dist);
+    const g0 = surfY(ball.x, ball.y), g1 = surfY(ball.x + dx * dist - dy * cv, ball.y + dy * dist + dx * cv);
     for (let i = 0; i <= AIM_N; i++) {
       const s = i / AIM_N, k = cv * s * s;
       p[i * 3] = ball.x + dx * dist * s - dy * k;
       p[i * 3 + 2] = ball.y + dy * dist * s + dx * k;
-      p[i * 3 + 1] = (c.putter ? 0.05 : hMax * 4 * s * (1 - s) + 0.15) + surfY(p[i * 3], p[i * 3 + 2]);
+      p[i * 3 + 1] = c.putter ? 0.05 + surfY(p[i * 3], p[i * 3 + 2]) : hMax * 4 * s * (1 - s) + 0.15 + g0 + (g1 - g0) * s;
     }
     aimGeo.attributes.position.needsUpdate = true;
     aimMat.dashSize = c.putter ? 0.25 : 1.6; aimMat.gapSize = c.putter ? 0.18 : 1.1;
@@ -1892,12 +1923,12 @@
     const by = h - (ball.overCup ? ball.dip || 0 : 0);
     const camD = camera.position.distanceTo(ballV.set(ball.x, h, ball.y));
     const r = ball.inCup ? BALL_R : clamp(camD * 0.0065, 0.07, 0.9);
-    const sy = surfY(ball.x, ball.y);
+    const sy = ballGround();
     ballMesh.scale.setScalar(r); ballMesh.position.set(ball.x, by + r + sy, ball.y);
     ballMesh.visible = !(state === 'penalty' && splash);
-    blob.position.set(ball.x, 0.07 + sy, ball.y); blob.scale.setScalar(r * (1.1 + h * 0.01));
+    blob.position.set(ball.x, 0.12 + surfY(ball.x, ball.y), ball.y); blob.scale.setScalar(r * (1.1 + h * 0.01));
     blob.material.opacity = 0.32 * clamp(1 - h / 50, 0.15, 1);
-    blob.visible = ballMesh.visible && !ball.inCup;
+    blob.visible = ballMesh.visible && !ball.inCup && h > 0.3;
 
     const aiming = (state === 'ready' || state === 'swinging') && introT <= 0;
     aimLine.visible = aiming;
@@ -1922,7 +1953,7 @@
     golfer.root.visible = viewMode !== 'overview' || state !== 'ready';
     if (gReady) {
       const c = CLUBS[clubIdx], kind = clubKind(c), dx = Math.cos(aimAng), dz = Math.sin(aimAng), B = golfer.B[kind];
-      golfer.root.position.set(ball.x + dz * B, Math.min(surfY(ball.x + dz * B, ball.y - dx * B), surfY(ball.x, ball.y) + 0.1), ball.y - dx * B);
+      golfer.root.position.set(ball.x + dz * B, surfY(ball.x, ball.y), ball.y - dx * B);
       golfer.root.rotation.y = Math.atan2(-dz, dx);
       let pose = { a: Math.sin(time * 1.7) * 0.025, h: 0, t: 0 };
       if (state === 'swinging' && swing) pose = backPose(!!c.putter, swing.power);
@@ -2486,8 +2517,8 @@
   // ================= Home slideshow =================
   // Snapshots of real holes, rendered one at a time (only when the player isn't touching the screen),
   // then cycled with a slow pan/zoom and crossfade. Cached so later visits don't render anything.
-  const SLIDE_VER = 'cg-slides-2', SLIDE_MS = 8000;
-  try { localStorage.removeItem('cg-slides-1'); } catch (e) {}
+  const SLIDE_VER = 'cg-slides-3', SLIDE_MS = 8000;
+  try { localStorage.removeItem('cg-slides-1'); localStorage.removeItem('cg-slides-2'); } catch (e) {}
   const SHOTS = [];
   COURSES.forEach((c, ci) => {
     const n = c.holes.length, picks = n > 9 ? [2, 7, 12, 16] : [1, 3, 5];
