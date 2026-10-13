@@ -268,6 +268,11 @@
   .logoEd .upl{position:relative;display:inline-flex;align-items:center;cursor:pointer;color:var(--gold-l);border:2px solid var(--gold);border-radius:999px;padding:6px 14px;
                font:700 14px Oswald,sans-serif;letter-spacing:.06em;text-transform:uppercase}
   .logoEd .upl input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .ballpv{display:flex;align-items:center;gap:16px}
+  .ballpv canvas{width:150px;height:150px;flex:none;background:radial-gradient(circle,#4f9d48,#2f6f30);border-radius:16px}
+  .ballpv b{display:block;font:700 22px Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase}
+  .ballpv span{font:700 13px Inter;color:#fff}
+  .ballpv p{font-size:12px;color:#f3d7a8;margin:8px 0 0;line-height:1.35}
   .buybar{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--gold)}
   .buybar .bsw{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.6);flex:none}
   .buybar .bi{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -490,7 +495,7 @@
             <label class="nameRow">Name on the leaderboard<input id="gName" maxlength="14" autocomplete="off" spellcheck="false"></label>
           </div>
           <div class="gright">
-            <div class="gtabs" id="gTabs"><button data-gtab="outfit" class="on">👔 Outfit</button><button data-gtab="bag">⛳ Golf Bag</button></div>
+            <div class="gtabs" id="gTabs"><button data-gtab="outfit" class="on">👔 Outfit</button><button data-gtab="bag">⛳ Golf Bag</button><button data-gtab="ball">⚪ Ball</button></div>
             <div id="gPanel"></div>
           </div>
         </div>
@@ -1330,7 +1335,47 @@
   const leafMats = [0, 1, 2].map(() => new THREE.MeshPhongMaterial({ color: 0x2d6e2f, flatShading: true, shininess: 0, specular: 0x000000 }));
 
   // ball, shadow blob, aim arc, targets, trail
-  const ballMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0 }));
+  // ---- golf ball looks (cosmetic; the Pro Ball upgrade in Clubs is separate) ----
+  // [name, colour, price, finish] — cheapest first, the most premium cost the most
+  const BALL_COLORS = [['White', '#f7f7f2', 0, 'gloss'], ['Yellow', '#f4e04d', 250, 'gloss'], ['Orange', '#ff8c2a', 300, 'gloss'], ['Pink', '#ff8fb8', 400, 'gloss'],
+    ['Green', '#5fd068', 500, 'gloss'], ['Sky blue', '#7cc7ff', 600, 'gloss'], ['Red', '#d81f3a', 900, 'gloss'], ['Matte black', '#232327', 1500, 'matte'],
+    ['Pearl', '#f6efe2', 2500, 'pearl'], ['Gold', '#e5b740', 5000, 'metal']];
+  const BALL_LINES = [['none', 'No line', 0], ['black', 'Black line', 200], ['red', 'Red line', 400], ['triple', 'Triple track', 1200], ['gold', 'Gold stripe', 1800]];
+  save.ballLook = Object.assign({ color: '#f7f7f2', line: 'none' }, save.ballLook || {});
+  function paintBall(g, W, H, look) {
+    const c = BALL_COLORS.find(x => x[1] === look.color) || BALL_COLORS[0];
+    g.fillStyle = c[1]; g.fillRect(0, 0, W, H);
+    // dimples
+    for (let y = 4; y < H; y += 8) for (let x = (y / 8 % 2) * 4; x < W; x += 8) {
+      g.fillStyle = 'rgba(0,0,0,.09)'; g.beginPath(); g.arc(x, y, 2.6, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.arc(x - 0.8, y - 0.8, 1.2, 0, Math.PI * 2); g.fill();
+    }
+    const band = (y, h, col) => { g.fillStyle = col; g.fillRect(0, y, W, h); };
+    if (look.line === 'black') band(H / 2 - 3, 6, '#111');
+    if (look.line === 'red') band(H / 2 - 3, 6, '#d81f3a');
+    if (look.line === 'gold') { band(H / 2 - 5, 10, '#d9a520'); band(H / 2 - 1, 2, '#fff3b0'); }
+    if (look.line === 'triple') { band(H / 2 - 11, 5, '#d81f3a'); band(H / 2 - 3, 6, '#2747a8'); band(H / 2 + 6, 5, '#d81f3a'); }
+    // little brand mark
+    g.save(); g.translate(W * 0.25, H / 2 + (look.line === 'none' ? 0 : 18)); g.fillStyle = c[3] === 'matte' ? '#e8e8e8' : '#1c1c22';
+    g.font = '800 14px Oswald, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('CHAMI', 0, 0); g.restore();
+    return c;
+  }
+  const ballCv = document.createElement('canvas'); ballCv.width = 256; ballCv.height = 128;
+  const ballTex = new THREE.CanvasTexture(ballCv);
+  function styleBallMat(mat, fin) {
+    mat.map = ballTex; mat.color.set(0xffffff);
+    mat.roughness = fin === 'matte' ? 0.95 : fin === 'pearl' ? 0.18 : fin === 'metal' ? 0.28 : 0.35;
+    mat.metalness = fin === 'metal' ? 0.55 : 0;
+    mat.emissive.set(fin === 'metal' ? 0x3a2a00 : fin === 'pearl' ? 0x1a1814 : 0x000000);
+    mat.needsUpdate = true;
+  }
+  const ballMats = [];
+  function applyBallLook() {
+    const c = paintBall(ballCv.getContext('2d'), ballCv.width, ballCv.height, save.ballLook); ballTex.needsUpdate = true;
+    ballMats.forEach(mat => styleBallMat(mat, c[3]));
+  }
+  const ballMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, metalness: 0 }));
+  ballMats.push(ballMesh.material); applyBallLook();
   ballMesh.renderOrder = 4; scene.add(ballMesh);
   const blob = new THREE.Mesh(new THREE.CircleGeometry(1, 24), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.32, depthWrite: false }));
   blob.rotation.x = -Math.PI / 2; scene.add(blob);
@@ -1528,10 +1573,14 @@
   function bagMats() {
     const cv = document.createElement('canvas'); cv.width = 256; cv.height = 512;
     const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4;
+    const knitCv = document.createElement('canvas'); knitCv.width = 128; knitCv.height = 256;
+    const knitTex = new THREE.CanvasTexture(knitCv); knitTex.wrapS = THREE.RepeatWrapping;
     return { cv, tex,
       body: new THREE.MeshPhongMaterial({ map: tex, specular: 0x2a2a2a, shininess: 28 }),
       trim: new THREE.MeshPhongMaterial({ color: 0xF2C14E, specular: 0x333333, shininess: 30 }),
-      covers: new THREE.MeshLambertMaterial({ color: 0xF2C14E }),
+      covers: new THREE.MeshLambertMaterial({ map: knitTex }),
+      knitCv, knitTex, tags: ['1', '3', 'X'].map(t => { const c = document.createElement('canvas'); c.width = c.height = 64; const tx = new THREE.CanvasTexture(c);
+        return { t, c, tx, mat: new THREE.MeshLambertMaterial({ map: tx, transparent: true, alphaTest: 0.2 }) }; }),
       dark: new THREE.MeshPhongMaterial({ color: 0x1b1b1f, specular: 0x444444, shininess: 40 }),
       rubber: new THREE.MeshLambertMaterial({ color: 0x111111 }),
       glove: new THREE.MeshLambertMaterial({ color: 0xf5f5f0 }),
@@ -1579,12 +1628,27 @@
       g.restore();
     }
     m.tex.needsUpdate = true;
-    m.trim.color.set(b.trim); m.covers.color.set(b.covers);
+    m.trim.color.set(b.trim);
+    // knit headcover: ribbed wool in the headcover colour with two trim stripes above the cuff
+    { const k = m.knitCv.getContext('2d'), KW = m.knitCv.width, KH = m.knitCv.height;
+      k.fillStyle = b.covers; k.fillRect(0, 0, KW, KH);
+      for (let x = 0; x < KW; x += 6) { k.fillStyle = 'rgba(0,0,0,.13)'; k.fillRect(x, 0, 2, KH); k.fillStyle = 'rgba(255,255,255,.08)'; k.fillRect(x + 3, 0, 1, KH); }
+      for (let y = 0; y < KH; y += 4) { k.fillStyle = 'rgba(0,0,0,.05)'; k.fillRect(0, y, KW, 1); }
+      const stripe = b.trim.toLowerCase() === b.covers.toLowerCase() ? b.body : b.trim;
+      k.fillStyle = stripe; k.fillRect(0, KH - 70, KW, 14); k.fillRect(0, KH - 46, KW, 14);
+      k.fillStyle = 'rgba(0,0,0,.18)'; k.fillRect(0, KH - 22, KW, 22);                                   // folded cuff
+      m.knitTex.needsUpdate = true; m.covers.color.set(0xffffff); }
+    // round number tags (1 = driver, 3 = fairway wood, X = hybrid)
+    m.tags.forEach(tg => {
+      const g2 = tg.c.getContext('2d'); g2.clearRect(0, 0, 64, 64);
+      g2.fillStyle = b.trim.toLowerCase() === b.covers.toLowerCase() ? b.body : b.trim; g2.beginPath(); g2.arc(32, 32, 30, 0, Math.PI * 2); g2.fill();
+      g2.strokeStyle = 'rgba(255,255,255,.85)'; g2.lineWidth = 3; g2.stroke();
+      g2.fillStyle = '#ffffff'; g2.font = '800 38px Oswald, Impact, sans-serif'; g2.textAlign = 'center'; g2.textBaseline = 'middle'; g2.fillText(tg.t, 32, 35);
+      tg.tx.needsUpdate = true;
+    });
   }
   // A stand bag: a smooth padded body, rounded collar, side pocket, backpack straps, two legs that kick out the back,
   // and real-looking clubs (knit headcovers on the woods, iron heads hanging sole-up, putter cover).
-  const HC_GEO = new THREE.LatheGeometry([[0.001, 0.235], [0.04, 0.226], [0.06, 0.2], [0.068, 0.16], [0.066, 0.12], [0.05, 0.08], [0.028, 0.04], [0.024, 0]].reverse()
-    .map(([x, y]) => new THREE.Vector2(x, y)), 28);
   function makeBag(m) {
     const root = new THREE.Group(), bag = new THREE.Group(); root.add(bag);
     const A = -0.28; bag.rotation.x = A;                                            // leans back on its stand
@@ -1612,9 +1676,16 @@
     tops.forEach(([x, z, h], i) => {
       const c = new THREE.Group(); c.position.set(x, 0.86, z); c.rotation.set(-0.12 - i * 0.04, 0, (x > 0 ? -1 : x < 0 ? 1 : 0) * 0.18); bag.add(c);
       const sh = part(new THREE.CylinderGeometry(0.0065, 0.0065, h, 8), m.dark, 0, h / 2, 0, c);
-      const hc = part(HC_GEO, m.covers, 0, h - 0.02, 0, c); hc.rotation.z = (i - 1) * 0.15;
-      part(new THREE.CylinderGeometry(0.028, 0.026, 0.03, 20), m.trim, 0, h - 0.005, 0, c);              // ribbed cuff
-      if (i === 1) part(new THREE.SphereGeometry(0.026, 12, 10), m.trim, 0, h + 0.225, 0, c);           // pom-pom on the driver
+      // a knit sock headcover: long ribbed neck, then the head bulge flopping to the toe side, with a number tag and a pom-pom
+      const big = i === 1 ? 1.12 : i === 2 ? 0.88 : 1;
+      part(new THREE.CylinderGeometry(0.031, 0.029, 0.17, 24, 1, true), m.covers, 0, h + 0.06, 0, c);
+      part(new THREE.CylinderGeometry(0.034, 0.034, 0.035, 24, 1, true), m.covers, 0, h - 0.01, 0, c);   // folded cuff
+      const side = x > 0 ? 1 : -1;
+      const hd = part(new THREE.SphereGeometry(1, 28, 18), m.covers, side * 0.042 * big, h + 0.19, 0.004, c);
+      hd.scale.set(0.074 * big, 0.062 * big, 0.064 * big); hd.rotation.z = -side * 0.35;
+      const nk = part(new THREE.SphereGeometry(1, 20, 12), m.covers, side * 0.012, h + 0.15, 0, c); nk.scale.set(0.042, 0.05, 0.04);   // where the neck meets the head
+      const tag = part(new THREE.PlaneGeometry(0.036, 0.036), m.tags[i].mat, side * 0.045 * big, h + 0.185, 0.064 * big + 0.004, c); tag.castShadow = false;
+      if (i === 1) part(new THREE.SphereGeometry(0.03, 14, 10), m.trim, side * 0.07, h + 0.255, 0, c);            // pom-pom on the driver
     });
     [[-0.1, 0.03, 0.12], [-0.05, 0.075, 0.15], [0.0, 0.09, 0.17], [0.05, 0.075, 0.14], [0.1, 0.035, 0.13], [-0.02, 0.02, 0.18]].forEach(([x, z, h], i) => {
       const c = new THREE.Group(); c.position.set(x, 0.86, z); c.rotation.set(0.1 + (i % 2) * 0.06, i * 0.9, x * -1.2); bag.add(c);
@@ -1623,7 +1694,9 @@
     });
     { const c = new THREE.Group(); c.position.set(0.11, 0.86, -0.02); c.rotation.set(-0.05, 0.4, -0.25); bag.add(c);
       part(new THREE.CylinderGeometry(0.006, 0.006, 0.12, 8), m.metal, 0, 0.06, 0, c);
-      const pc = part(new THREE.SphereGeometry(1, 20, 12), m.covers, 0, 0.14, 0.04, c); pc.scale.set(0.022, 0.035, 0.065); }
+      // blade putter cover: a flat rounded cover with a magnet-tab look
+      const pc = part(new THREE.SphereGeometry(1, 24, 14), m.covers, 0.035, 0.135, 0, c); pc.scale.set(0.066, 0.03, 0.024);
+      const pt = part(new THREE.BoxGeometry(0.03, 0.012, 0.05), m.trim, 0.035, 0.155, 0, c); pt.castShadow = false; }
     // stand: two carbon legs hinged under the collar, kicking out behind, with rubber feet
     const toRoot = v => { const c = Math.cos(A), sn = Math.sin(A); return V3(v.x, v.y * c - v.z * sn, v.y * sn + v.z * c); };
     for (const sx of [-1, 1]) {
@@ -3433,7 +3506,8 @@
     const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
     const turn = new THREE.Group(); sc.add(turn);
     const g = makeGolfer(previewMats); turn.add(g.root);
-    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.04, 14, 10), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }));
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.04, 20, 14), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }));
+    ballMats.push(ball.material); applyBallLook();
     turn.add(ball);
     const pad = new THREE.Mesh(new THREE.CircleGeometry(1.5, 40), new THREE.MeshLambertMaterial({ color: 0x5fb556 }));
     pad.rotation.x = -Math.PI / 2; turn.add(pad);
@@ -3536,10 +3610,40 @@
       `<div class="gnote">Your bag sits on the tee box next to you on every hole. Locked bags unlock with achievements.</div></div>` +
       `<div class="gcard"><div class="sect">CUSTOMIZE</div><div class="chiprow">${chips}</div><div class="swpane">${pane}</div></div>`;
   }
+  // ---- Ball tab: a big preview of your ball, colours and alignment lines for sale ----
+  const ownsBall = (kind, id, price) => !price || !!save.ownedLook[`ball-${kind}:${id}`];
+  function ballPanel() {
+    const L = save.ballLook;
+    const cols = BALL_COLORS.map(([n, c, pr, fin]) => {
+      const own = ownsBall('color', c, pr);
+      return `<button data-ballc="${c}" title="${n}" class="${c === L.color ? 'on' : ''}${own ? '' : ' buy'}" style="background:${fin === 'metal' ? `radial-gradient(circle at 35% 30%,#fff3b0,${c} 55%,#8a6416)` : fin === 'pearl' ? `radial-gradient(circle at 35% 30%,#fff,${c} 60%,#d9cdb8)` : c}">${own ? '' : `<em>${pr >= 1000 ? '$' + pr / 1000 + 'k' : '$' + pr}</em>`}</button>`;
+    }).join('');
+    const lines = BALL_LINES.map(([id, n, pr]) => `<button data-balll="${id}" class="${L.line === id ? 'on' : ''}">${n}${ownsBall('line', id, pr) ? '' : `<br><small style="font:800 10px Inter;color:var(--gold)">${money(pr)}</small>`}</button>`).join('');
+    const cn = (BALL_COLORS.find(x => x[1] === L.color) || BALL_COLORS[0])[0], ln = (BALL_LINES.find(x => x[0] === L.line) || BALL_LINES[0])[1];
+    return `<div class="gcard"><div class="sect" style="display:flex;justify-content:space-between">GOLF BALL<span>${money(save.coins)}</span></div>
+      <div class="ballpv"><canvas id="ballPv" width="320" height="320"></canvas><div><b>${cn}</b><span>${ln}</span>
+        <p>Looks only. The Pro Ball upgrade in the Clubs tab is what cuts the wind.</p></div></div></div>
+      <div class="gcard"><div class="sect">COLOUR</div><div class="sw">${cols}</div>${pendingBuy && pendingBuy.kind === 'ballc' ? buyBar() : ''}
+      <div class="sect" style="margin-top:16px">ALIGNMENT LINE</div><div class="opts" style="flex-wrap:wrap">${lines}</div>${pendingBuy && pendingBuy.kind === 'balll' ? buyBar() : ''}</div>`;
+  }
+  function drawBallPreview() {
+    const cv = $('ballPv'); if (!cv) return;
+    const g = cv.getContext('2d'), S = cv.width, R = S * 0.4, cx = S / 2, cy = S / 2;
+    const c = BALL_COLORS.find(x => x[1] === save.ballLook.color) || BALL_COLORS[0];
+    g.clearRect(0, 0, S, S);
+    g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(cx, cy + R + 14, R * 0.8, 12, 0, 0, Math.PI * 2); g.fill();
+    // the ball's skin wrapped onto a circle (front half of the texture)
+    g.save(); g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.clip();
+    g.drawImage(ballCv, ballCv.width * 0.0, 0, ballCv.width * 0.5, ballCv.height, cx - R * 1.05, cy - R, R * 2.1, R * 2);
+    const sh = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+    sh.addColorStop(0, c[3] === 'matte' ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.55)'); sh.addColorStop(0.5, 'rgba(255,255,255,0)'); sh.addColorStop(1, 'rgba(0,0,0,.45)');
+    g.fillStyle = sh; g.fillRect(cx - R, cy - R, R * 2, R * 2); g.restore();
+  }
   function renderGolfer() {
     $('gName').value = save.name || '';
     document.querySelectorAll('#gTabs button').forEach(b => b.classList.toggle('on', b.dataset.gtab === gTab));
-    $('gPanel').innerHTML = gTab === 'bag' ? bagPanel() : outfitPanel();
+    $('gPanel').innerHTML = gTab === 'bag' ? bagPanel() : gTab === 'ball' ? ballPanel() : outfitPanel();
+    if (gTab === 'ball') drawBallPreview();
     applyLook(previewMats, save.look); applyBag(previewBagMats, save.gbag);
   }
   function setBag(b) { Object.assign(save.gbag, b); persist(); applyBag(playerBagMats, save.gbag); applyBag(previewBagMats, save.gbag); }
@@ -3577,6 +3681,18 @@
       if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(bp.bag); } else bLockMsg = bp;
     }
     else if (d.bpart) bPart = d.bpart;
+    else if (d.ballc) {
+      const bc = BALL_COLORS.find(x => x[1] === d.ballc);
+      if (bc && !ownsBall('color', bc[1], bc[2])) pendingBuy = { kind: 'ballc', title: `${bc[0]} golf ball`, price: bc[2], swatch: bc[1],
+        grant: () => { save.ownedLook[`ball-color:${bc[1]}`] = 1; }, apply: () => { save.ballLook.color = bc[1]; persist(); applyBallLook(); } };
+      else { save.ballLook.color = d.ballc; persist(); applyBallLook(); }
+    }
+    else if (d.balll) {
+      const bl = BALL_LINES.find(x => x[0] === d.balll);
+      if (bl && !ownsBall('line', bl[0], bl[2])) pendingBuy = { kind: 'balll', title: `${bl[1]} ball marking`, price: bl[2], swatch: save.ballLook.color,
+        grant: () => { save.ownedLook[`ball-line:${bl[0]}`] = 1; }, apply: () => { save.ballLook.line = bl[0]; persist(); applyBallLook(); } };
+      else { save.ballLook.line = d.balll; persist(); applyBallLook(); }
+    }
     else if (d.logoclear) { customLogo().img = ''; logoSrc = ''; persist(); setBag({}); }
     else if (d.logo) {
       if (d.logo === 'custom' && !save.ownedLook['bag-logo:custom']) pendingBuy = { kind: 'bag', title: 'Custom bag logo', price: CUSTOM_LOGO_PRICE, swatch: save.gbag.trim,
@@ -3803,7 +3919,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic, ballLook: save.ballLook }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
