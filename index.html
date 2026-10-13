@@ -371,15 +371,15 @@
   const CUP_R = 0.225, CUP_D = 0.42, BALL_R = 0.075, MAX_STROKES = 12;
   // cup physics: real gravity in yd/s², and how far the ball's centre must sink below the rim to catch the back wall
   const CUP_G = 10.7, CUP_DROP = BALL_R * 1.3;
-  const DECEL = { green: 2.6, fringe: 5.5, fairway: 6.5, tee: 6.5, rough: 22, sand: 60 };
+  const DECEL = { green: 2.6, fringe: 5.5, fairway: 6.5, tee: 6.5, rough: 22, sand: 60, path: 3.2 };
   // Bounce: how much upward speed the ball keeps (REST) and forward speed it loses (SKID) on each landing.
-  const REST = { tee: 0.42, fairway: 0.42, fringe: 0.36, green: 0.32, rough: 0.2, sand: 0.04 };
-  const SKID = { tee: 0.1, fairway: 0.1, fringe: 0.14, green: 0.18, rough: 0.25, sand: 0.85 };
+  const REST = { tee: 0.42, fairway: 0.42, fringe: 0.36, green: 0.32, rough: 0.2, sand: 0.04, path: 0.66 };   // cart path: hard, big bounces
+  const SKID = { tee: 0.1, fairway: 0.1, fringe: 0.14, green: 0.18, rough: 0.25, sand: 0.85, path: 0.03 };
   const GRAV = 20;
   // Sideways pull (-1 left .. 1 right) -> yards of planned curve. Pull right = fade (curves right), left = draw.
   const curveOf = (lat, carry) => { const a = Math.abs(lat || 0); return a < 0.12 ? 0 : Math.sign(lat) * (a - 0.12) / 0.88 * carry * 0.13; };
-  const LIE_MULT = { tee: 1, fairway: 1, fringe: 0.97, green: 0.95, rough: 0.85, sand: 0.6 };
-  const LIE_NAME = { tee: 'Tee box', fairway: 'Fairway', fringe: 'Fringe', green: 'Green', rough: 'Rough', sand: 'Bunker' };
+  const LIE_MULT = { tee: 1, fairway: 1, fringe: 0.97, green: 0.95, rough: 0.85, sand: 0.6, path: 1 };
+  const LIE_NAME = { tee: 'Tee box', fairway: 'Fairway', fringe: 'Fringe', green: 'Green', rough: 'Rough', sand: 'Bunker', path: 'Cart path' };
   // Every slot in the bag has several club models you can buy and swap in.
   //   carry  full-swing yards (pull 100%)        roll   how far it runs after landing
   //   loft   how high it flies                   spread how far a mistimed shot starts off line
@@ -736,6 +736,84 @@
     for (let i = 0; i < f.pts.length - 1; i++) if (segDist(p, f.pts[i], f.pts[i + 1]) <= f.w / 2) return true;
     return false;
   }
+  // ---- Cart path: a paved path from beside the tee, along one side of the fairway, to beside the green ----
+  const PATH_W = 2.6;
+  function cartPath(h) {
+    if (h.path !== undefined) return h.path;
+    const b = h.bounds, tee = h.tee, pin = h.pin, gr = h.green;
+    const L = Math.hypot(pin.x - tee.x, pin.y - tee.y) || 1, ux = (pin.x - tee.x) / L, uy = (pin.y - tee.y) / L;
+    // fairway centre line, ordered from tee to green
+    const cl = [];
+    h.fairways.forEach(f => f.pts.forEach(q => cl.push({ x: q[0], y: q[1], w: f.w })));
+    cl.sort((a, c) => ((a.x - tee.x) * ux + (a.y - tee.y) * uy) - ((c.x - tee.x) * ux + (c.y - tee.y) * uy));
+    const center = [{ x: tee.x, y: tee.y, w: 14 }, ...cl.filter(q => ((q.x - tee.x) * ux + (q.y - tee.y) * uy) > 20 && ((pin.x - q.x) * ux + (pin.y - q.y) * uy) > 25),
+      { x: gr.x, y: gr.y, w: Math.max(gr.rx, gr.ry) * 2 + 6 }];
+    const bad = p => p.x < b.x + 3 || p.y < b.y + 3 || p.x > b.x + b.w - 3 || p.y > b.y + b.h - 3
+      || h.water.some(e => inEl(p, e, 4)) || h.bunkers.some(e => inEl(p, e, 3)) || inEl(p, gr, 4)
+      || h.fairways.some(f => f.pts.some((q, i) => i && segDist(p, f.pts[i - 1], q) < f.w / 2 + 2));
+    const build = side => {
+      let cost = 0;
+      const pts = center.map((c, i) => {
+        const a = center[Math.max(0, i - 1)], n = center[Math.min(center.length - 1, i + 1)];
+        let dx = n.x - a.x, dy = n.y - a.y; const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+        const nx = -dy * side, ny = dx * side;
+        for (let off = c.w / 2 + 7; off < c.w / 2 + 34; off += 3) {
+          const p = { x: c.x + nx * off, y: c.y + ny * off };
+          if (!bad(p)) return p;
+        }
+        cost++; return null;
+      }).filter(Boolean);
+      return { pts, cost };
+    };
+    const A = build(1), B = build(-1), best = A.cost <= B.cost ? A : B;
+    let pts = best.pts;
+    if (pts.length < 2 || best.cost > center.length / 2) return (h.path = null);
+    // round the corners (Chaikin)
+    for (let k = 0; k < 2; k++) {
+      const o = [pts[0]];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], c = pts[i + 1];
+        o.push({ x: a.x * 0.75 + c.x * 0.25, y: a.y * 0.75 + c.y * 0.25 }, { x: a.x * 0.25 + c.x * 0.75, y: a.y * 0.25 + c.y * 0.75 });
+      }
+      o.push(pts[pts.length - 1]); pts = o;
+    }
+    // walk the path every 2 yards and steer it around bunkers, water and the green
+    const dense = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], c = pts[i + 1], n = Math.max(1, Math.ceil(Math.hypot(c.x - a.x, c.y - a.y) / 2));
+      for (let j = 0; j < n; j++) dense.push({ x: a.x + (c.x - a.x) * j / n, y: a.y + (c.y - a.y) * j / n });
+    }
+    dense.push(pts[pts.length - 1]);
+    const avoid = h.bunkers.map(e => [e, 2.5]).concat(h.water.map(e => [e, 3]), [[gr, 4]]);
+    const steer = () => dense.forEach(q => {
+      for (const [e, pad] of avoid) {
+        const ex = q.x - e.x, ey = q.y - e.y, d = Math.sqrt((ex / (e.rx + pad)) ** 2 + (ey / (e.ry + pad)) ** 2);
+        if (d < 1) { const k = 1 / Math.max(d, 0.05); q.x = e.x + ex * k; q.y = e.y + ey * k; }
+      }
+      q.x = clamp(q.x, b.x + 2, b.x + b.w - 2); q.y = clamp(q.y, b.y + 2, b.y + b.h - 2);
+    });
+    steer();
+    for (let k = 0; k < 3; k++) {   // relax the kinks the steering made, then steer again
+      for (let i = 1; i < dense.length - 1; i++) { dense[i].x = (dense[i - 1].x + dense[i].x * 2 + dense[i + 1].x) / 4; dense[i].y = (dense[i - 1].y + dense[i].y * 2 + dense[i + 1].y) / 4; }
+      steer();
+    }
+    return (h.path = { pts: dense.map(q => [q.x, q.y]), w: PATH_W });
+  }
+  function onPath(p, h) {
+    const P = cartPath(h); if (!P) return false;
+    for (let i = 0; i < P.pts.length - 1; i++) if (segDist(p, P.pts[i], P.pts[i + 1]) <= P.w / 2) return true;
+    return false;
+  }
+  // ---- Out-of-bounds stakes (red) around the edge of the hole, skipping water ----
+  function obStakes(h) {
+    const b = h.bounds, out = [], gap = 11;
+    const edge = (x0, y0, x1, y1) => {
+      const L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(1, Math.round(L / gap));
+      for (let i = 0; i < n; i++) { const p = { x: x0 + (x1 - x0) * i / n, y: y0 + (y1 - y0) * i / n }; if (!h.water.some(e => inEl(p, e, 1))) out.push(p); }
+    };
+    edge(b.x, b.y, b.x + b.w, b.y); edge(b.x + b.w, b.y, b.x + b.w, b.y + b.h); edge(b.x + b.w, b.y + b.h, b.x, b.y + b.h); edge(b.x, b.y + b.h, b.x, b.y);
+    return out;
+  }
   const gauss = () => (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 1.73;
   const fmtRel = r => r === 0 ? 'E' : (r > 0 ? '+' + r : '' + r);
   const money = n => '$' + n.toLocaleString();
@@ -1014,6 +1092,19 @@
 
     for (const e of h.water) { ell(g, e, 1.4); g.fillStyle = '#5e7f45'; g.fill(); ell(g, e); g.fillStyle = '#1d5a8c'; g.fill(); }
 
+    // cart path: grey asphalt with a darker worn edge, centre wear and fine grit
+    const cp = cartPath(h);
+    if (cp) {
+      const line = (gg, w) => { gg.beginPath(); cp.pts.forEach(([x, y], i) => i ? gg.lineTo(x, y) : gg.moveTo(x, y)); gg.lineWidth = w; gg.stroke(); };
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      g.strokeStyle = 'rgba(0,0,0,.25)'; line(g, cp.w + 0.7);
+      const Pl = mk(); Pl.lineCap = 'round'; Pl.lineJoin = 'round'; Pl.strokeStyle = '#9b9a94'; line(Pl, cp.w);
+      Pl.globalCompositeOperation = 'source-atop';
+      Pl.strokeStyle = 'rgba(255,255,255,.08)'; line(Pl, cp.w * 0.35);
+      grain(Pl, Math.min(cp.pts.length * 400, cap / 40), 'rgba(40,40,40,.25)', 'rgba(255,255,255,.18)', 0.12);
+      blit(g, Pl);
+    }
+
     const t = h.tee;
     g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(t.x - 7.4, t.y - 4.9, 14.8, 9.8);
     g.fillStyle = pal.tee; g.fillRect(t.x - 7, t.y - 4.5, 14, 9);
@@ -1083,8 +1174,9 @@
       S.save(); S.translate(e.x, e.y); S.scale(e.rx, e.ry); S.translate(-e.x, -e.y); S.fillStyle = sg; S.fillRect(e.x - 1, e.y - 1, 2, 2); S.restore();
       blit(g, S);
     }
-    g.setLineDash([3, 3]); g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 0.7;
-    g.strokeRect(b.x, b.y, b.w, b.h); g.setLineDash([]);
+    // red out-of-bounds stakes (seen from above as small red dots)
+    g.fillStyle = '#c4162e';
+    for (const st of obStakes(h)) { g.beginPath(); g.arc(st.x, st.y, 0.9, 0, Math.PI * 2); g.fill(); }
     return { canvas: g.canvas, ox, oy, W, H: Hh };
   }
 
@@ -1338,6 +1430,16 @@
     disposables.push(tmGeo, tmMat);
     [-5, 5].forEach(dx => { const m = new THREE.Mesh(tmGeo, tmMat); m.position.set(h.tee.x + dx, h.terr.teeH + 0.4, h.tee.y - 2); holeGroup.add(m); });
 
+    // red out-of-bounds stakes
+    { const st = obStakes(h);
+      const sGeo = new THREE.CylinderGeometry(0.05, 0.06, 1.1, 6); sGeo.translate(0, 0.45, 0);
+      const sMat = new THREE.MeshLambertMaterial({ color: 0xd0142c });
+      disposables.push(sGeo, sMat);
+      const inst = new THREE.InstancedMesh(sGeo, sMat, Math.max(1, st.length)), M = new THREE.Matrix4();
+      st.forEach((p, i) => { M.makeTranslation(p.x, terrainH(h, p.x, p.y), p.y); inst.setMatrixAt(i, M); });
+      inst.count = st.length; inst.castShadow = true;
+      holeGroup.add(inst); }
+
     // cup: a real hole cut into the green. A stencil mask marks the opening, then the
     // cup's liner, dirt walls and bottom are drawn "through" the ground inside it.
     const maskGeo = new THREE.CircleGeometry(CUP_R, 40);
@@ -1388,6 +1490,7 @@
     for (const e of hole.bunkers) if (inEl(p, e)) return 'sand';
     if (inEl(p, hole.green, 2.5)) return 'fringe';
     for (const e of hole.water) if (inEl(p, e)) return 'water';
+    if (onPath(p, hole)) return 'path';
     if (Math.abs(p.x - hole.tee.x) < 7 && Math.abs(p.y - hole.tee.y) < 4.5) return 'tee';
     for (const f of hole.fairways) if (inFairway(p, f)) return 'fairway';
     return 'rough';
@@ -1728,7 +1831,7 @@
   // The ball meets the ground: it loses some forward speed and bounces back up depending on the surface.
   function touchdown(t) {
     const vin = Math.abs(ball.vz || 0);
-    const k = Math.max(0, 1 - (SKID[t] || 0.1) - (ball.spin || 0) * (t === 'green' ? 1 : 0.4));
+    const k = Math.max(0, 1 - (SKID[t] || 0.1) - (ball.spin || 0) * (t === 'green' ? 1 : t === 'path' ? 0.05 : 0.4));
     ball.vx *= k; ball.vy *= k; ball.spin = (ball.spin || 0) * 0.5;
     ball.vz = vin * (REST[t] || 0.3);
     if (ball.vz < 1.5) { ball.vz = 0; ball.z = 0; } else ball.z = 0.001;
@@ -2381,6 +2484,7 @@
         <p><b>Rough</b> costs 15% distance (Hybrid only 5%). <b>Sand</b> costs 40% (Sand/Lob Wedge only 8%). Rough and sand also make misses wilder.</p>
         <p><b>Wind</b> pushes the ball in the air; high shots get pushed more. The Pro Ball upgrade cuts wind effect.</p>
         <p><b>Water / out of bounds</b> cost a stroke and you replay from the last spot.</p>
+        <p><b>Red stakes</b> mark out of bounds. <b>Cart paths</b> are hard: the ball bounces high and runs a long way.</p>
         <p><b>Money</b> comes from par or better plus a round bonus. Spend it in <b>Clubs</b> on new models and upgrades. Customize your look in <b>Golfer</b>.</p>
       </div>`;
   }
@@ -2517,8 +2621,8 @@
   // ================= Home slideshow =================
   // Snapshots of real holes, rendered one at a time (only when the player isn't touching the screen),
   // then cycled with a slow pan/zoom and crossfade. Cached so later visits don't render anything.
-  const SLIDE_VER = 'cg-slides-3', SLIDE_MS = 8000;
-  try { localStorage.removeItem('cg-slides-1'); localStorage.removeItem('cg-slides-2'); } catch (e) {}
+  const SLIDE_VER = 'cg-slides-4', SLIDE_MS = 8000;
+  try { localStorage.removeItem('cg-slides-1'); localStorage.removeItem('cg-slides-2'); localStorage.removeItem('cg-slides-3'); } catch (e) {}
   const SHOTS = [];
   COURSES.forEach((c, ci) => {
     const n = c.holes.length, picks = n > 9 ? [2, 7, 12, 16] : [1, 3, 5];
