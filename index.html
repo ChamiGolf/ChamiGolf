@@ -1565,7 +1565,7 @@
     g.fillStyle = b.trim; g.fillRect(W * 0.5 - 46, 0, 6, H); g.fillRect(W * 0.5 + 40, 0, 6, H);
     if (b.logo === 'custom') drawCustomLogo(g, W, H, b);
     if (b.logo === 'chaminade') {
-      g.save(); g.translate(W / 2, H * 0.47); g.rotate(-Math.PI / 2);
+      g.save(); g.translate(W / 2, H * 0.5); g.rotate(-Math.PI / 2);
       g.font = '700 50px Oswald, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
       g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText('CHAMINADE', 0, 2);
       g.fillStyle = b.trim.toLowerCase() === b.body.toLowerCase() ? '#ffffff' : b.trim; g.fillText('CHAMINADE', 0, 0);
@@ -1582,7 +1582,11 @@
     const root = new THREE.Group(), bag = new THREE.Group(); root.add(bag);
     const A = -0.28; bag.rotation.x = A;                                            // leans back on its stand
     const prof = [[0, 0.012], [0.11, 0.012], [0.138, 0.025], [0.148, 0.06], [0.15, 0.2], [0.153, 0.5], [0.156, 0.78], [0.158, 0.84]].map(([x, y]) => new THREE.Vector2(x, y));
-    const body = part(new THREE.LatheGeometry(prof, 48), m.body, 0, 0, 0, bag); body.rotation.y = Math.PI;
+    // map the bag's skin by height (not by profile point) so the logo sits centred on the front of the bag
+    const bodyGeo = new THREE.LatheGeometry(prof, 48), bp = bodyGeo.attributes.position, buv = bodyGeo.attributes.uv;
+    for (let i = 0; i < bp.count; i++) buv.setY(i, clamp((bp.getY(i) - 0.06) / (0.84 - 0.06), 0, 1));
+    buv.needsUpdate = true;
+    const body = part(bodyGeo, m.body, 0, 0, 0, bag); body.rotation.y = Math.PI;
     // rounded top collar and cuff
     const cuff = part(new THREE.CylinderGeometry(0.164, 0.16, 0.1, 48, 1, true), m.trim, 0, 0.83, 0, bag);
     const roll = part(new THREE.TorusGeometry(0.158, 0.022, 14, 48), m.trim, 0, 0.88, 0, bag); roll.rotation.x = Math.PI / 2;
