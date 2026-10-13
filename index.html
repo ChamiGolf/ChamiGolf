@@ -647,8 +647,8 @@
 
   // ================= Golfer looks =================
   const LOOK_PRESETS = [
-    { name: 'Red & Gold', look: { style: 'suit', jacket: '#B3122B', shirt: '#ffffff', tie: '#F2C14E', pants: '#1c1c22', shoes: '#111111', trim: '#F2C14E', skin: '#e0ac7e', hair: '#3b2416' } },
-    { name: 'Classic Outfit', price: 1500, look: { style: 'suit', jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#1f2c4d', shoes: '#111111' } },
+    { name: 'Classic Outfit', look: { style: 'suit', jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#1f2c4d', shoes: '#111111', trim: '#F2C14E', skin: '#e0ac7e', hair: '#3b2416' } },
+    { name: 'Red & Gold', price: 1500, look: { style: 'suit', jacket: '#B3122B', shirt: '#ffffff', tie: '#F2C14E', pants: '#1c1c22', shoes: '#111111' } },
     { name: 'Senior Sweater', lock: 'senior', look: { style: 'sweater', jacket: '#f4f1ea', trim: '#F2C14E', shirt: '#bcd6f2', tie: '#2747a8', pants: '#8a8d93', shoes: '#111111' } },
     { name: 'Brother Outfit', price: 1800, look: { style: 'suit', jacket: '#111113', shirt: '#ffffff', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
     { name: 'NHS Outfit', price: 4000, look: { style: 'suit', jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
@@ -670,9 +670,9 @@
   };
   // What each colour costs in the shop (by swatch name). Skin tone and hair are always free.
   const PRICES = {   // ranked by how clean and premium each colour looks: the classiest cost the most
-    jacket: { Red: 0, Gray: 300, Brown: 400, Tan: 500, Maroon: 700, Green: 900, Royal: 1100, Charcoal: 1300, Navy: 1500, Black: 1800, White: 2200, 'Off-white': 2600, Gold: 3200 },
+    jacket: { Gray: 300, Brown: 400, Tan: 500, Maroon: 700, Green: 900, Royal: 1100, Red: 1200, Charcoal: 1300, Navy: 1500, Black: 1800, White: 2200, 'Off-white': 2600, Gold: 3200 },
     shirt: { White: 0, Gray: 150, Pink: 200, Lavender: 250, Red: 300, Gold: 400, 'Light blue': 500, Black: 700 },
-    tie: { Gold: 0, Green: 150, 'Light blue': 200, Maroon: 250, White: 300, Purple: 400, Red: 500, Black: 600, Navy: 700, Silver: 900 },
+    tie: { Green: 150, 'Light blue': 200, Maroon: 250, White: 300, Purple: 400, Gold: 400, Red: 500, Black: 600, Navy: 700, Silver: 900 },
     pants: { Brown: 150, Red: 200, Khaki: 300, Gray: 450, Charcoal: 600, Navy: 750, Black: 900, White: 1500 },
     shoes: { Black: 0, Brown: 400, White: 900 },
     trim: { Gold: 0, Red: 300, Navy: 400, Black: 500, White: 700, Silver: 1200 },
