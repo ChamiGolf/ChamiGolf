@@ -164,16 +164,40 @@
   .nameRow{display:block;font:800 10px Inter;letter-spacing:.16em;color:var(--gold);margin:14px 2px 0;text-transform:uppercase}
   .nameRow input{display:block;width:100%;margin-top:6px;padding:11px 14px;border-radius:12px;border:2px solid rgba(242,193,78,.55);background:var(--red-dd);
                  color:#fff;font:700 18px Oswald,sans-serif;letter-spacing:.03em;-webkit-user-select:text;user-select:text;touch-action:auto}
-  .presets{display:flex;flex-wrap:wrap;gap:8px}
-  .presets button{border:2px solid rgba(242,193,78,.5);background:var(--red-dd);color:#fff;border-radius:999px;padding:7px 12px 7px 8px;font:700 13px Inter,sans-serif;
-                  display:flex;align-items:center;gap:7px;cursor:pointer}
-  .presets button i{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.6)}
-  .lookrow{margin-top:14px}
-  .lookrow .lh{font:800 10px Inter;letter-spacing:.16em;color:var(--gold);margin:0 2px 7px;text-transform:uppercase;display:flex;justify-content:space-between}
-  .lookrow .lh b{color:#fff;letter-spacing:.04em;font-weight:600}
   .sw{display:flex;flex-wrap:wrap;gap:8px}
   .sw button{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,.35);cursor:pointer;padding:0}
   .sw button.on{border:3px solid var(--gold-l);box-shadow:0 0 0 3px rgba(255,224,138,.35)}
+  /* golfer page: preview on the left (top on phones), Outfit / Golf Bag panels on the right */
+  .wrap.wide{max-width:980px}
+  .gwrap{display:grid;grid-template-columns:1fr;gap:14px;margin-top:10px}
+  @media (min-width:760px){.gwrap{grid-template-columns:minmax(300px,5fr) 6fr;align-items:start}
+    .gleft{position:sticky;top:0}.gwrap .gstage{height:400px}}
+  .gcard{background:rgba(79,7,18,.88);border:1px solid rgba(242,193,78,.4);border-radius:18px;padding:12px 14px 14px}
+  .gcard .sect{margin:2px 2px 10px}
+  .gcard + .gcard{margin-top:12px}
+  .gtabs{display:flex;gap:6px;background:rgba(0,0,0,.25);border-radius:999px;padding:4px;margin-bottom:12px}
+  .gtabs button{flex:1;border:0;border-radius:999px;padding:10px 6px;background:none;color:#f3d7a8;font:700 15px Oswald,sans-serif;letter-spacing:.06em;
+               text-transform:uppercase;cursor:pointer}
+  .gtabs button.on{background:linear-gradient(180deg,var(--gold-l),var(--gold-d));color:var(--red-dd)}
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+  .pcard{display:flex;flex-direction:column;align-items:center;gap:7px;border:2px solid rgba(242,193,78,.35);background:var(--red-dd);color:#fff;
+         border-radius:14px;padding:10px 6px 9px;cursor:pointer;font:700 13px Inter,sans-serif;text-align:center;line-height:1.15}
+  .pcard.on{border-color:var(--gold-l);box-shadow:0 0 0 3px rgba(255,224,138,.25);background:#6d0a1a}
+  .pcard .mini{display:flex;flex-direction:column;width:46px;height:46px;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,.35)}
+  .pcard .mini i{flex:1;display:block}
+  .chiprow{display:flex;flex-wrap:wrap;gap:6px}
+  .chiprow button{display:flex;align-items:center;gap:6px;border:1px solid rgba(242,193,78,.45);background:rgba(69,6,15,.85);color:#f3d7a8;
+                  border-radius:999px;padding:6px 11px 6px 6px;font:700 12px Inter,sans-serif;cursor:pointer}
+  .chiprow button i{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.55);flex:none}
+  .chiprow button.on{background:var(--gold);color:var(--red-dd);border-color:var(--gold)}
+  .swpane{margin-top:12px;padding-top:12px;border-top:1px solid rgba(242,193,78,.2)}
+  .swpane .lh{font:800 10px Inter;letter-spacing:.16em;color:var(--gold);margin:0 2px 9px;text-transform:uppercase;display:flex;justify-content:space-between}
+  .swpane .lh b{color:#fff;letter-spacing:.04em;font-weight:600}
+  .opts{display:flex;gap:8px}
+  .opts button{flex:1;border:2px solid rgba(242,193,78,.45);background:var(--red-dd);color:#fff;border-radius:12px;padding:11px 8px;font:700 14px Oswald,sans-serif;
+               letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+  .opts button.on{border-color:var(--gold-l);background:#6d0a1a;color:var(--gold-l)}
+  .gnote{font-size:12px;color:#f3d7a8;margin:10px 2px 0;line-height:1.4}
   .hero{height:150px;border-radius:18px;background:#2f6f30 center/cover no-repeat;border:2px solid rgba(242,193,78,.55);margin-top:8px}
   .cdname{font:700 34px/1.05 Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.03em;margin-top:6px}
   .cddesc{font-size:14px;color:#f3d7a8;margin:4px 0 10px;line-height:1.4}
@@ -303,12 +327,16 @@
       <section id="tab-play"><div class="sect">CHOOSE A COURSE</div><div id="courseList"></div></section>
       <section id="tab-course" class="hidden"><div id="courseDetail"></div></section>
       <section id="tab-golfer" class="hidden">
-        <div class="sect">YOUR GOLFER</div>
-        <div class="gstage"><canvas id="gPrev"></canvas></div>
-        <label class="nameRow">Name on the leaderboard<input id="gName" maxlength="14" autocomplete="off" spellcheck="false"></label>
-        <div class="sect">OUTFITS</div>
-        <div class="presets" id="presetRow"></div>
-        <div id="lookRows"></div>
+        <div class="gwrap">
+          <div class="gleft">
+            <div class="gstage"><canvas id="gPrev"></canvas></div>
+            <label class="nameRow">Name on the leaderboard<input id="gName" maxlength="14" autocomplete="off" spellcheck="false"></label>
+          </div>
+          <div class="gright">
+            <div class="gtabs" id="gTabs"><button data-gtab="outfit" class="on">👔 Outfit</button><button data-gtab="bag">⛳ Golf Bag</button></div>
+            <div id="gPanel"></div>
+          </div>
+        </div>
       </section>
       <section id="tab-clubs" class="hidden">
         <div id="clubList"></div>
@@ -432,11 +460,11 @@
 
   // ================= Golfer looks =================
   const LOOK_PRESETS = [
-    { name: 'Red & Gold', look: { jacket: '#B3122B', shirt: '#ffffff', tie: '#F2C14E', pants: '#1c1c22', shoes: '#111111', skin: '#e0ac7e', hair: '#3b2416' } },
-    { name: 'Brother Outfit', look: { jacket: '#111113', shirt: '#ffffff', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
-    { name: 'Navy Blazer', look: { jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#b9a47c', shoes: '#4a2c17' } },
-    { name: 'NHS Outfit', look: { jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
-    { name: 'Charcoal', look: { jacket: '#3a3d42', shirt: '#bcd6f2', tie: '#1f2c4d', pants: '#3a3d42', shoes: '#111111' } },
+    { name: 'Red & Gold', look: { style: 'suit', jacket: '#B3122B', shirt: '#ffffff', tie: '#F2C14E', pants: '#1c1c22', shoes: '#111111', trim: '#F2C14E', skin: '#e0ac7e', hair: '#3b2416' } },
+    { name: 'Classic Outfit', look: { style: 'suit', jacket: '#1f2c4d', shirt: '#ffffff', tie: '#B3122B', pants: '#1f2c4d', shoes: '#111111' } },
+    { name: 'Senior Sweater', look: { style: 'sweater', jacket: '#B3122B', trim: '#F2C14E', shirt: '#ffffff', tie: '#F2C14E', pants: '#8a8d93', shoes: '#111111' } },
+    { name: 'Brother Outfit', look: { style: 'suit', jacket: '#111113', shirt: '#ffffff', tie: '#09090a', pants: '#111113', shoes: '#0a0a0a' } },
+    { name: 'NHS Outfit', look: { style: 'suit', jacket: '#C9962B', shirt: '#ffffff', tie: '#B3122B', pants: '#1c1c22', shoes: '#111111' } },
   ];
   const SWATCHES = {
     jacket: [['Black', '#111113'], ['Navy', '#1f2c4d'], ['Charcoal', '#3a3d42'], ['Gray', '#7d8088'], ['Red', '#B3122B'], ['Maroon', '#6b0f1e'],
@@ -448,17 +476,38 @@
     pants: [['Black', '#111113'], ['Navy', '#1f2c4d'], ['Charcoal', '#3a3d42'], ['Gray', '#8a8d93'], ['Khaki', '#b9a47c'], ['Brown', '#5a3b24'],
             ['Red', '#B3122B'], ['White', '#eeeeea']],
     shoes: [['Black', '#0a0a0a'], ['Brown', '#4a2c17'], ['White', '#eeeeea']],
+    trim: [['Gold', '#F2C14E'], ['White', '#f2f2ee'], ['Red', '#B3122B'], ['Navy', '#1f2c4d'], ['Black', '#111113'], ['Silver', '#b8bcc4']],
     skin: [['1', '#f6d2b5'], ['2', '#e0ac7e'], ['3', '#c68a5e'], ['4', '#9a643f'], ['5', '#6b4026'], ['6', '#4a2c1a']],
     hair: [['Black', '#141010'], ['Dark brown', '#3b2416'], ['Brown', '#6a4527'], ['Blonde', '#d8b46a'], ['Red', '#9c3d1c'], ['Gray', '#9a9a9a']],
   };
-  const LOOK_PARTS = [['jacket', 'Suit jacket'], ['shirt', 'Shirt'], ['tie', 'Tie'], ['pants', 'Dress pants'], ['shoes', 'Shoes'], ['skin', 'Skin tone'], ['hair', 'Hair']];
+  const LOOK_PARTS = [['style', 'Top'], ['jacket', 'Suit jacket'], ['trim', 'Sweater trim'], ['shirt', 'Shirt'], ['tie', 'Tie'], ['pants', 'Dress pants'],
+    ['shoes', 'Shoes'], ['skin', 'Skin tone'], ['hair', 'Hair']];
+  const STYLES = [['suit', 'Suit jacket'], ['sweater', 'Sweater']];
+  const partLabel = (k, look) => k === 'jacket' && look.style === 'sweater' ? 'Sweater' : (LOOK_PARTS.find(x => x[0] === k) || [k, k])[1];
+  const partShown = (k, look) => k !== 'trim' || look.style === 'sweater';
+
+  // ================= Golf bag looks =================
+  const BAG_PRESETS = [
+    { name: 'Chaminade', bag: { body: '#B3122B', trim: '#F2C14E', covers: '#F2C14E', logo: 'chaminade' } },
+    { name: 'Tour Black', bag: { body: '#111113', trim: '#B3122B', covers: '#111113', logo: 'none' } },
+    { name: 'Navy Staff', bag: { body: '#1f2c4d', trim: '#eeeeea', covers: '#B3122B', logo: 'none' } },
+    { name: 'White & Gold', bag: { body: '#eeeeea', trim: '#C9962B', covers: '#B3122B', logo: 'chaminade' } },
+  ];
+  const BAG_SWATCHES = {
+    body: [['Red', '#B3122B'], ['Maroon', '#6b0f1e'], ['Black', '#111113'], ['Navy', '#1f2c4d'], ['Royal', '#2747a8'], ['Green', '#1f5a34'],
+           ['Gray', '#7d8088'], ['Tan', '#b9a47c'], ['Gold', '#C9962B'], ['White', '#eeeeea']],
+    trim: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['White', '#eeeeea'], ['Black', '#111113'], ['Navy', '#1f2c4d'], ['Silver', '#b8bcc4']],
+    covers: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['Black', '#111113'], ['White', '#eeeeea'], ['Navy', '#1f2c4d'], ['Green', '#1f5a34']],
+  };
+  const BAG_LOGOS = [['chaminade', 'Chaminade'], ['none', 'No logo']];
+  const BAG_PARTS = [['body', 'Bag color'], ['trim', 'Trim'], ['covers', 'Headcovers'], ['logo', 'Logo']];
 
   // ================= Save data =================
   const SAVE_KEY = 'fairwayclub-save';
   const freshStats = () => ({ rounds: 0, holes: 0, aces: 0, eagles: 0, birdies: 0, pars: 0, shots: 0, perfects: 0,
     longest: 0, earnedTotal: 0, strokesTotal: 0, parTotal: 0, roundsBy: {}, bestBy: {} });
   const freshSave = () => ({ coins: 0, lv: {}, ball: 0, course: 'pines', stats: freshStats(), bag: STARTER_BAG.slice(), owned: STARTER_BAG.slice(),
-    name: 'Player', look: Object.assign({}, LOOK_PRESETS[0].look), board: {} });
+    name: 'Player', look: Object.assign({}, LOOK_PRESETS[0].look), gbag: Object.assign({}, BAG_PRESETS[0].bag), board: {} });
   let save = freshSave();
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -476,6 +525,8 @@
   if (!Array.isArray(save.owned)) save.owned = STARTER_BAG.slice();
   STARTER_BAG.forEach(id => { if (!save.owned.includes(id)) save.owned.push(id); });
   save.look = Object.assign({}, LOOK_PRESETS[0].look, save.look || {});
+  if (save.look.style !== 'sweater') save.look.style = 'suit';
+  save.gbag = Object.assign({}, BAG_PRESETS[0].bag, save.gbag || {});
   if (!save.board) save.board = {};
   if (!save.pid) save.pid = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36));
   if (!save.tourney) save.tourney = {};   // { 'YYYY-MM-DD': { courseId: true } } days this device entered, prize not yet checked
@@ -947,9 +998,18 @@
     m.dark = new THREE.MeshStandardMaterial({ color: 0x1d1d22, metalness: 0.5, roughness: 0.35 });
     m.grip = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
     m.glove = new THREE.MeshLambertMaterial({ color: 0xf5f5f0 });
+    m.trim = new THREE.MeshLambertMaterial({ color: 0xF2C14E });
+    m.lapel = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    m.button = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.5 });
+    m.styled = [];   // suit-only / sweater-only parts of every golfer built with these materials
     return m;
   }
-  function applyLook(m, look) { for (const k in look) if (m[k]) m[k].color.set(look[k]); }
+  function applyLook(m, look) {
+    for (const k in look) if (m[k] && m[k].color && k !== 'style') m[k].color.set(look[k]);
+    if (look.jacket) m.lapel.color.set(look.jacket).multiplyScalar(0.72);
+    const sw = look.style === 'sweater';
+    m.styled.forEach(g => { g.suit.forEach(o => o.visible = !sw); g.sweater.forEach(o => o.visible = sw); });
+  }
   function limb(a, b, r1, r2, mat) {
     const d = V3(0, 0, 0).subVectors(b, a), L = d.length();
     const mesh = new THREE.Mesh(new THREE.CylinderGeometry(r2, r1, L, 10), mat);
@@ -974,6 +1034,14 @@
     part(new THREE.BoxGeometry(0.065, 0.05, 0.03), m.tie, 0, 0.6, 0.148, torso);
     part(new THREE.BoxGeometry(0.17, 0.05, 0.12), m.shirt, 0, 0.64, 0.03, torso);       // collar
     for (const sx of [-1, 1]) part(new THREE.SphereGeometry(0.085, 12, 8), m.jacket, sx * 0.21, 0.58, 0, torso);
+    // suit: lapels + buttons. Sweater: V-neck trim, ribbed hem and cuffs.
+    const suit = [], sweater = [];
+    for (const sx of [-1, 1]) {
+      const lp = part(new THREE.BoxGeometry(0.05, 0.25, 0.014), m.lapel, sx * 0.078, 0.5, 0.142, torso); lp.rotation.z = sx * 0.32; suit.push(lp);
+      const vt = part(new THREE.BoxGeometry(0.026, 0.22, 0.014), m.trim, sx * 0.04, 0.52, 0.146, torso); vt.rotation.z = sx * 0.3; sweater.push(vt);
+    }
+    for (const by of [0.3, 0.18]) suit.push(part(new THREE.SphereGeometry(0.014, 8, 6), m.button, 0, by, 0.142, torso));
+    const hem = part(new THREE.CylinderGeometry(0.207, 0.205, 0.07, 14, 1, true), m.trim, 0, 0.055, 0, torso); hem.scale.z = 0.64; sweater.push(hem);
     part(new THREE.CylinderGeometry(0.055, 0.06, 0.12, 10), m.skin, 0, 0.69, 0.01, torso);
     const head = part(new THREE.SphereGeometry(0.12, 18, 14), m.skin, 0, 0.82, 0.02, torso); head.scale.set(0.95, 1.1, 1);
     part(new THREE.SphereGeometry(0.022, 8, 6), m.skin, 0, 0.8, 0.135, torso);            // nose
@@ -981,7 +1049,11 @@
     hair.scale.set(0.97, 1.08, 1.04); hair.rotation.x = -0.35;
 
     const pivot = new THREE.Group(); pivot.position.copy(SHOULDER); upper.add(pivot);    // arms + club swing from here
-    for (const sx of [-1, 1]) pivot.add(limb(V3(sx * 0.21, 0, 0), HANDS, 0.058, 0.045, m.jacket));
+    for (const sx of [-1, 1]) {
+      const a = V3(sx * 0.21, 0, 0); pivot.add(limb(a, HANDS, 0.058, 0.045, m.jacket));
+      const cuff = limb(a.clone().lerp(HANDS, 0.84), a.clone().lerp(HANDS, 0.95), 0.05, 0.049, m.trim); pivot.add(cuff); sweater.push(cuff);
+    }
+    m.styled.push({ suit, sweater });
     part(new THREE.SphereGeometry(0.055, 10, 8), m.glove, HANDS.x, HANDS.y, HANDS.z, pivot);
     const hinge = new THREE.Group(); hinge.position.copy(HANDS); pivot.add(hinge);      // wrist cock
     const clubs = {}, axis = {}, B = {};
@@ -1020,6 +1092,75 @@
   const playerMats = lookMats();
   const golfer = makeGolfer(playerMats); scene.add(golfer.root);
   applyLook(playerMats, save.look);
+
+  // ================= Golf bag (stands on the tee box, customizable in Golfer) =================
+  function bagMats() {
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 512;
+    const tex = new THREE.CanvasTexture(cv);
+    return { cv, tex,
+      body: new THREE.MeshLambertMaterial({ map: tex }),
+      trim: new THREE.MeshLambertMaterial({ color: 0xF2C14E }),
+      covers: new THREE.MeshLambertMaterial({ color: 0xF2C14E }),
+      dark: new THREE.MeshLambertMaterial({ color: 0x1b1b1f }),
+      metal: new THREE.MeshStandardMaterial({ color: 0xd4d8de, metalness: 0.75, roughness: 0.3 }) };
+  }
+  // the bag's skin: body color plus a vertical CHAMINADE logo down the front (u = 0.5 faces front)
+  function applyBag(m, b) {
+    const g = m.cv.getContext('2d'), W = m.cv.width, H = m.cv.height;
+    g.fillStyle = b.body; g.fillRect(0, 0, W, H);
+    // stitched panel seams
+    g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = 3;
+    [0.25, 0.75].forEach(u => { g.beginPath(); g.moveTo(u * W, 0); g.lineTo(u * W, H); g.stroke(); });
+    // trim stripes beside the logo
+    g.fillStyle = b.trim; g.fillRect(W * 0.5 - 46, 0, 6, H); g.fillRect(W * 0.5 + 40, 0, 6, H);
+    if (b.logo === 'chaminade') {
+      g.save(); g.translate(W / 2, H * 0.47); g.rotate(-Math.PI / 2);
+      g.font = '700 50px Oswald, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText('CHAMINADE', 0, 2);
+      g.fillStyle = b.trim.toLowerCase() === b.body.toLowerCase() ? '#ffffff' : b.trim; g.fillText('CHAMINADE', 0, 0);
+      g.restore();
+    }
+    m.tex.needsUpdate = true;
+    m.trim.color.set(b.trim); m.covers.color.set(b.covers);
+  }
+  function makeBag(m) {
+    const root = new THREE.Group(), bag = new THREE.Group(); root.add(bag);
+    bag.rotation.x = -0.28;                                                    // leans back on its stand
+    const body = part(new THREE.CylinderGeometry(0.15, 0.14, 0.82, 24), m.body, 0, 0.45, 0, bag); body.rotation.y = Math.PI;
+    part(new THREE.CylinderGeometry(0.165, 0.16, 0.11, 24), m.trim, 0, 0.88, 0, bag);           // top cuff
+    part(new THREE.CylinderGeometry(0.15, 0.15, 0.03, 24), m.dark, 0, 0.94, 0, bag);             // divider top
+    part(new THREE.CylinderGeometry(0.152, 0.155, 0.08, 24), m.trim, 0, 0.04, 0, bag);           // base
+    const pocket = part(new THREE.BoxGeometry(0.17, 0.3, 0.07), m.trim, 0, 0.32, 0.15, bag); pocket.material = m.trim;
+    part(new THREE.BoxGeometry(0.14, 0.012, 0.075), m.dark, 0, 0.42, 0.152, bag);                 // zipper
+    // carry strap on the back
+    const strap = part(new THREE.TorusGeometry(0.2, 0.018, 6, 16, Math.PI), m.dark, 0, 0.55, -0.16, bag); strap.rotation.y = Math.PI / 2;
+    // clubs sticking out: headcovers on the woods, irons poking up
+    [[-0.06, 0.06], [0.06, 0.06], [0, -0.04]].forEach(([x, z], i) => {
+      part(new THREE.CylinderGeometry(0.012, 0.012, 0.16, 6), m.dark, x, 1.0, z, bag);
+      const hc = part(new THREE.SphereGeometry(0.065, 12, 10), m.covers, x, 1.11 + i * 0.02, z, bag); hc.scale.set(1, 1.25, 0.95);
+      part(new THREE.SphereGeometry(0.02, 8, 6), m.trim, x, 1.2 + i * 0.02, z, bag);              // pom-pom
+    });
+    [[-0.08, -0.07], [-0.02, -0.09], [0.04, -0.09], [0.09, -0.05]].forEach(([x, z], i) => {
+      part(new THREE.CylinderGeometry(0.009, 0.009, 0.24, 6), m.metal, x, 1.04 + (i % 2) * 0.03, z, bag);
+      part(new THREE.BoxGeometry(0.06, 0.035, 0.018), m.metal, x + 0.02, 1.16 + (i % 2) * 0.03, z, bag);
+    });
+    // stand legs
+    for (const sx of [-1, 1]) root.add(limb(V3(sx * 0.07, 0.62, -0.18), V3(sx * 0.2, 0, -0.44), 0.012, 0.012, m.dark));
+    root.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    return root;
+  }
+  const playerBagMats = bagMats();
+  const teeBag = makeBag(playerBagMats); teeBag.scale.setScalar(1.05); teeBag.visible = false; scene.add(teeBag);
+  applyBag(playerBagMats, save.gbag);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => applyBag(playerBagMats, save.gbag));
+  // set the bag down on the tee box, just to the golfer's side, logo turned toward the camera
+  function placeTeeBag() {
+    const dx = Math.cos(aimAng), dz = Math.sin(aimAng);
+    const x = hole.tee.x + dz * 2.3 + dx * 1.6, z = hole.tee.y - dx * 2.3 + dz * 1.6;
+    teeBag.position.set(x, surfY(x, z), z);
+    teeBag.rotation.y = Math.atan2(-dx, -dz) + 0.5;
+    teeBag.visible = true;
+  }
 
   // ================= Course painting =================
   const ell = (g, e, pad = 0) => { g.beginPath(); g.ellipse(e.x, e.y, e.rx + pad, e.ry + pad, 0, 0, Math.PI * 2); };
@@ -1174,9 +1315,6 @@
       S.save(); S.translate(e.x, e.y); S.scale(e.rx, e.ry); S.translate(-e.x, -e.y); S.fillStyle = sg; S.fillRect(e.x - 1, e.y - 1, 2, 2); S.restore();
       blit(g, S);
     }
-    // red out-of-bounds stakes (seen from above as small red dots)
-    g.fillStyle = '#c4162e';
-    for (const st of obStakes(h)) { g.beginPath(); g.arc(st.x, st.y, 0.9, 0, Math.PI * 2); g.fill(); }
     return { canvas: g.canvas, ox, oy, W, H: Hh };
   }
 
@@ -1432,11 +1570,11 @@
 
     // red out-of-bounds stakes
     { const st = obStakes(h);
-      const sGeo = new THREE.CylinderGeometry(0.05, 0.06, 1.1, 6); sGeo.translate(0, 0.45, 0);
+      const sGeo = new THREE.BoxGeometry(0.09, 1.25, 0.09); sGeo.translate(0, 0.5, 0);   // square wooden post, a bit sunk into the ground
       const sMat = new THREE.MeshLambertMaterial({ color: 0xd0142c });
       disposables.push(sGeo, sMat);
       const inst = new THREE.InstancedMesh(sGeo, sMat, Math.max(1, st.length)), M = new THREE.Matrix4();
-      st.forEach((p, i) => { M.makeTranslation(p.x, terrainH(h, p.x, p.y), p.y); inst.setMatrixAt(i, M); });
+      st.forEach((p, i) => { M.makeRotationY(i * 0.7); M.setPosition(p.x, terrainH(h, p.x, p.y), p.y); inst.setMatrixAt(i, M); });
       inst.count = st.length; inst.castShadow = true;
       holeGroup.add(inst); }
 
@@ -1558,7 +1696,7 @@
     strokes = 0; flight = null; swing = null; ptr = null; splash = null; lastPutt = false; strike = null; swingAnim = null;
     trailReset(); closeSheet();
     viewMode = 'normal'; introT = 1.5;
-    readyForShot();
+    readyForShot(); placeTeeBag();
     overviewCam(camPos, camLook); placeCamera();
     showBanner(hole.name ? `${i + 1}. ${hole.name}` : `Hole ${i + 1}`, `Par ${hole.par} · ${hole.yds} yards${hole.after ? ' · After ' + hole.after : ''}`, 2.4);
   }
@@ -2223,6 +2361,7 @@
     if (t === 'play') renderCourses();
     if (t === 'course') renderCourse();
     if (t === 'golfer') renderGolfer();
+    document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer');
     if (t === 'clubs') renderClubs();
     if (t === 'stats') renderStats();
     if (t === 'how') renderHow();
@@ -2382,7 +2521,7 @@
 
   // ---- Golfer page ----
   let prev3 = null;
-  const previewMats = lookMats();
+  const previewMats = lookMats(), previewBagMats = bagMats();
   function golferPreview() {
     if (prev3) return prev3;
     const r = new THREE.WebGLRenderer({ canvas: $('gPrev'), antialias: true, alpha: true });
@@ -2397,7 +2536,9 @@
     turn.add(ball);
     const pad = new THREE.Mesh(new THREE.CircleGeometry(1.5, 40), new THREE.MeshLambertMaterial({ color: 0x5fb556 }));
     pad.rotation.x = -Math.PI / 2; turn.add(pad);
-    prev3 = { r, sc, cam, g, ball, turn, w: 0, h: 0 };
+    const bag = makeBag(previewBagMats); bag.position.set(-0.85, 0, -0.55); bag.rotation.y = 0.5; turn.add(bag);
+    applyLook(previewMats, save.look); applyBag(previewBagMats, save.gbag);
+    prev3 = { r, sc, cam, g, ball, bag, turn, w: 0, h: 0 };
     return prev3;
   }
   function renderPreview(time) {
@@ -2414,30 +2555,76 @@
     else if (T >= 2.2 && T < 2.36) pose = lerpPose(backPose(false, p), IMPACT, easeIn((T - 2.2) / 0.16));
     else if (T >= 2.36) pose = lerpPose(IMPACT, finishPose(false, p), easeOut(clamp((T - 2.36) / 0.45, 0, 1)));
     poseGolfer(P.g, kind, pose.a, pose.h, pose.t);
-    P.cam.position.set(0, 1.25, 4.6); P.cam.lookAt(0, 0.85, 0);
+    P.cam.position.set(0, 1.3, 5.3); P.cam.lookAt(0, 0.8, 0);
     P.r.render(P.sc, P.cam);
   }
   function setLook(look) {
     Object.assign(save.look, look); persist();
     applyLook(playerMats, save.look); applyLook(previewMats, save.look);
   }
+  let gTab = 'outfit', gPart = 'jacket', bPart = 'body';
+  const sameLook = (a, b) => Object.keys(b).every(k => k === 'skin' || k === 'hair' || String(a[k] || '').toLowerCase() === String(b[k]).toLowerCase());
+  const swName = (list, c) => { const hit = list.find(x => x[1].toLowerCase() === String(c || '').toLowerCase()); return hit ? hit[0] : 'Custom'; };
+  const swRow = (attr, list, cur, label) => '<div class="sw">' + list.map(([n, c]) =>
+    `<button ${attr}="${c}" title="${n}" aria-label="${label}: ${n}" class="${c.toLowerCase() === String(cur).toLowerCase() ? 'on' : ''}" style="background:${c}"></button>`).join('') + '</div>';
+  function outfitPanel() {
+    const L = save.look;
+    if (!partShown(gPart, L)) gPart = 'jacket';
+    const cards = LOOK_PRESETS.map((p, i) => {
+      const k = p.look;
+      return `<button class="pcard ${sameLook(L, k) ? 'on' : ''}" data-preset="${i}"><span class="mini">` +
+        `<i style="background:${k.jacket}"></i><i style="background:linear-gradient(90deg,${k.shirt} 35%,${k.tie} 35% 65%,${k.shirt} 65%)"></i>` +
+        `${k.style === 'sweater' ? `<i style="background:${k.trim};flex:.35"></i>` : ''}<i style="background:${k.pants}"></i></span>${p.name}</button>`;
+    }).join('');
+    const chips = LOOK_PARTS.filter(([k]) => partShown(k, L)).map(([k]) => {
+      const dot = k === 'style' ? '' : `<i style="background:${L[k]}"></i>`;
+      return `<button data-gpart="${k}" class="${k === gPart ? 'on' : ''}">${dot}${k === 'style' ? (L.style === 'sweater' ? '🧶 ' : '🧥 ') + 'Top' : partLabel(k, L)}</button>`;
+    }).join('');
+    let pane;
+    if (gPart === 'style') pane = `<div class="lh">Top<b>${L.style === 'sweater' ? 'Sweater' : 'Suit jacket'}</b></div><div class="opts">` +
+      STYLES.map(([v, n]) => `<button data-style="${v}" class="${L.style === v ? 'on' : ''}">${n}</button>`).join('') + '</div>';
+    else pane = `<div class="lh">${partLabel(gPart, L)}<b>${gPart === 'skin' ? '' : swName(SWATCHES[gPart], L[gPart])}</b></div>` +
+      swRow('data-col', SWATCHES[gPart], L[gPart], partLabel(gPart, L));
+    return `<div class="gcard"><div class="sect">OUTFITS</div><div class="pgrid">${cards}</div></div>` +
+      `<div class="gcard"><div class="sect">CUSTOMIZE</div><div class="chiprow">${chips}</div><div class="swpane">${pane}</div></div>`;
+  }
+  function bagPanel() {
+    const G = save.gbag;
+    const cards = BAG_PRESETS.map((p, i) => {
+      const k = p.bag;
+      return `<button class="pcard ${sameLook(G, k) ? 'on' : ''}" data-bpreset="${i}"><span class="mini">` +
+        `<i style="background:${k.covers};flex:.6"></i><i style="background:${k.trim};flex:.3"></i><i style="background:${k.body}"></i><i style="background:${k.trim};flex:.3"></i></span>${p.name}</button>`;
+    }).join('');
+    const chips = BAG_PARTS.map(([k, n]) => `<button data-bpart="${k}" class="${k === bPart ? 'on' : ''}">${k === 'logo' ? '🏷️ ' : `<i style="background:${G[k]}"></i>`}${n}</button>`).join('');
+    const label = BAG_PARTS.find(x => x[0] === bPart)[1];
+    const pane = bPart === 'logo'
+      ? `<div class="lh">Logo<b>${G.logo === 'chaminade' ? 'Chaminade' : 'None'}</b></div><div class="opts">` +
+        BAG_LOGOS.map(([v, n]) => `<button data-logo="${v}" class="${G.logo === v ? 'on' : ''}">${n}</button>`).join('') + '</div>'
+      : `<div class="lh">${label}<b>${swName(BAG_SWATCHES[bPart], G[bPart])}</b></div>` + swRow('data-bcol', BAG_SWATCHES[bPart], G[bPart], label);
+    return `<div class="gcard"><div class="sect">GOLF BAGS</div><div class="pgrid">${cards}</div>` +
+      `<div class="gnote">Your bag sits on the tee box next to you on every hole.</div></div>` +
+      `<div class="gcard"><div class="sect">CUSTOMIZE</div><div class="chiprow">${chips}</div><div class="swpane">${pane}</div></div>`;
+  }
   function renderGolfer() {
     $('gName').value = save.name || '';
-    $('presetRow').innerHTML = LOOK_PRESETS.map((p, i) =>
-      `<button data-preset="${i}"><i style="background:${p.look.jacket}"></i>${p.name}</button>`).join('');
-    $('lookRows').innerHTML = LOOK_PARTS.map(([k, label]) => {
-      const cur = (save.look[k] || '').toLowerCase(), hit = SWATCHES[k].find(x => x[1].toLowerCase() === cur);
-      return `<div class="lookrow"><div class="lh">${label}<b>${hit ? (k === 'skin' ? '' : hit[0]) : ''}</b></div><div class="sw">` +
-        SWATCHES[k].map(([n, c]) => `<button data-part="${k}" data-col="${c}" title="${n}" aria-label="${label}: ${n}" class="${c.toLowerCase() === cur ? 'on' : ''}" style="background:${c}"></button>`).join('') +
-        '</div></div>';
-    }).join('');
-    applyLook(previewMats, save.look);
+    document.querySelectorAll('#gTabs button').forEach(b => b.classList.toggle('on', b.dataset.gtab === gTab));
+    $('gPanel').innerHTML = gTab === 'bag' ? bagPanel() : outfitPanel();
+    applyLook(previewMats, save.look); applyBag(previewBagMats, save.gbag);
   }
+  function setBag(b) { Object.assign(save.gbag, b); persist(); applyBag(playerBagMats, save.gbag); applyBag(previewBagMats, save.gbag); }
   $('tab-golfer').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     ensureAudio(); sfx.click();
-    if (b.dataset.preset != null) setLook(LOOK_PRESETS[+b.dataset.preset].look);
-    else if (b.dataset.part) setLook({ [b.dataset.part]: b.dataset.col });
+    const d = b.dataset;
+    if (d.gtab) gTab = d.gtab;
+    else if (d.preset != null) setLook(LOOK_PRESETS[+d.preset].look);
+    else if (d.gpart) gPart = d.gpart;
+    else if (d.style) setLook({ style: d.style, trim: save.look.trim || '#F2C14E' });
+    else if (d.col) setLook({ [gPart]: d.col });
+    else if (d.bpreset != null) setBag(BAG_PRESETS[+d.bpreset].bag);
+    else if (d.bpart) bPart = d.bpart;
+    else if (d.logo) setBag({ logo: d.logo });
+    else if (d.bcol) setBag({ [bPart]: d.bcol });
     renderGolfer();
   });
   $('gName').addEventListener('input', e => { save.name = e.target.value.trim().slice(0, 14); persist(); });
@@ -2485,7 +2672,7 @@
         <p><b>Wind</b> pushes the ball in the air; high shots get pushed more. The Pro Ball upgrade cuts wind effect.</p>
         <p><b>Water / out of bounds</b> cost a stroke and you replay from the last spot.</p>
         <p><b>Red stakes</b> mark out of bounds. <b>Cart paths</b> are hard: the ball bounces high and runs a long way.</p>
-        <p><b>Money</b> comes from par or better plus a round bonus. Spend it in <b>Clubs</b> on new models and upgrades. Customize your look in <b>Golfer</b>.</p>
+        <p><b>Money</b> comes from par or better plus a round bonus. Spend it in <b>Clubs</b> on new models and upgrades. Customize your outfit and golf bag in <b>Golfer</b>.</p>
       </div>`;
   }
 
@@ -2614,7 +2801,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look, pid: save.pid, tourney: save.tourney }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
