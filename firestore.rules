@@ -1,16 +1,30 @@
 rules_version = '2';
 // Firestore security rules for Red & Gold Golf (project chamigolf1).
 // Paste into Firebase console > Firestore Database > Rules and press Publish.
+// Guests can post scores too: turn on Authentication > Sign-in method > Anonymous in the Firebase console.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isMe(uid) { return request.auth != null && request.auth.uid == uid; }
+    // The creator (admin tools: bans, analytics, gifts, removing scores). Must be a verified Google sign-in.
+    function isAdmin() { return request.auth != null && request.auth.token.email == 'jamesondoyle11@gmail.com' && request.auth.token.email_verified == true; }
+    function notBanned() { return request.auth != null && !exists(/databases/$(database)/documents/bans/$(request.auth.uid)); }
     // Names: 1-14 characters, and none of the worst words (the game also runs a much bigger filter before posting).
     function okName(n) { return n is string && n.size() > 0 && n.size() <= 14
       && !n.lower().matches('.*(fuck|shit|bitch|cunt|nigg|faggot|retard|whore|slut|penis|vagina|porn|nazi|hitler|dildo|pussy|rapist|molest|pedo|asshole|kkk).*'); }
+    // Badges shown next to names. Creator, First Ace Ever and Creator's Pick are checked here so nobody can fake them.
+    function okBadge(d, uid) {
+      return !('badge' in d) || d.badge in ['ace', 'champ']
+        || (d.badge == 'creator' && isAdmin())
+        || (d.badge == 'gift' && exists(/databases/$(database)/documents/gifts/$(uid)))
+        || (d.badge == 'firstace' && get(/databases/$(database)/documents/meta/firstAce).data.uid == uid);
+    }
+    // a score's time has to be close to now (no posting to other days by changing the device clock)
+    function recent(ms) { return ms is int && ms > request.time.toMillis() - 172800000 && ms < request.time.toMillis() + 172800000; }
 
-    // Each golfer's saved progress (only they can read or write it).
+    // Each golfer's saved progress (only they can read or write it; the creator can read it).
     match /users/{uid} {
-      allow read, delete: if isMe(uid);
+      allow read: if isMe(uid) || isAdmin();
+      allow delete: if isMe(uid);
       allow create, update: if isMe(uid)
         && request.resource.data.keys().hasOnly(['data', 'name', 'coins', 'earned', 'updated'])
         && request.resource.data.data is string && request.resource.data.data.size() < 500000;
@@ -19,35 +33,90 @@ service cloud.firestore {
     // Course leaderboards: one row per golfer (their best), all-time and per day.
     function okScore(uid) {
       let d = request.resource.data;
-      return isMe(uid) && d.keys().hasOnly(['name', 'uid', 'rel', 'strokes', 'date', 'day', 't'])
-        && d.uid == uid && okName(d.name)
-        && d.rel is int && d.rel > -60 && d.rel < 300
+      return isMe(uid) && notBanned() && d.keys().hasOnly(['name', 'uid', 'rel', 'strokes', 'date', 'day', 't', 'badge'])
+        && d.uid == uid && okName(d.name) && okBadge(d, uid)
+        && d.rel is int && d.rel > -30 && d.rel < 300
         && d.strokes is int && d.strokes > 0 && d.strokes < 400
-        && d.date is int && d.day is string && d.t == request.time;
+        && recent(d.date) && d.day is string && d.t == request.time;
     }
     match /courses/{cid}/scores/{uid} {
       allow read: if true;
       allow create: if okScore(uid);
       allow update: if okScore(uid) && request.resource.data.rel < resource.data.rel;
+      allow delete: if isAdmin();
     }
     match /courses/{cid}/days/{day}/scores/{uid} {
       allow read: if true;
       allow create: if okScore(uid) && request.resource.data.day == day;
       allow update: if okScore(uid) && request.resource.data.day == day && request.resource.data.rel < resource.data.rel;
+      allow delete: if isAdmin();
     }
 
     // Daily Closest to the Pin: one row per golfer per day (their closest shot, in yards).
     function okShot(uid, day) {
       let d = request.resource.data;
-      return isMe(uid) && d.keys().hasOnly(['name', 'uid', 'yd', 'date', 'day', 't'])
-        && d.uid == uid && okName(d.name)
+      return isMe(uid) && notBanned() && d.keys().hasOnly(['name', 'uid', 'yd', 'date', 'day', 't', 'badge'])
+        && d.uid == uid && okName(d.name) && okBadge(d, uid)
         && d.yd is number && d.yd >= 0 && d.yd < 400
-        && d.date is int && d.day == day && d.t == request.time;
+        && recent(d.date) && d.day == day && d.t == request.time;
     }
     match /ctp/{day}/shots/{uid} {
       allow read: if true;
       allow create: if okShot(uid, day);
       allow update: if okShot(uid, day) && request.resource.data.yd < resource.data.yd;
+      allow delete: if isAdmin();
+    }
+
+    // Hole-in-ones today (the banner on the Play tab).
+    match /aces/{day}/list/{id} {
+      allow read: if true;
+      allow create: if notBanned() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['name', 'uid', 'cid', 'course', 'hole', 'yds', 'date', 't', 'badge'])
+        && okName(request.resource.data.name) && okBadge(request.resource.data, request.auth.uid)
+        && request.resource.data.course is string && request.resource.data.course.size() < 40
+        && recent(request.resource.data.date) && request.resource.data.t == request.time;
+      allow delete: if isAdmin();
+    }
+    // The very first hole in one in the game's history (First Ace Ever badge). Can only be claimed once.
+    match /meta/firstAce {
+      allow read: if true;
+      allow create: if notBanned() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+    // Creator's Pick badges, handed out by the creator.
+    match /gifts/{uid} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // ---- Anti-cheat ----
+    // Bans: the game bans itself when it catches cheating (auto); only the creator can ban anyone else or lift a ban.
+    match /bans/{uid} {
+      allow read: if isMe(uid) || isAdmin();
+      allow create: if isAdmin() || (isMe(uid) && request.resource.data.auto == true);
+      allow update, delete: if isAdmin();
+    }
+    // Suspicious things the game noticed, for the creator to review.
+    match /flags/{id} {
+      allow read, delete: if isAdmin();
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'kind', 'detail', 'strong', 'google', 'at', 't'])
+        && request.resource.data.detail is string && request.resource.data.detail.size() <= 140;
+    }
+
+    // ---- Analytics for the creator ----
+    // One small "last seen" note per golfer.
+    match /presence/{uid} {
+      allow read: if isAdmin();
+      allow write: if isMe(uid)
+        && request.resource.data.keys().hasOnly(['name', 'google', 'day', 'first', 'lastMs', 'last', 'where', 'coins', 'earned', 'rounds', 'aces', 'ver'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 20;
+    }
+    // Daily counters (rounds, aces, sign-ins, new players, Closest to the Pin shots).
+    match /daily/{day} {
+      allow read: if isAdmin();
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['rounds', 'aces', 'signins', 'newPlayers', 'ctp']);
     }
 
     // ---- Play Friends ----
