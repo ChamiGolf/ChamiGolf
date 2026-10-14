@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@500;600;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root{--red:#B3122B;--red-d:#7A0C1D;--red-dd:#45060F;--gold:#F2C14E;--gold-l:#FFE08A;--gold-d:#C9962B;--cream:#FFF7E3}
   *{box-sizing:border-box}
@@ -309,6 +312,16 @@
   .seg{display:flex;gap:6px;margin:0 0 8px}
   .seg button{flex:1;padding:8px;border-radius:999px;border:1px solid rgba(242,193,78,.5);background:rgba(69,6,15,.85);color:#f3d7a8;font:800 12px Inter;letter-spacing:.08em;cursor:pointer}
   .seg button.on{background:var(--gold);color:#45060f;border-color:var(--gold)}
+  #acctBtn{flex:none;height:38px;min-width:38px;padding:0 14px;border-radius:999px;border:2px solid var(--gold);background:var(--red-dd);color:var(--gold-l);
+    font:800 13px Inter,sans-serif;letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #acctBtn.in{padding:0;width:38px;font:700 18px Oswald,sans-serif}
+  #acctBtn img{width:100%;height:100%;object-fit:cover}
+  .acctCard{margin:14px 2px 0;padding:12px 14px;border-radius:14px;background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.45)}
+  .acctCard .an{font:700 18px Oswald,sans-serif;color:#fff;text-transform:uppercase;letter-spacing:.03em}
+  .acctCard .am{font-size:12px;color:#f3d7a8;margin:3px 0 10px;word-break:break-word}
+  .gsign{display:flex;align-items:center;gap:10px;justify-content:center;width:100%;padding:11px 16px;border-radius:999px;border:0;background:#fff;color:#222;font:700 15px Inter,sans-serif;cursor:pointer}
+  .ctpLb{margin-top:10px}
+  .ctpLb .board td,.ctpLb .board th{padding:6px 10px}
   .tnote{font-size:12px;color:#f3d7a8;text-align:center;margin:6px 0 0}
   .tnote b{color:var(--gold-l)}
   .postBox{font-size:13px;color:#f3d7a8;margin:-8px 0 14px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
@@ -480,6 +493,7 @@
       <div style="min-width:0"><div class="bname" id="gameName">Red &amp; Gold Golf</div><div class="tag">CHAMPIONSHIP GOLF</div></div>
     </div>
     <div class="slideCap" id="slideCap"></div>
+    <button id="acctBtn" class="hidden">Sign in</button>
     <div class="coins" id="homeCoins">$0</div>
   </header>
   <button class="miniBtn" id="miniBtn"><span>⭐</span>Mini Golf</button>
@@ -493,6 +507,7 @@
           <div class="gleft">
             <div class="gstage"><canvas id="gPrev"></canvas></div>
             <label class="nameRow">Name on the leaderboard<input id="gName" maxlength="14" autocomplete="off" spellcheck="false"></label>
+            <div id="acctBox"></div>
           </div>
           <div class="gright">
             <div class="gtabs" id="gTabs"><button data-gtab="outfit" class="on">👔 Outfit</button><button data-gtab="bag">⛳ Golf Bag</button><button data-gtab="ball">⚪ Ball</button></div>
@@ -824,7 +839,13 @@
   if (!save.tourney) save.tourney = {};   // { 'YYYY-MM-DD': { courseId: true } } days this device entered, prize not yet checked
   function loadBag() { CLUBS.length = 0; save.bag.forEach(id => CLUBS.push(modelById(id))); }
   loadBag();
-  function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} }
+  // Online state (filled in by the Online section below). var so persist() can run before that section does.
+  var fbAuth = null, fbDb = null, fbUser = null, cloudReady = false, cloudTimer = null, lastSavedJson = null;
+  function persist() {
+    const j = JSON.stringify(Object.assign({}, save, { mtime: 0 }));
+    if (j !== lastSavedJson) { if (lastSavedJson !== null) save.mtime = Date.now(); lastSavedJson = j; pushCloud(); }
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {}
+  }
 
   const MAX_LV = 5, COSTS = [150, 350, 700, 1200, 2000];
   const lvOf = c => save.lv[c.id] || 0;
@@ -3408,43 +3429,71 @@
     return rank <= 10 ? rank : 0;
   }
 
-  // ================= Online leaderboards (Firebase Firestore, free plan) =================
-  // Paste your Firebase project ID here. Leave '' to keep leaderboards on this device only.
-  const FIREBASE_PROJECT = '';
-  // In-game money paid to the top 3 of each course's Daily Tournament, collected the next time they open the game.
+  // ================= Online: Google sign-in, cloud saves, leaderboards (Firebase, free Spark plan) =================
+  // This config is meant to be public; the Firestore security rules (firestore.rules) are what protect the data.
+  const FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyAcboWhLOZvyV7sMPBZGXBFIlTFJI_52EU',
+    authDomain: 'chamigolf1.firebaseapp.com',
+    projectId: 'chamigolf1',
+    storageBucket: 'chamigolf1.firebasestorage.app',
+    messagingSenderId: '934222144340',
+    appId: '1:934222144340:web:b7f2209350da831f4e5ec1'
+  };
+  // In-game money paid to the top 3 of each Daily Tournament, collected the next time they open the game.
   const DAILY_PRIZES = [1000, 500, 250];
-  const ONLINE = !!FIREBASE_PROJECT;
-  const FS = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents`;
+  const CTP_PRIZES = [1500, 750, 400];   // Daily Closest to the Pin: top 3 closest shots of the day
+  try { if (window.firebase && !fbAuth) { firebase.initializeApp(FIREBASE_CONFIG); fbAuth = firebase.auth(); fbDb = firebase.firestore(); } } catch (e) { fbAuth = fbDb = null; }
+  const ONLINE = !!fbDb;
   const etDay = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
   const prevDay = day => { const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); };
-  const scorePath = (cid, day) => day ? `courses/${cid}/days/${day}` : `courses/${cid}`;
+  const serverTime = () => firebase.firestore.FieldValue.serverTimestamp();
+  const scoresRef = (cid, day) => day ? fbDb.collection('courses').doc(cid).collection('days').doc(day).collection('scores')
+    : fbDb.collection('courses').doc(cid).collection('scores');
+  const ctpRef = day => fbDb.collection('ctp').doc(day).collection('shots');
+  const boardName = () => (save.name && save.name !== 'Player' ? save.name : (fbUser && fbUser.displayName || 'Player').split(' ')[0]).slice(0, 14);
+
+  // One row per golfer per board: their best score. Ties go to whoever posted it first.
   async function fetchBoard(cid, day, limit = 10) {
-    const r = await fetch(`${FS}/${scorePath(cid, day)}:runQuery`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'scores' }], orderBy: [{ field: { fieldPath: 'rel' }, direction: 'ASCENDING' }], limit: limit + 15 } }) });
-    if (!r.ok) throw new Error('board ' + r.status);
-    const rows = (await r.json()).filter(x => x.document).map(x => {
-      const f = x.document.fields;
-      return { name: f.name.stringValue, pid: f.pid ? f.pid.stringValue : '', rel: +f.rel.integerValue, strokes: +f.strokes.integerValue, date: Date.parse(f.t.timestampValue) };
-    });
-    rows.sort((a, b) => a.rel - b.rel || a.date - b.date);   // ties: whoever posted first ranks higher
+    const snap = await scoresRef(cid, day).orderBy('rel').limit(limit + 15).get();
+    const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, rel: f.rel, strokes: f.strokes, date: f.date }; });
+    rows.sort((a, b) => a.rel - b.rel || a.date - b.date);
     return rows.slice(0, limit);
   }
+  async function postBest(ref, doc, better) {
+    const cur = await ref.get();
+    if (cur.exists && !better(cur.data())) return false;
+    await ref.set(Object.assign(doc, { t: serverTime() }));
+    return true;
+  }
   async function postOnline(cid, entry) {
-    const day = etDay(new Date(entry.date));
-    const doc = { fields: { name: { stringValue: entry.name }, pid: { stringValue: save.pid }, rel: { integerValue: String(entry.rel) }, strokes: { integerValue: String(entry.strokes) },
-      day: { stringValue: day }, t: { timestampValue: new Date(entry.date).toISOString() } } };
-    const send = path => fetch(`${FS}/${path}/scores`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc) })
-      .then(r => { if (!r.ok) throw new Error('post ' + r.status); });
-    await Promise.all([send(scorePath(cid)), send(scorePath(cid, day))]);
+    if (!fbUser) throw new Error('signed out');
+    const day = etDay(new Date(entry.date)), uid = fbUser.uid;
+    const doc = () => ({ name: boardName(), uid, rel: entry.rel, strokes: entry.strokes, date: entry.date, day });
+    await Promise.all([postBest(scoresRef(cid).doc(uid), doc(), o => entry.rel < o.rel), postBest(scoresRef(cid, day).doc(uid), doc(), o => entry.rel < o.rel)]);
     (save.tourney[day] || (save.tourney[day] = {}))[cid] = true; persist();
     const today = await fetchBoard(cid, day, 50);
-    const i = today.findIndex(r => r.date === entry.date && r.name === entry.name);
+    const i = today.findIndex(r => r.pid === uid);
     return i >= 0 ? i + 1 : 0;
   }
-  // After a day ends, pay out any top-3 finishes this device had in that day's tournaments.
+  async function fetchCtp(day, limit = 10) {
+    const snap = await ctpRef(day).orderBy('yd').limit(limit + 10).get();
+    const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, yd: f.yd, date: f.date }; });
+    rows.sort((a, b) => a.yd - b.yd || a.date - b.date);
+    return rows.slice(0, limit);
+  }
+  async function postCtp(yd) {
+    if (!fbUser) throw new Error('signed out');
+    const day = ctpCourse().day, uid = fbUser.uid;
+    await postBest(ctpRef(day).doc(uid), { name: boardName(), uid, yd: Math.round(yd * 1000) / 1000, date: Date.now(), day }, o => yd < o.yd);
+    (save.tourney[day] || (save.tourney[day] = {})).ctp = true; persist();
+    const top = await fetchCtp(day, 50), i = top.findIndex(r => r.pid === uid);
+    return i >= 0 ? i + 1 : 0;
+  }
+
+  // After a day ends, pay out any top-3 finishes this golfer had in that day's tournaments.
   let claiming = false;
   async function claimPrizes() {
-    if (!ONLINE || claiming) return;
+    if (!ONLINE || !fbUser || !cloudReady || claiming) return;
     const today = etDay(), days = Object.keys(save.tourney).filter(d => d < today);
     if (!days.length) return;
     claiming = true;
@@ -3452,9 +3501,13 @@
     try {
       for (const day of days) {
         for (const cid of Object.keys(save.tourney[day])) {
-          const top = await fetchBoard(cid, day, 3);
-          const place = top.findIndex(r => r.pid === save.pid);
-          if (place >= 0) wins.push({ day, c: courseById(cid), place, prize: DAILY_PRIZES[place], rel: top[place].rel });
+          if (cid === 'ctp') {
+            const top = await fetchCtp(day, 3), place = top.findIndex(r => r.pid === fbUser.uid);
+            if (place >= 0) wins.push({ day, label: 'Closest to the Pin', place, prize: CTP_PRIZES[place], score: top[place].yd === 0 ? 'Ace' : fmtFt(top[place].yd) });
+          } else {
+            const top = await fetchBoard(cid, day, 3), place = top.findIndex(r => r.pid === fbUser.uid), c = courseById(cid);
+            if (place >= 0) wins.push({ day, label: c ? c.name : 'a course', place, prize: DAILY_PRIZES[place], score: fmtRel(top[place].rel) });
+          }
           delete save.tourney[day][cid];
         }
         if (!Object.keys(save.tourney[day]).length) delete save.tourney[day];
@@ -3464,7 +3517,7 @@
       const total = wins.reduce((a, w) => a + w.prize, 0);
       save.coins += total; save.stats.earnedTotal += total;
       const medal = ['🥇 1st', '🥈 2nd', '🥉 3rd'];
-      $('prizeBody').innerHTML = wins.map(w => `${medal[w.place]} at ${esc(w.c ? w.c.name : 'a course')} (${fmtRel(w.rel)}) · ${w.day.slice(5).replace('-', '/')} · <b>+${money(w.prize)}</b>`).join('<br>')
+      $('prizeBody').innerHTML = wins.map(w => `${medal[w.place]} at ${esc(w.label)} (${w.score}) · ${w.day.slice(5).replace('-', '/')} · <b>+${money(w.prize)}</b>`).join('<br>')
         + `<br><br>Total: <b>+${money(total)}</b>`;
       $('prize').classList.remove('hidden');
     }
@@ -3473,10 +3526,80 @@
   }
   $('prizeOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('prize').classList.add('hidden'); });
 
+  // ---- Accounts: sign in with Google; progress is saved to the cloud and follows you to any device ----
+  async function signIn() {
+    if (!fbAuth) { alert('Online features could not load. Check your internet connection and reload.'); return; }
+    const p = new firebase.auth.GoogleAuthProvider();
+    p.setCustomParameters({ prompt: 'select_account' });
+    try { await fbAuth.signInWithPopup(p); }
+    catch (e) {
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') return fbAuth.signInWithRedirect(p);
+      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') alert('Sign-in did not work: ' + (e.message || e.code));
+    }
+  }
+  function signOut() { if (fbAuth) fbAuth.signOut(); }
+  const userDoc = () => fbDb.collection('users').doc(fbUser.uid);
+  function pushCloud() {
+    if (!fbUser || !cloudReady) return;
+    clearTimeout(cloudTimer);
+    cloudTimer = setTimeout(() => {
+      if (!fbUser) return;
+      userDoc().set({ data: JSON.stringify(save), name: boardName(), coins: save.coins, earned: save.stats.earnedTotal, updated: serverTime() }).catch(() => {});
+    }, 1200);
+  }
+  async function syncFromCloud() {
+    cloudReady = false;
+    let snap; try { snap = await userDoc().get(); } catch (e) { return; }
+    let cloud = null; try { cloud = snap.exists ? JSON.parse(snap.data().data) : null; } catch (e) {}
+    const mine = save.uid === fbUser.uid, localEarned = save.stats.earnedTotal || 0;
+    const take = cloud && (mine ? (cloud.mtime || 0) > (save.mtime || 0) : (cloud.stats && cloud.stats.earnedTotal || 0) >= localEarned);
+    let reloaded = false; try { reloaded = sessionStorage.getItem('cgCloudLoad') === fbUser.uid; } catch (e) {}
+    if (take && !reloaded) {
+      cloud.uid = fbUser.uid;
+      try { localStorage.setItem(SAVE_KEY, JSON.stringify(cloud)); sessionStorage.setItem('cgCloudLoad', fbUser.uid); } catch (e) {}
+      location.reload(); return;
+    }
+    cloudReady = true;
+    save.uid = fbUser.uid;
+    if (!save.name || save.name === 'Player') save.name = boardName();
+    persist(); pushCloud();
+  }
+  function acctHtml() {
+    if (!ONLINE) return '<div class="acctCard"><div class="an">Offline</div><div class="am">Online leaderboards and sign-in couldn\'t load. Check your connection and reload.</div></div>';
+    if (!fbUser) return `<div class="acctCard"><div class="an">Play online</div><div class="am">Sign in to save your progress to the cloud, play on any device, and post scores to the online leaderboards, Daily Tournaments and Closest to the Pin.</div>
+      <button class="gsign" data-signin="1"><svg viewBox="0 0 48 48" width="20" height="20"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.7 6c4.5-4.2 6.9-10.3 6.9-17.7z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.1 1.4-4.9 2.3-8.2 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>Sign in with Google</button></div>`;
+    return `<div class="acctCard"><div class="an">${esc(fbUser.displayName || 'Signed in')}</div><div class="am">${esc(fbUser.email || '')}<br>${cloudReady ? '☁️ Progress saved to your account' : 'Syncing…'}</div>
+      <button class="ghost sm" data-signout="1">Sign out</button></div>`;
+  }
+  function renderAcct() {
+    const b = $('acctBtn');
+    if (b) {
+      b.classList.toggle('hidden', !ONLINE);
+      b.innerHTML = fbUser ? (fbUser.photoURL ? `<img src="${esc(fbUser.photoURL)}" alt="" referrerpolicy="no-referrer">` : esc((fbUser.displayName || '?')[0])) : 'Sign in';
+      b.classList.toggle('in', !!fbUser);
+    }
+    if ($('acctBox')) $('acctBox').innerHTML = acctHtml();
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-signin],[data-signout],#acctBtn'); if (!t) return;
+    ensureAudio(); sfx.click();
+    if (t.dataset.signout != null) signOut();
+    else if (t.id === 'acctBtn' && fbUser) setTab('golfer');
+    else signIn();
+  });
+  if (fbAuth) {
+    fbAuth.getRedirectResult().catch(() => {});
+    fbAuth.onAuthStateChanged(async u => {
+      fbUser = u; cloudReady = false; renderAcct();
+      if (u) { await syncFromCloud(); renderAcct(); claimPrizes(); }
+      if (!$('home').classList.contains('hidden')) { if (tab === 'course') fillBoard(course); renderCtpCard(); }
+    });
+  }
+
   function rowsHtml(rows, emptyMsg) {
     if (!rows.length) return `<div class="empty">${emptyMsg}</div>`;
     return `<table class="board"><tr><th></th><th>GOLFER</th><th>STROKES</th><th>SCORE</th></tr>` + rows.map((r, i) =>
-      `<tr class="${lastEntry && r.date === lastEntry.date && r.name === lastEntry.name ? 'me' : ''}"><td class="rk">${i + 1}</td><td>${esc(r.name)}<div style="font-size:11px;color:#c9a98a">${fmtDate(r.date)}</div></td><td>${r.strokes}</td><td><b>${fmtRel(r.rel)}</b></td></tr>`).join('') + '</table>';
+      `<tr class="${fbUser && r.pid === fbUser.uid ? 'me' : ''}"><td class="rk">${i + 1}</td><td>${esc(r.name)}<div style="font-size:11px;color:#c9a98a">${fmtDate(r.date)}</div></td><td>${r.strokes}</td><td><b>${fmtRel(r.rel)}</b></td></tr>`).join('') + '</table>';
   }
   function resetsIn() {
     const now = new Date(), et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
@@ -3500,6 +3623,7 @@
       } else {
         html = rowsHtml(await fetchBoard(c.id), 'No rounds yet. Finish a round here to post the first score.');
       }
+      if (!fbUser) html += '<div class="tnote" style="margin-top:10px"><button class="main sm" data-signin="1">Sign in with Google</button><br>to post your scores online</div>';
       if (course.id === c.id && boardMode === mode && $('boardBox') === box) box.innerHTML = html;
     } catch (e) {
       if ($('boardBox') === box) box.innerHTML = `<div class="empty">Couldn't reach the online leaderboard. Your best here: ${save.stats.bestBy[c.id] == null ? '—' : fmtRel(save.stats.bestBy[c.id])}</div>`;
@@ -3932,7 +4056,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic, migSchoolBag: save.migSchoolBag, ballLook: save.ballLook }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, uid: save.uid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic, migSchoolBag: save.migSchoolBag, ballLook: save.ballLook }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
@@ -4094,7 +4218,7 @@
 
   function showPostBox(c, entry) {
     const box = $('postBox');
-    if (!ONLINE) { box.innerHTML = ''; return; }
+    if (!ONLINE || !entry) { box.innerHTML = ''; return; }
     const post = async () => {
       box.textContent = 'Posting to the online leaderboard…';
       try {
@@ -4102,14 +4226,9 @@
         box.innerHTML = rank ? `🏆 You're <b style="color:var(--gold-l)">#${rank}</b> in today's ${esc(c.name)} tournament!` : 'Score posted online.';
       } catch (e) { box.innerHTML = 'Couldn\'t post online. <button id="retryPost">Retry</button>'; $('retryPost').onclick = post; }
     };
-    if (save.name && save.name !== 'Player') { post(); return; }
-    box.innerHTML = '<input id="postName" maxlength="14" placeholder="Your name" autocomplete="off" spellcheck="false"><button id="postBtn">Post score</button>';
-    const inp = $('postName');
-    inp.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') $('postBtn').click(); });
-    $('postBtn').onclick = () => {
-      const n = inp.value.trim().slice(0, 14); if (!n) { inp.focus(); return; }
-      save.name = n; entry.name = n; persist(); post();
-    };
+    if (fbUser) { post(); return; }
+    box.innerHTML = '<button id="postBtn">Sign in with Google to post this score</button>';
+    $('postBtn').onclick = async () => { await signIn(); if (fbUser) post(); };
   }
 
   // ---- Daily Closest to the Pin: start, result card ----
@@ -4144,6 +4263,19 @@
     $('ctpAgain').style.display = left > 0 ? '' : 'none';
     $('ctpAgain').textContent = `Try again (${left} left)`;
     if (yd === 0 || (ft != null && ft <= CTP_UNLOCK_FT)) { burst(160); sfx.perfect(); }
+    if (ONLINE) {
+      const box = document.createElement('div'); box.className = 'tnote'; box.style.marginTop = '8px'; $('ctpInfo').appendChild(box);
+      const post = async () => {
+        box.textContent = 'Posting to today\'s Closest to the Pin leaderboard…';
+        try {
+          const rank = await postCtp(st.best);
+          box.innerHTML = rank ? `🎯 You're <b>#${rank}</b> today · Top 3 win 🥇 ${money(CTP_PRIZES[0])} · 🥈 ${money(CTP_PRIZES[1])} · 🥉 ${money(CTP_PRIZES[2])}` : 'Posted online.';
+        } catch (e) { box.textContent = 'Couldn\'t post online right now.'; }
+      };
+      if (st.best == null) box.innerHTML = '';
+      else if (fbUser) post();
+      else { box.innerHTML = '<button class="main sm" data-ctpsign="1">Sign in to post your best online</button>'; box.querySelector('button').onclick = async () => { await signIn(); if (fbUser) post(); }; }
+    }
     setTimeout(() => $('ctpEnd').classList.remove('hidden'), yd == null ? 300 : 1100);
   }
   $('ctpAgain').addEventListener('click', () => { ensureAudio(); sfx.click(); startCtp(); });
@@ -4156,7 +4288,21 @@
         <div class="cm">${h.yds} yds · Wind ${h.fixedWind.mph} mph · ${CTP_TRIES} tries a day · New hole in ${resetsIn()}</div>
         <div class="cm" style="color:#FFE08A;margin-top:3px">Best today: ${st.best == null ? '—' : st.best === 0 ? 'Ace!' : fmtFt(st.best)} · Tries left: ${left}</div>
         ${unlocked('senior') ? '' : `<div class="cm" style="margin-top:3px">Within ${CTP_UNLOCK_FT} ft unlocks the 🔒 Senior Sweater</div>`}
-        <div class="act">${left > 0 ? '<button class="main sm" data-ctp="1">Take your shot</button>' : '<div class="lock">Come back tomorrow for a new hole</div>'}</div></div></div>`;
+        <div class="act">${left > 0 ? '<button class="main sm" data-ctp="1">Take your shot</button>' : '<div class="lock">Come back tomorrow for a new hole</div>'}</div></div></div>`
+      + (ONLINE ? '<div class="ctpLb" id="ctpLb"><div class="empty">Loading today\'s leaders…</div></div>' : '');
+    if (ONLINE) fillCtpBoard(c.day);
+  }
+  async function fillCtpBoard(day) {
+    try {
+      const [rows, yest] = await Promise.all([fetchCtp(day, 5), fetchCtp(prevDay(day), 1)]);
+      const box = $('ctpLb'); if (!box) return;
+      box.innerHTML = (rows.length ? '<table class="board"><tr><th></th><th>TODAY\'S CLOSEST</th><th>DISTANCE</th></tr>' + rows.map((r, i) =>
+        `<tr class="${fbUser && r.pid === fbUser.uid ? 'me' : ''}"><td class="rk">${i + 1}</td><td>${esc(r.name)}</td><td><b>${r.yd === 0 ? 'Ace!' : fmtFt(r.yd)}</b></td></tr>`).join('') + '</table>'
+        : '<div class="empty">No shots posted today yet. Be the first!</div>')
+        + `<div class="tnote">Top 3 at midnight ET win 🥇 <b>${money(CTP_PRIZES[0])}</b> · 🥈 <b>${money(CTP_PRIZES[1])}</b> · 🥉 <b>${money(CTP_PRIZES[2])}</b></div>`
+        + (yest.length ? `<div class="tnote">Yesterday's winner: <b>${esc(yest[0].name)}</b> (${yest[0].yd === 0 ? 'Ace' : fmtFt(yest[0].yd)})</div>` : '')
+        + (fbUser ? '' : '<div class="tnote" style="margin-top:8px"><button class="main sm" data-signin="1">Sign in with Google</button> to compete</div>');
+    } catch (e) { const box = $('ctpLb'); if (box) box.innerHTML = '<div class="empty">Couldn\'t reach the online leaderboard.</div>'; }
   }
   $('ctpCard').addEventListener('click', e => { if (e.target.closest('[data-ctp]')) { ensureAudio(); sfx.click(); startCtp(); } });
 
@@ -4170,6 +4316,7 @@
   }
   persist();
   showHome();
+  renderAcct();
   claimPrizes();
   document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('home').classList.contains('hidden')) claimPrizes(); });
 

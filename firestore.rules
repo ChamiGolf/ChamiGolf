@@ -1,0 +1,51 @@
+rules_version = '2';
+// Firestore security rules for Red & Gold Golf (project chamigolf1).
+// Paste into Firebase console > Firestore Database > Rules and press Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isMe(uid) { return request.auth != null && request.auth.uid == uid; }
+    function okName(n) { return n is string && n.size() > 0 && n.size() <= 14; }
+
+    // Each golfer's saved progress (only they can read or write it).
+    match /users/{uid} {
+      allow read, delete: if isMe(uid);
+      allow create, update: if isMe(uid)
+        && request.resource.data.keys().hasOnly(['data', 'name', 'coins', 'earned', 'updated'])
+        && request.resource.data.data is string && request.resource.data.data.size() < 500000;
+    }
+
+    // Course leaderboards: one row per golfer (their best), all-time and per day.
+    function okScore(uid) {
+      let d = request.resource.data;
+      return isMe(uid) && d.keys().hasOnly(['name', 'uid', 'rel', 'strokes', 'date', 'day', 't'])
+        && d.uid == uid && okName(d.name)
+        && d.rel is int && d.rel > -60 && d.rel < 300
+        && d.strokes is int && d.strokes > 0 && d.strokes < 400
+        && d.date is int && d.day is string && d.t == request.time;
+    }
+    match /courses/{cid}/scores/{uid} {
+      allow read: if true;
+      allow create: if okScore(uid);
+      allow update: if okScore(uid) && request.resource.data.rel < resource.data.rel;
+    }
+    match /courses/{cid}/days/{day}/scores/{uid} {
+      allow read: if true;
+      allow create: if okScore(uid) && request.resource.data.day == day;
+      allow update: if okScore(uid) && request.resource.data.day == day && request.resource.data.rel < resource.data.rel;
+    }
+
+    // Daily Closest to the Pin: one row per golfer per day (their closest shot, in yards).
+    function okShot(uid, day) {
+      let d = request.resource.data;
+      return isMe(uid) && d.keys().hasOnly(['name', 'uid', 'yd', 'date', 'day', 't'])
+        && d.uid == uid && okName(d.name)
+        && d.yd is number && d.yd >= 0 && d.yd < 400
+        && d.date is int && d.day == day && d.t == request.time;
+    }
+    match /ctp/{day}/shots/{uid} {
+      allow read: if true;
+      allow create: if okShot(uid, day);
+      allow update: if okShot(uid, day) && request.resource.data.yd < resource.data.yd;
+    }
+  }
+}
