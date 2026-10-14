@@ -566,6 +566,19 @@
   .gbadge span{font-size:20px;line-height:1}
   .gbadge b{font:700 14px Oswald,sans-serif;color:#fff;letter-spacing:.03em;text-transform:uppercase}
   .gbadge small{font:800 9px Inter;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
+  /* Play tab: head to head, daily challenge and today's aces sit in a slim column on the left, courses on the right */
+  #tab-play:not(.hidden){display:grid;grid-template-columns:1fr;gap:4px 16px}
+  @media (min-width:760px){#tab-play:not(.hidden){grid-template-columns:280px minmax(0,1fr);align-items:start}
+    .playSide{position:sticky;top:0}.playMain .sect:first-child{margin-top:8px}}
+  .playSide .mpc,.playSide .ctp,.playSide .tour{padding:9px 10px;margin:6px 0;border-radius:14px}
+  .playSide .ctp .thumb{display:none}
+  .playSide .mpc .cn,.playSide .ctp .cn,.playSide .tour .cn{font-size:17px;margin:2px 0}
+  .playSide .mpc .cm,.playSide .ctp .cm,.playSide .tour .cm{font-size:11px;margin:2px 0}
+  .playSide .ctp .act{padding-top:5px}
+  .playSide button.main{padding:7px 12px;font-size:13px}
+  .playSide button.main.sm{padding:6px 12px;font-size:13px}
+  .playSide button.ghost{padding:6px 12px;font-size:13px}
+  .playSide .acebar{margin:6px 0;padding:6px 10px}
   .acebar{display:flex;align-items:center;gap:10px;margin:2px 0 8px;padding:8px 12px;border-radius:14px;border:2px solid var(--gold-l);overflow:hidden;
           background:linear-gradient(90deg,#C9962B,#8E0F22 40%,#45060F);box-shadow:0 6px 18px rgba(0,0,0,.35)}
   .acebar.none{border-color:rgba(242,193,78,.5);background:rgba(69,6,15,.85)}
@@ -588,6 +601,11 @@
   .trow .tl{flex:none;font:600 13px Inter;white-space:nowrap}
   .trow .tl b{color:var(--gold-l);margin-left:4px}.trow .tl i{opacity:.65;font-size:12px}
   .cardsBack{margin:26px auto 6px;text-align:center;font:700 20px Oswald,sans-serif;letter-spacing:.05em;color:var(--gold-l);opacity:.92}
+  #fbkBtn{flex:none;height:38px;width:38px;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);font-size:17px;cursor:pointer;padding:0}
+  .fbk textarea{display:block;width:100%;min-height:120px;margin:10px 0;padding:10px 12px;border-radius:12px;border:2px solid rgba(242,193,78,.55);background:var(--red-dd);
+                color:#fff;font:500 15px Inter,sans-serif;resize:vertical;-webkit-user-select:text;user-select:text;touch-action:auto}
+  .fbk .opts{margin-top:10px}
+  .fbk .fmsg{font-size:13px;color:#f3d7a8;min-height:18px;margin-bottom:8px}
   #adminBtn{flex:none;height:38px;width:38px;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);font-size:18px;cursor:pointer;padding:0}
   .wrapseg{flex-wrap:wrap}.wrapseg button{flex:1 1 30%}
   .pill2{display:inline-block;font:800 9px Inter;letter-spacing:.1em;padding:2px 6px;border-radius:999px;background:rgba(66,133,244,.35);color:#dce8ff;vertical-align:2px;text-transform:uppercase}
@@ -658,6 +676,7 @@
       <div style="min-width:0"><div class="bname" id="gameName">Red &amp; Gold Golf</div><div class="tag">CHAMPIONSHIP GOLF</div></div>
     </div>
     <div class="slideCap" id="slideCap"></div>
+    <button id="fbkBtn" title="Send feedback" aria-label="Send feedback">💬</button>
     <button id="adminBtn" class="hidden" title="Creator tools">🛡️</button>
     <button id="acctBtn" class="hidden">Sign in</button>
     <div class="coins" id="homeCoins">$0</div>
@@ -666,7 +685,8 @@
   <main class="hbody">
     <div class="wrap">
       <div id="err" class="hidden">Your browser couldn't start 3D graphics. Try Chrome or Safari with hardware acceleration turned on.</div>
-      <section id="tab-play"><div id="aceBar"></div><div id="mpCard"></div><div id="ctpCard"></div><div id="tourCard"></div><div class="sect">CHOOSE A COURSE</div><div id="courseList"></div></section>
+      <section id="tab-play"><aside class="playSide"><div id="aceBar"></div><div id="mpCard"></div><div id="ctpCard"></div><div id="tourCard"></div></aside>
+        <div class="playMain"><div class="sect">CHOOSE A COURSE</div><div id="courseList"></div></div></section>
       <section id="tab-admin" class="hidden"><div id="adminBody"></div></section>
       <section id="tab-course" class="hidden"><div id="courseDetail"></div></section>
       <section id="tab-ctp" class="hidden"><div id="ctpDetail"></div></section>
@@ -788,6 +808,28 @@
       <button class="main" id="ctpAgain">Try again</button>
       <button class="ghost" id="ctpHome">Home</button>
     </div>
+  </div>
+</div>
+
+<!-- ===== Fresh start notice (full reset) ===== -->
+<div id="resetNote" class="overlay hidden">
+  <div class="card">
+    <h2>Fresh start! ⛳</h2>
+    <div class="sub" style="font-size:14px;line-height:1.45">The game just got a big update, so <b>everyone's progress has been reset</b>: money, clubs, gear, stats and leaderboards all start over.<br><br>
+      Your name, sign-in and friends are kept. Good luck!</div>
+    <div class="btns" style="margin-top:14px"><button class="main" id="resetOk">Let's go</button></div>
+  </div>
+</div>
+
+<!-- ===== Feedback ===== -->
+<div id="fbk" class="overlay hidden">
+  <div class="card fbk">
+    <h2>Send feedback 💬</h2>
+    <div class="sub">Found a bug or have an idea? Tell the creator.</div>
+    <div class="opts" id="fbkKind"><button data-k="bug" class="on">🐞 Bug</button><button data-k="idea">💡 Idea</button><button data-k="other">💬 Other</button></div>
+    <textarea id="fbkText" maxlength="1000" placeholder="What happened, or what would make the game better?"></textarea>
+    <div class="fmsg" id="fbkMsg"></div>
+    <div class="btns"><button class="main" id="fbkSend">Send</button><button class="ghost" id="fbkClose">Close</button></div>
   </div>
 </div>
 
@@ -998,12 +1040,16 @@
 
   // ================= Save data =================
   const SAVE_KEY = 'fairwayclub-save';
+  // FULL RESET (Oct 14 2026): bumping this wipes every player's progress (money, gear, stats, unlocks, awards) on every
+  // device and in the cloud the next time they open the game. Names, sign-ins, friends and settings are kept.
+  const RESET_EPOCH = 1, RESET_KEEP = ['name', 'pid', 'uid', 'friendCode', 'friends', 'ui', 'lefty', 'signinDay', 'badgeAuto', 'migClassic', 'migSchoolBag'];
+  const resetSave = old => { const k = {}; RESET_KEEP.forEach(x => { if (old && old[x] !== undefined) k[x] = old[x]; }); return Object.assign(freshSave(), k, { epoch: RESET_EPOCH, mtime: 0, resetNote: 1 }); };
   const freshStats = () => ({ rounds: 0, holes: 0, aces: 0, eagles: 0, birdies: 0, pars: 0, shots: 0, perfects: 0,
     longest: 0, earnedTotal: 0, strokesTotal: 0, parTotal: 0, roundsBy: {}, bestBy: {},
     albatross: 0, chipIns: 0, sandHoles: 0, longPutts: 0, underPar: 0, miniAces: 0 });
   const freshSave = () => ({ coins: 0, lv: {}, up: {}, migUp: 1, ball: 0, course: 'par3', stats: freshStats(), bag: STARTER_BAG.slice(), owned: STARTER_BAG.slice(),
     name: 'Player', look: Object.assign({}, LOOK_PRESETS[0].look), gbag: Object.assign({}, BAG_PRESETS[0].bag), board: {}, awards: {}, unlocks: {}, ownedLook: {},
-    clubCol: {}, badges: {}, badge: '', lefty: false });
+    clubCol: {}, badges: {}, badge: '', lefty: false, epoch: RESET_EPOCH });
   // ---- Anti-cheat: a fingerprint of everything money can buy. Editing the save by hand breaks it. ----
   const canon = v => v && typeof v === 'object' ? (Array.isArray(v) ? '[' + v.map(canon).join(',') + ']'
     : '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}') : JSON.stringify(v === undefined ? null : v);
@@ -1017,9 +1063,12 @@
   let tamperedSave = false;
   let save = freshSave();
   try {
-    const s = JSON.parse(localStorage.getItem(SAVE_KEY));
-    if (s) {
+    let s = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if (s && (s.epoch | 0) < RESET_EPOCH) s = resetSave(s);   // the full reset: start over, keep who you are
+    else if (s) {
       if (s.sig && s.sig !== sigOf(s)) tamperedSave = true;   // the save was edited outside the game
+    }
+    if (s) {
       save = Object.assign(save, s);
       save.stats = Object.assign(freshStats(), s.stats || {});
       if (s.best != null && save.stats.bestBy.pines == null) save.stats.bestBy.pines = s.best;   // older saves
@@ -1028,7 +1077,7 @@
       if (!s.course) save.course = 'pines';
     }
   } catch (e) {}
-  save.up = save.up || {}; save.clubCol = save.clubCol || {}; save.badges = save.badges || {}; save.badge = save.badge || '';
+  save.up = save.up || {}; save.clubCol = save.clubCol || {}; save.badges = save.badges || {}; save.badge = save.badge && save.badge !== 'firstace' ? save.badge : '';
   // Older saves keyed upgrades by club name.
   const OLD_NAMES = { 'Driver': 'driver', '3 Wood': 'wood3', '4 Iron': 'iron4', '6 Iron': 'iron6', '8 Iron': 'iron8', 'Pitching Wedge': 'pw', 'Sand Wedge': 'sw', 'Putter': 'putter' };
   for (const k in OLD_NAMES) if (save.lv[k] != null) { save.lv[OLD_NAMES[k]] = Math.max(save.lv[OLD_NAMES[k]] || 0, save.lv[k]); delete save.lv[k]; }
@@ -1140,7 +1189,7 @@
   //   Power (+3% distance)   Accuracy (+1% gold zone)   Control (needle 9% slower)
   // A track can only go one level past the club's lowest track, so you have to upgrade a bit of everything at a time.
   const MAX_LV = 5, COSTS = [150, 350, 700, 1200, 2000];   // (old single-level prices, kept for the anti-cheat money check)
-  const UP_COSTS = [500, 1200, 2500, 5000, 9000], BALL_COSTS = [600, 1500, 3000, 6000, 10000];
+  const UP_COSTS = [500, 1200, 2500, 5000, 9000], BALL_COSTS = [600, 1500, 3000, 5000, 7500, 10000, 15000];
   const TRACKS = [['p', 'Power'], ['a', 'Accuracy'], ['c', 'Control']];
   const upOf = c => { const u = save.up[c.id] || {}; return { p: u.p | 0, a: u.a | 0, c: u.c | 0 }; };
   const upCost = (c, k, lv) => Math.round(UP_COSTS[lv] * (k === 'p' ? 1.25 : 1));
@@ -1151,7 +1200,9 @@
   const stockOf = c => Math.round(c.carry * distMult(c));
   const needleMult = c => Math.pow(0.91, upOf(c).c);
   const perfectZone = c => c.zone + 0.01 * upOf(c).a;
-  const windMult = () => 1 - 0.1 * save.ball;
+  // Pro Ball: the first upgrade cuts the wind to 90%, then each one after cuts 5% more, down to 60% at level 7
+  const BALL_MAX = 7, ballWind = lv => lv <= 0 ? 1 : Math.max(0.6, 0.9 - 0.05 * (lv - 1));
+  const windMult = () => ballWind(save.ball);
   const PAY = { '-4': 1000, '-3': 1000, '-2': 250, '-1': 100, '0': 25 };   // bogey or worse pays nothing
   const ROUND_BONUS = 50, UNDER_PAR_BONUS = 40;
   const payFor = (s, p) => s === 1 ? 1500 : (PAY[String(s - p)] || 0);   // hole-in-one $1,500
@@ -1257,9 +1308,11 @@
   }
   // Difficulty per course: k = share of the real yardage, fw = fairway width, gm = green size.
   // (Holes got longer in the Oct 2026 update so birdies take a good drive AND a good approach.)
-  const EASY = { k: 0.88, fw: 1.2, gm: 1.2 }, MED = { k: 0.92, fw: 1.02, gm: 1.06 }, MEDH = { k: 0.97, fw: 0.95, gm: 0.98 },
-        HARD = { k: 1.0, fw: 0.9, gm: 0.9 }, BRUTAL = { k: 1.04, fw: 0.78, gm: 0.76 };
-  const YEL = { k: 0.93, fw: 1.06, gm: 1.08 }, BLK = { k: 0.99, fw: 0.92, gm: 0.96 }, LAKE = { k: 0.95, fw: 1.0, gm: 1.0 }, D3C = { k: 1, fw: 1.15, gm: 1.2 };
+  // (Oct 14 2026: every hole is about 8% longer again, so birdies take a really good drive AND approach.
+  //  Chami Links Black is now the hardest test in the game: full-plus length, the narrowest fairways and smallest greens.)
+  const EASY = { k: 0.95, fw: 1.2, gm: 1.2 }, MED = { k: 0.99, fw: 1.02, gm: 1.06 }, MEDH = { k: 1.05, fw: 0.95, gm: 0.98 },
+        HARD = { k: 1.08, fw: 0.9, gm: 0.9 }, BRUTAL = { k: 1.12, fw: 0.78, gm: 0.76 };
+  const YEL = { k: 1.0, fw: 1.06, gm: 1.08 }, BLK = { k: 1.1, fw: 0.7, gm: 0.7 }, LAKE = { k: 1.03, fw: 1.0, gm: 1.0 }, D3C = { k: 1.08, fw: 1.15, gm: 1.2 };
   const BB = (n, nm, par, y, o) => R(EASY, 'Bethpage Black', n, nm, par, y, Object.assign({ t: [56, 56], ts: 34 }, o));
   const CLY = (n, nm, par, y, o) => R(YEL, 'Bethpage Black', n, nm, par, y, Object.assign({ t: [52, 52], ts: 32 }, o));
   const CLB = (n, nm, par, y, o) => R(BLK, 'Bethpage Black', n, nm, par, y, Object.assign({ t: [46, 46], ts: 28 }, o));
@@ -1298,28 +1351,6 @@
         BB(15, 'The Climb', 4, 459, { p: [[0, 0], [0, 250], [-80, 450]], bk: [['v1+10', 28, 10, 7], ['g-14', -12, 6, 10]], wd: [['v1-40', -60, 22, 5]] }),
         BB(18, 'The Squeeze', 4, 411, { fw: [[0.08, 0.93, 34]], bk: [[0.6, -24, 14, 7], [0.6, 24, 14, 7], ['g-14', -15, 7, 8], ['g-14', 15, 7, 8]] }),
       ] },
-    { id: 'clyellow', name: 'Chami Links Yellow', unlock: 'pines', teeCol: '#F2C14E', desc: 'Chami Links from the yellow tees: six new Bethpage Black holes, longer and tighter than the crimson tees.', wind: 11,
-      pal: Object.assign({}, CL_PAL, { sky: ['#e0a040', '#f6d79a', '#fdf0d6'], fog: 0xf3dfb8, sun: 0xffe2a8 }),
-      holes: [
-        CLY(2, 'Hogback', 4, 389, { p: [[0, 0], [0, 240], [-35, 389]], bk: [['v1+5', 26, 10, 7], ['g-12', -15, 7, 8], ['g-6', 16, 6, 7]], wd: [['v1-40', -58, 22, 5]] }),
-        CLY(3, 'Plateau Three', 3, 230, { fw: [['g-45', 'g-14', 30]], bk: [['g-10', -17, 7, 9], ['g-12', 15, 8, 8], ['g+12', 0, 5, 9]] }),
-        CLY(6, 'Long Six', 4, 408, { fw: [[0.08, 0.93, 40]], bk: [[0.55, -24, 12, 7], [0.62, 22, 10, 7], ['g-14', 0, 5, 14]] }),
-        CLY(7, 'Big Seven', 5, 553, { p: [[0, 0], [0, 250], [70, 400], [60, 553]], fw: [[0.07, 0.55, 44], [0.65, 0.95, 40]],
-          bk: [['v1+10', -28, 12, 8], ['v2+25', 0, 6, 30], ['g-12', -15, 7, 8]], wd: [['v1-30', 62, 24, 6]] }),
-        CLY(9, 'Down the Hill', 4, 460, { p: [[0, 0], [0, 260], [-75, 450]], bk: [['v1+10', 28, 10, 7], ['g-14', 14, 7, 8]], wd: [['v1-40', -60, 24, 6]] }),
-        CLY(10, 'Long Ten', 4, 470, { fw: [[0.3, 0.94, 40]], bk: [[0.17, 0, 10, 30], [0.6, 26, 12, 7], ['g-12', -15, 7, 8]] }),
-      ] },
-    { id: 'clblack', name: 'Chami Links Black', unlock: 'clyellow', teeCol: '#111113', desc: 'The tips. Chami Links from the black tees: the six toughest Bethpage Black holes, full length, with narrow fairways.', wind: 16,
-      pal: Object.assign({}, CL_PAL, { sky: ['#4b5866', '#9aa8b4', '#d9dfe4'], fog: 0xc9d1d8, sun: 0xe8ecf0, leaves: [0x23542a, 0x1d4a24, 0x2b5f2d] }),
-      holes: [
-        CLB(11, 'Eleven', 4, 435, { p: [[0, 0], [0, 250], [60, 435]], bk: [['v1', -26, 10, 7], ['g-12', 15, 7, 8], ['g-14', -14, 6, 7]], wd: [['v1-40', 60, 24, 6]] }),
-        CLB(12, 'Cross Hazard', 4, 501, { p: [[0, 0], [0, 270], [-70, 495]], bk: [['v1-25', 0, 8, 34], ['v1+10', 30, 10, 7], ['g-12', -15, 6, 8], ['g-10', 15, 6, 7]], wd: [['v1-30', -62, 26, 6]] }),
-        CLB(13, 'The Long Haul', 5, 608, { p: [[0, 0], [0, 280], [-40, 440], [-20, 605]], fw: [[0.06, 0.5, 40], [0.6, 0.95, 38]],
-          bk: [['v1+20', 0, 6, 30], ['v2-10', 26, 10, 7], ['g-12', -15, 7, 8], ['g+8', 14, 5, 6]] }),
-        CLB(14, 'Little Fourteen', 3, 161, { g: [12, 16], bk: [['g-11', 0, 5, 16], ['g-2', -16, 5, 7], ['g+2', 15, 5, 7]] }),
-        CLB(16, 'Sixteen', 4, 490, { p: [[0, 0], [0, 280], [50, 485]], fw: [[0.08, 0.94, 36]], bk: [['v1+5', -26, 12, 7], ['g-12', 15, 6, 8], ['g-14', -14, 6, 7]], wd: [['v1-40', 58, 24, 6]] }),
-        CLB(17, 'Amphitheater', 3, 207, { g: [10, 22], fw: [['g-40', 'g-14', 26]], bk: [['g-10', -16, 6, 9], ['g-10', 16, 6, 9], ['g+10', 0, 5, 12], ['g-2', -20, 4, 6]] }),
-      ] },
     { id: 'coast', name: 'TPC Saragosa', unlock: 'pines', desc: 'Stadium golf modeled on TPC Sawgrass. Water everywhere, doglegs around lakes and the famous island green.', wind: 14,
       pal: { outer: '#6f8f4a', rough: '#8fa54f', fairEdge: '#6fae55', fair: '#7cc663', fringe: '#6dbd5c', green: '#93de86', sand: '#f8eecd', sandRim: '#806a3a',
              tee: '#80d070', far: 0x3f6f35, sky: ['#2f86d6', '#a9d8f5', '#f3f9fb'], fog: 0xdcecf5, sun: 0xfff6e0, leaves: [0x3e6b3a, 0x4b7a40, 0x35602f], style: 'pine' },
@@ -1346,7 +1377,18 @@
         FL(8, 'Sunset Cove', 3, 192, { p: [[0, 0], [20, 192]], wt: [[0.45, 32, 56, 20]], bk: [['g-6', -16, 6, 8], ['g+8', 12, 5, 6]] }),
         FL(9, 'Clubhouse', 4, 440, { p: [[0, 0], [0, 270], [-40, 440]], wt: [['g-30', 0, 9, 40]], bk: [['v1', 28, 10, 7], ['g+8', -14, 5, 7]], wd: [['v1-30', -58, 22, 5]] }),
       ] },
-    { id: 'meribah', name: 'Meribah Country Club', unlock: 'coast', desc: '18 holes modeled on Augusta National. Sharp doglegs through tall pines, creeks and white sand.', wind: 12,
+    { id: 'clyellow', name: 'Chami Links Yellow', unlock: 'farbor', teeCol: '#F2C14E', desc: 'Chami Links from the yellow tees: six new Bethpage Black holes, longer and tighter than the crimson tees.', wind: 11,
+      pal: Object.assign({}, CL_PAL, { sky: ['#e0a040', '#f6d79a', '#fdf0d6'], fog: 0xf3dfb8, sun: 0xffe2a8 }),
+      holes: [
+        CLY(2, 'Hogback', 4, 389, { p: [[0, 0], [0, 240], [-35, 389]], bk: [['v1+5', 26, 10, 7], ['g-12', -15, 7, 8], ['g-6', 16, 6, 7]], wd: [['v1-40', -58, 22, 5]] }),
+        CLY(3, 'Plateau Three', 3, 230, { fw: [['g-45', 'g-14', 30]], bk: [['g-10', -17, 7, 9], ['g-12', 15, 8, 8], ['g+12', 0, 5, 9]] }),
+        CLY(6, 'Long Six', 4, 408, { fw: [[0.08, 0.93, 40]], bk: [[0.55, -24, 12, 7], [0.62, 22, 10, 7], ['g-14', 0, 5, 14]] }),
+        CLY(7, 'Big Seven', 5, 553, { p: [[0, 0], [0, 250], [70, 400], [60, 553]], fw: [[0.07, 0.55, 44], [0.65, 0.95, 40]],
+          bk: [['v1+10', -28, 12, 8], ['v2+25', 0, 6, 30], ['g-12', -15, 7, 8]], wd: [['v1-30', 62, 24, 6]] }),
+        CLY(9, 'Down the Hill', 4, 460, { p: [[0, 0], [0, 260], [-75, 450]], bk: [['v1+10', 28, 10, 7], ['g-14', 14, 7, 8]], wd: [['v1-40', -60, 24, 6]] }),
+        CLY(10, 'Long Ten', 4, 470, { fw: [[0.3, 0.94, 40]], bk: [[0.17, 0, 10, 30], [0.6, 26, 12, 7], ['g-12', -15, 7, 8]] }),
+      ] },
+    { id: 'meribah', name: 'Meribah Country Club', unlock: 'clyellow', desc: '18 holes modeled on Augusta National. Sharp doglegs through tall pines, creeks and white sand.', wind: 12,
       pal: { outer: '#2c6a34', rough: '#3d8a3f', fairEdge: '#55a84c', fair: '#6cc95f', fringe: '#62bf57', green: '#8fe086', sand: '#fbf6ea', sandRim: '#857552',
              tee: '#78d06c', far: 0x2c5f30, sky: ['#d9714a', '#f4c296', '#fde9d2'], fog: 0xf0d2b2, sun: 0xffd9a8, leaves: [0x24502a, 0x2d5e2f, 0x1f4524], style: 'pine' },
       holes: [
@@ -1406,7 +1448,7 @@
           bk: [['g-2', -15, 5, 5]], wd: [['v1-60', 70, 34, 18]], cl: [['v1-80', 40, 5, 9]] }),
         SA(18, 'Tom Morris', 4, 357, { fw: [[0.05, 0.93, 70]], g: [18, 26], m: [64, 36], t: [44, 0], wt: [[0.14, 0, 4, 80]] }),
       ] },
-    { id: 'valley', name: 'Deans Valley', unlock: 'hollow', desc: 'The hardest course. 18 holes modeled on Pebble Beach: narrow fairways, tiny greens, sharp doglegs and the ocean.', wind: 24,
+    { id: 'valley', name: 'Deans Valley', unlock: 'hollow', desc: 'The big one. 18 holes modeled on Pebble Beach: narrow fairways, tiny greens, sharp doglegs and the ocean.', wind: 24,
       pal: { outer: '#4f8a45', rough: '#5f9e48', fairEdge: '#5aa84f', fair: '#6fc462', fringe: '#66bb5a', green: '#8cdc82', sand: '#f8efd2', sandRim: '#7d6a42',
              tee: '#7bd06d', far: 0x1f6aa8, sky: ['#2a7fcf', '#a6d4f2', '#f1f8fb'], fog: 0xd6e8f3, sun: 0xfff3dc, leaves: [0x2a4f2c, 0x335a32, 0x223f24], style: 'pine' },
       holes: [
@@ -1437,6 +1479,17 @@
           bk: [['g-11', 0, 4, 14], ['g+2', -16, 4, 5], ['g+4', 18, 4, 5]] }),
         PB(18, 'Room 23', 5, 543, { p: [[0, 0], [0, 220], [-60, 380], [-160, 520]], t: [0, 40], m: [44, 60], cl: [['v1+20', 14, 1, 9]],
           wt: [['v1', -96, 130, 50, 1], ['v2+40', -88, 90, 46, 1]], bk: [['v2', 26, 8, 6], ['g-6', -15, 5, 6], ['g+4', 14, 5, 5]] }),
+      ] },
+    { id: 'clblack', name: 'Chami Links Black', unlock: 'valley', teeCol: '#111113', desc: 'The hardest course in the game. Chami Links from the black tees: the six toughest Bethpage Black holes, longer than the real thing, razor-thin fairways, tiny fast greens and big wind. Beat Deans Valley to play it.', wind: 22,
+      pal: Object.assign({}, CL_PAL, { sky: ['#4b5866', '#9aa8b4', '#d9dfe4'], fog: 0xc9d1d8, sun: 0xe8ecf0, leaves: [0x23542a, 0x1d4a24, 0x2b5f2d] }),
+      holes: [
+        CLB(11, 'Eleven', 4, 435, { p: [[0, 0], [0, 250], [60, 435]], bk: [['v1', -26, 10, 7], ['g-12', 15, 7, 8], ['g-14', -14, 6, 7]], wd: [['v1-40', 60, 24, 6]] }),
+        CLB(12, 'Cross Hazard', 4, 501, { p: [[0, 0], [0, 270], [-70, 495]], bk: [['v1-25', 0, 8, 34], ['v1+10', 30, 10, 7], ['g-12', -15, 6, 8], ['g-10', 15, 6, 7]], wd: [['v1-30', -62, 26, 6]] }),
+        CLB(13, 'The Long Haul', 5, 608, { p: [[0, 0], [0, 280], [-40, 440], [-20, 605]], fw: [[0.06, 0.5, 40], [0.6, 0.95, 38]],
+          bk: [['v1+20', 0, 6, 30], ['v2-10', 26, 10, 7], ['g-12', -15, 7, 8], ['g+8', 14, 5, 6]] }),
+        CLB(14, 'Little Fourteen', 3, 161, { g: [12, 16], bk: [['g-11', 0, 5, 16], ['g-2', -16, 5, 7], ['g+2', 15, 5, 7]] }),
+        CLB(16, 'Sixteen', 4, 490, { p: [[0, 0], [0, 280], [50, 485]], fw: [[0.08, 0.94, 36]], bk: [['v1+5', -26, 12, 7], ['g-12', 15, 6, 8], ['g-14', -14, 6, 7]], wd: [['v1-40', 58, 24, 6]] }),
+        CLB(17, 'Amphitheater', 3, 207, { g: [10, 22], fw: [['g-40', 'g-14', 26]], bk: [['g-10', -16, 6, 9], ['g-10', 16, 6, 9], ['g+10', 0, 5, 12], ['g-2', -20, 4, 6]] }),
       ] },
   ];
   COURSES.forEach(c => { c.par = c.holes.reduce((a, h) => a + h.par, 0); c.yds = c.holes.reduce((a, h) => a + h.yds, 0); });
@@ -1490,18 +1543,20 @@
     const walls = area.map((a, i) => ({ a, b: area[(i + 1) % area.length], th: 0 }))
       .concat((sp.walls || []).map(([ax, ay, bx, by]) => ({ a: P([ax, ay]), b: P([bx, by]), th: 0.18 })));
     const aim = sp.aim ? P(sp.aim) : null;
+    // the course gets harder as you go: steeper hills and slopes, faster windmills and slicker carpet on later holes
+    const f = (n - 1) / 17, hillK = 1 + 0.9 * f, spinK = 1 + 1.0 * f;
     const yds = Math.round(aim ? Math.hypot(aim.x - tee.x, aim.y - tee.y) + Math.hypot(pin.x - aim.x, pin.y - aim.y) : Math.hypot(pin.x - tee.x, pin.y - tee.y));
-    return { mini: true, n, name: sp.name, par: sp.par, yds, after: null, path: null,
+    return { mini: true, n, name: sp.name, par: sp.par, yds, after: null, path: null, slick: 1 - 0.35 * f,
       bounds: { x: 0, y: 0, w: x1 - x0 + 2 * M, h: y1 - y0 + 2 * M }, tee, pin, aim, area, walls,
       fairways: [], bunkers: [], trees: [], green: { x: pin.x, y: pin.y, rx: 0.4, ry: 0.4 },
       water: (sp.water || []).map(([x, y, rx, ry]) => Object.assign(P([x, y]), { rx, ry })),
       posts: (sp.posts || []).map(([x, y, r]) => Object.assign(P([x, y]), { r })),
-      mounds: (sp.mounds || []).map(([x, y, r, hh]) => Object.assign(P([x, y]), { r, h: hh })),
-      tilt: sp.tilt ? { x: sp.tilt[0], y: -sp.tilt[1] } : null,
-      spinners: (sp.spin || []).map(([x, y, len, w], i) => Object.assign(P([x, y]), { len, w, ph: i * 0.9 })) };
+      mounds: (sp.mounds || []).map(([x, y, r, hh]) => Object.assign(P([x, y]), { r, h: hh * hillK })),
+      tilt: sp.tilt ? { x: sp.tilt[0] * hillK, y: -sp.tilt[1] * hillK } : null,
+      spinners: (sp.spin || []).map(([x, y, len, w], i) => Object.assign(P([x, y]), { len, w: w * spinK, ph: i * 0.9 })) };
   }
   const MINI = { id: 'mini', mini: true, name: 'Gold Star Mini Golf', wind: 0,
-    desc: '18 holes of putt-putt fun: bumpers, windmills, ponds, hills, a volcano and the Grand Gold Star finale. Putter only!',
+    desc: '18 holes of putt-putt fun: bumpers, windmills, ponds, hills, a volcano and the Grand Gold Star finale. It gets harder every hole: steeper hills, faster windmills and slicker carpet. Putter only!',
     pal: Object.assign({}, COURSES[0].pal, { style: 'round' }), holes: MINI_SPECS.map((sp, i) => miniHole(sp, i + 1)) };
   MINI.par = MINI.holes.reduce((a, h) => a + h.par, 0); MINI.yds = MINI.holes.reduce((a, h) => a + h.yds, 0);
   const MINI_PAY = { '-2': 60, '-1': 30, '0': 10 };
@@ -2501,7 +2556,7 @@
   const HILL = { mini: 0.15, pines: 1.2, coast: 0.6, meribah: 1.7, hollow: 0.55, valley: 1.2 };   // how hilly each course is
   const LINKS = { hollow: 1 };
   // How much the greens break (slope, yards of rise per yard). Chami Links is the flattest, Deans Valley the wildest.
-  const BREAK = { pines: 0.01, coast: 0.02, meribah: 0.03, hollow: 0.026, valley: 0.045, ctp: 0.03 };
+  const BREAK = { clblack: 0.05, clyellow: 0.022, pines: 0.01, coast: 0.02, meribah: 0.03, hollow: 0.026, valley: 0.045, ctp: 0.03 };
   const SLOPE_G = 7.6;   // a rolling ball feels 5/7 of gravity (yd/s²) along the slope                                                         // lots of small humps and hollows
   const sm01 = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
   const LIP_Q = 1.28;
@@ -3193,7 +3248,7 @@
       const step = Math.min(ds, dist - s);
       p.x = ball.x + cx * (s + step / 2); p.y = ball.y + cy * (s + step / 2);
       const t = terrainAt(p);
-      let a = DECEL[t] || DECEL.green;
+      let a = (DECEL[t] || DECEL.green) * (hole.slick || 1);
       if (slopeLie(hole, t)) { const gr = slopeGrad(hole, p.x, p.y); a += SLOPE_G * (gr.x * cx + gr.y * cy); }   // uphill needs more pace, downhill less
       v2 += 2 * Math.max(0.4, a) * step;
     }
@@ -3386,13 +3441,13 @@
         sp = Math.hypot(ball.vx, ball.vy);
       }
       // a full shot's pace dies off naturally: quick at first, then a slow final trickle
-      let dec = DECEL[t] + (ball.full ? (DRAG[t] || 0.1) * sp : 0);
+      let dec = DECEL[t] * (hole.slick || 1) + (ball.full ? (DRAG[t] || 0.1) * sp : 0);
       if (ball.full && ball.rollCap) {   // past its normal run-out the grass grabs it (never a runaway roll)
         const over = ball.rollD - ball.rollCap * (t === 'path' ? 1.3 : 1);
         if (over > 0) dec += 18 + over * 6;
       }
       const ns = Math.max(0, sp - dec * h);
-      if (ns < 0.12 && pull < DECEL[t] * 0.9) { ball.vx = ball.vy = 0; return stopped(); }
+      if (ns < 0.12 && pull < DECEL[t] * (hole.slick || 1) * 0.9) { ball.vx = ball.vy = 0; return stopped(); }
       if (sp > 0) { ball.vx *= ns / sp; ball.vy *= ns / sp; }
     }
   }
@@ -3784,7 +3839,7 @@
       const dt = 1 / 120; b.x += b.vx * dt; b.y += b.vy * dt;
       const t = terrainAt(b); if (t === 'water' || t === 'oob') break;
       if (slopeLie(hole, t)) { const g = slopeGrad(hole, b.x, b.y); b.vx -= SLOPE_G * g.x * dt; b.vy -= SLOPE_G * g.y * dt; }
-      const sp = Math.hypot(b.vx, b.vy), ns = sp - (DECEL[t] || DECEL.green) * dt;
+      const sp = Math.hypot(b.vx, b.vy), ns = sp - (DECEL[t] || DECEL.green) * (hole.slick || 1) * dt;
       if (ns < 0.12) break;
       b.vx *= ns / sp; b.vy *= ns / sp;
       if (i % 4 === 0) path.push({ x: b.x, y: b.y });
@@ -3991,8 +4046,8 @@
     if (t === 'admin') renderAdmin();
     if (t === 'course') renderCourse();
     if (t === 'ctp') renderCtpTab();
-    if (t === 'golfer') renderGolfer();
-    document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer' || t === 'clubs');
+    if (t === 'golfer') { pendingBuy = null; tryLook = tryBag = null; renderGolfer(); }
+    document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer' || t === 'clubs' || t === 'play');
     $('miniBtn').classList.toggle('hidden', t !== 'play');
     if (t === 'clubs') renderClubs();
     if (t === 'stats') { renderStats(); renderHow(); }
@@ -4075,8 +4130,10 @@
   const etDay = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
   const prevDay = day => { const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); };
   const serverTime = () => firebase.firestore.FieldValue.serverTimestamp();
-  const scoresRef = (cid, day) => day ? fbDb.collection('courses').doc(cid).collection('days').doc(day).collection('scores')
-    : fbDb.collection('courses').doc(cid).collection('scores');
+  // Leaderboard season: the full reset started fresh boards (old scores stay in the database, they just aren't shown).
+  const SEASON = '_s2';
+  const scoresRef = (cid, day) => day ? fbDb.collection('courses').doc(cid + SEASON).collection('days').doc(day).collection('scores')
+    : fbDb.collection('courses').doc(cid + SEASON).collection('scores');
   const ctpRef = day => fbDb.collection('ctp').doc(day).collection('shots');
   const acesRef = day => fbDb.collection('aces').doc(day).collection('list');
   // fbUser = signed in with Google (cloud saves, Play Friends). fbGuest = a quiet guest account so anyone can post to the
@@ -4092,12 +4149,11 @@
   // ---- Badges: a small icon next to your name on the leaderboards. Earn them, then equip one in the Golfer tab. ----
   const BADGES = [
     { id: 'creator', icon: '👑', name: 'Creator', how: 'Only the creator of the game has this one.' },
-    { id: 'firstace', icon: '🌟', name: 'First Ace Ever', how: 'Make the very first hole in one in the game\'s history.' },
     { id: 'gift', icon: '🎁', name: "Creator's Pick", how: 'Handed out by the creator.' },
     { id: 'champ', icon: '🏆', name: 'Daily Champion', how: 'Finish 1st in a Daily Tournament or the Daily Closest to the Pin.' },
     { id: 'ace', icon: '🎯', name: 'Hole in One', how: 'Make a hole in one.' },
   ];
-  let remoteBadges = {};   // First Ace Ever and Creator's Pick are checked online, so they can't be faked
+  let remoteBadges = {};   // Creator's Pick is checked online, so it can't be faked
   const badgeOf = id => BADGES.find(b => b.id === id);
   const hasBadge = id => id === 'creator' ? isCreator() : id === 'ace' ? !!(save.badges.ace || save.stats.aces > 0) : id === 'champ' ? !!save.badges.champ : !!remoteBadges[id];
   const myBadge = () => (save.badge && hasBadge(save.badge) ? save.badge : '');
@@ -4105,7 +4161,6 @@
   async function loadRemoteBadges() {
     const u = meUser(); if (!u || !fbDb) return;
     const got = {};
-    try { const fa = await fbDb.collection('meta').doc('firstAce').get(); if (fa.exists && fa.data().uid === u.uid) got.firstace = true; } catch (e) {}
     try { const gf = await fbDb.collection('gifts').doc(u.uid).get(); if (gf.exists) got.gift = true; } catch (e) {}
     remoteBadges = got;
     if (isCreator() && !save.badgeAuto) { save.badgeAuto = 1; save.badge = 'creator'; persist(); }
@@ -4251,6 +4306,7 @@
     cloudReady = false;
     let snap; try { snap = await userDoc().get(); } catch (e) { return; }
     let cloud = null; try { cloud = snap.exists ? JSON.parse(snap.data().data) : null; } catch (e) {}
+    if (cloud && (cloud.epoch | 0) < RESET_EPOCH) cloud = null;   // a cloud save from before the full reset is replaced by the fresh one
     const mine = save.uid === fbUser.uid, localEarned = save.stats.earnedTotal || 0;
     const take = cloud && (mine ? (cloud.mtime || 0) > (save.mtime || 0) : (cloud.stats && cloud.stats.earnedTotal || 0) >= localEarned);
     let reloaded = false; try { reloaded = sessionStorage.getItem('cgCloudLoad') === fbUser.uid; } catch (e) {}
@@ -4289,6 +4345,23 @@
     if (t.dataset.signout != null) signOut();
     else if (t.id === 'acctBtn' && fbUser) setTab('golfer');
     else signIn();
+  });
+  // ---- Feedback: goes to the creator's inbox (Creator tools → Feedback) ----
+  let fbkKind = 'bug';
+  $('fbkBtn').addEventListener('click', () => { ensureAudio(); sfx.click(); $('fbkMsg').textContent = ''; $('fbk').classList.remove('hidden'); });
+  $('fbkClose').addEventListener('click', () => { sfx.click(); $('fbk').classList.add('hidden'); });
+  $('fbkKind').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; fbkKind = b.dataset.k; [...$('fbkKind').children].forEach(x => x.classList.toggle('on', x === b)); });
+  $('fbkText').addEventListener('keydown', e => e.stopPropagation());
+  $('fbkSend').addEventListener('click', async () => {
+    const text = $('fbkText').value.trim().slice(0, 1000), u = meUser();
+    if (!text) { $('fbkMsg').textContent = 'Type something first.'; return; }
+    if (!u || !fbDb) { $('fbkMsg').textContent = "Can't reach the internet right now. Try again in a bit."; return; }
+    $('fbkSend').disabled = true; $('fbkMsg').textContent = 'Sending…';
+    try {
+      await fbDb.collection('feedback').add({ uid: u.uid, name: boardName(), text, kind: fbkKind, at: Date.now(), t: serverTime(), ver: navigator.userAgent.slice(0, 120) });
+      $('fbkText').value = ''; $('fbkMsg').textContent = '✅ Thanks! The creator will read it.';
+    } catch (e) { $('fbkMsg').textContent = "That didn't send (" + (e.code || 'error') + '). Try again later.'; }
+    $('fbkSend').disabled = false;
   });
   // a Google sign-in counts once a day per device for the analytics
   function countSignin() { const d = etDay(); if (save.signinDay !== d) { save.signinDay = d; persist(); bumpDaily({ signins: 1 }); } }
@@ -4417,13 +4490,6 @@
       const doc = Object.assign({ name: boardName(), uid: u.uid, cid: c.id, course: cname, hole: i + 1, yds: h.yds | 0, date: Date.now() }, b ? { badge: b } : {});
       if (needsName()) pendingAces.push({ day, doc }); else await acesRef(day).add(Object.assign(doc, { t: serverTime() }));
       acesCache = null; bumpDaily({ aces: 1 });
-      // the very first hole in one in the game's history earns its own badge (whoever gets there first)
-      const ref = fbDb.collection('meta').doc('firstAce'), snap = await ref.get();
-      if (!snap.exists) {
-        await ref.set({ uid: u.uid, name: boardName(), course: cname, hole: i + 1, date: Date.now(), t: serverTime() });
-        remoteBadges.firstace = true;
-        toastQ.push({ a: { icon: '🌟', name: 'First Ace Ever!', pay: 0, label: 'NEW BADGE' }, bag: null }); nextToast();
-      }
     } catch (e) {}
   }
 
@@ -4513,7 +4579,7 @@
       for (let l = 0; l < base; l++) spent += COSTS[l];
       tracksOf(m).forEach(([k]) => { for (let l = base; l < u[k]; l++) spent += upCost(m, k, l); });
     }
-    for (let l = 0; l < Math.min(MAX_LV, save.ball | 0); l++) spent += COSTS[l];
+    for (let l = 0; l < Math.min(BALL_MAX, save.ball | 0); l++) spent += BALL_COSTS[l];
     const worth = (save.coins || 0) + spent;
     if (save.coins > 3000000 || worth > earned + 60000) cheatFlag('money', `${money(Math.round(worth))} in money and gear but only ${money(Math.round(earned))} ever earned`, true);
     if (save.coins < 0 || !isFinite(save.coins)) cheatFlag('money', 'impossible bank balance', true);
@@ -4531,12 +4597,12 @@
   // always agree, and a golfer who reloads can rejoin where their team is.
   const MP_FMT = { stroke: 'Stroke play', scramble: 'Scramble', alt: 'Alt shot', best: 'Best ball' };
   const MP_MODES = { 1: { name: '1v1', fmts: ['stroke'], sub: 'You vs a friend' }, 2: { name: '2v2', fmts: ['scramble', 'alt', 'best'], sub: 'Teams of 2' },
-    4: { name: 'Foursome', fmts: ['stroke', 'scramble'], sub: 'One group of golfers, everyone puts up the same buy-in' } };
-  // Foursome "own ball" is every golfer for themselves (1v1v1v1, 2 to 4 golfers); Foursome scramble is two teams of two.
-  const isGroup = m => +m.mode === 4 && m.fmt !== 'scramble';
+    4: { name: 'Foursome', fmts: ['stroke', 'scramble', 'alt', 'best'], sub: 'One group of golfers, everyone puts up the same buy-in' } };
+  // Foursome "own ball" is every golfer for themselves (1v1v1v1, 2 to 4 golfers); Foursome scramble, alt shot and best ball are two teams of two.
+  const isGroup = m => +m.mode === 4 && (m.fmt || 'stroke') === 'stroke';
   const teamSize = m => +m.mode === 4 ? 2 : +m.mode;
-  const fmtName = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'Scramble (2 v 2)' : 'Own ball (1v1v1v1)') : MP_FMT[fmt] || '';
-  const fmtHow = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'Four golfers, two teams of two. Everyone hits, each team plays its best ball every shot. The lower team splits the pot.'
+  const fmtName = (mode, fmt) => +mode === 4 ? (fmt && fmt !== 'stroke' ? `${MP_FMT[fmt]} (2 v 2)` : 'Own ball (1v1v1v1)') : MP_FMT[fmt] || '';
+  const fmtHow = (mode, fmt) => +mode === 4 ? (fmt && fmt !== 'stroke' ? `Four golfers, two teams of two. ${FMT_HOW[fmt]} The lower team splits the pot.`
     : 'Every golfer for themselves (2 to 4 golfers). Lowest total takes the whole pot; a tie for the lead goes to a sudden-death playoff.') : FMT_HOW[fmt];
   // Buy-ins are held as soon as you join a lobby (so nobody can spend it before tee off) and handed back if the match never starts.
   // Pop-up when joining: shows the buy-in the host set, the pot, and your bank. Not enough money = can't join.
@@ -5138,7 +5204,7 @@
         <div class="lh" style="margin-top:14px">${grp ? 'GROUP' : 'TEAMS'}</div><div class="teams">${grp ? grpCol : col(0) + col(1)}</div>
         <div class="mpbtns">${!grp && t[1 - myTeam].length < ts ? '<button class="ghost sm" data-swap="1">Switch team</button>' : ''}<button class="ghost sm" data-sharematch="1">Share invite link</button></div>
         ${host ? `<button class="main" data-start="1" style="width:100%;margin-top:12px"${ready ? '' : ' disabled'}>${ready ? (full || grp ? `Start ${grp ? players + '-golfer ' : ''}match` : `Start ${t[0].length}v${t[1].length}`) : 'Waiting for golfers…'}</button>`
-          + (ready || m.mode === 1 ? '' : `<div class="gnote" style="text-align:center">${grp ? 'Need at least 2 golfers.' : +m.mode === 4 ? 'Scramble foursomes need all 4 golfers, 2 on each team.' : 'Teams must be even to start.'}</div>`)
+          + (ready || m.mode === 1 ? '' : `<div class="gnote" style="text-align:center">${grp ? 'Need at least 2 golfers.' : +m.mode === 4 ? 'Team foursomes need all 4 golfers, 2 on each team.' : 'Teams must be even to start.'}</div>`)
           : '<div class="tnote" style="margin-top:12px">Waiting for the host to start…</div>'}
         <button class="ghost sm" data-leave="1" style="width:100%;margin-top:10px">${host ? 'Cancel match' : 'Leave match'}</button>
         <div class="mpmsg${mpMsg.ok ? ' ok' : ''}" id="mpMsg">${esc(mpMsg.t)}</div>
@@ -5250,12 +5316,13 @@
     return `<button ${attr}="${c}" title="${n}${own ? '' : ' · ' + money(pr)}" aria-label="${label}: ${n}${own ? '' : ', costs ' + money(pr)}" class="${c.toLowerCase() === String(cur).toLowerCase() ? 'on' : ''}${own ? '' : ' buy'}" style="background:${c}">${own ? '' : `<em>${pr >= 1000 ? '$' + (pr / 1000) + 'k' : '$' + pr}</em>`}</button>`;
   }).join('') + '</div>';
   // the buy bar shown under the swatches when you pick something you don't own yet
-  let pendingBuy = null;
+  let pendingBuy = null, tryLook = null, tryBag = null;
   function buyBar() {
     if (!pendingBuy) return '';
     const b = pendingBuy, can = save.coins >= b.price;
     return `<div class="buybar"><span class="bsw" style="background:${b.swatch}"></span><div class="bi"><b>${b.title}</b><span>${money(b.price)} · You have ${money(save.coins)}</span></div>`
-      + `<button class="main sm" data-buy="1"${can ? '' : ' disabled'}>${can ? 'Buy & wear' : `Need ${money(b.price - save.coins)} more`}</button></div>`;
+      + `<button class="main sm" data-buy="1"${can ? '' : ' disabled'}>${can ? 'Buy & wear' : `Need ${money(b.price - save.coins)} more`}</button></div>`
+      + (tryLook || tryBag ? '<div class="gnote">👀 Trying it on: check the preview. Buy it to wear it in your rounds.</div>' : '');
   }
   function outfitPanel() {
     const L = save.look;
@@ -5268,7 +5335,7 @@
         `${k.style === 'sweater' ? `<i style="background:linear-gradient(90deg,${k.jacket} 30%,#B3122B 30% 40%,${k.trim} 40% 60%,#B3122B 60% 70%,${k.jacket} 70%);flex:.35"></i>` : ''}<i style="background:${k.pants}"></i>` +
         `${locked ? '<b class="lk">🔒</b>' : ''}</span>${p.name}${locked ? '<small>LOCKED</small>' : forSale ? `<small>${money(p.price)}</small>` : ''}</button>`;
     }).join('');
-    const lockNote = gLockMsg ? `<div class="locknote">🔒 <b>${UNLOCKS[gLockMsg].name}</b> is locked. ${UNLOCKS[gLockMsg].how}</div>` : '';
+    const lockNote = gLockMsg ? `<div class="locknote">🔒 <b>${UNLOCKS[gLockMsg].name}</b> is locked. ${UNLOCKS[gLockMsg].how}${tryLook ? '<br>👀 You\'re trying it on in the preview.' : ''}</div>` : '';
     const chips = LOOK_PARTS.filter(([k]) => partShown(k, L)).map(([k]) => {
       const dot = k === 'style' ? '' : `<i style="background:${L[k]}"></i>`;
       return `<button data-gpart="${k}" class="${k === gPart ? 'on' : ''}">${dot}${k === 'style' ? (L.style === 'sweater' ? '🧶 ' : '🧥 ') + 'Top' : partLabel(k, L)}</button>`;
@@ -5294,7 +5361,7 @@
     }).join('');
     const bodies = byCost(BAG_SWATCHES.body, ([, c]) => { const bp = BAG_PRESETS.find(p => p.bag.body.toLowerCase() === c.toLowerCase()); return bp ? bagCost(bp) : 0; }).filter(([, c]) => BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === c.toLowerCase()));
     const openN = BAG_PRESETS.filter(bagOpen).length;
-    const lockNote = bLockMsg ? (() => { const a = AWARDS.find(x => x.id === bLockMsg.award); return `<div class="locknote">🔒 <b>${bLockMsg.name}</b> bag is locked. Earn the <b>${a.icon} ${a.name}</b> achievement: ${a.how}.</div>`; })() : '';
+    const lockNote = bLockMsg ? (() => { const a = AWARDS.find(x => x.id === bLockMsg.award); return `<div class="locknote">🔒 <b>${bLockMsg.name}</b> bag is locked. Earn the <b>${a.icon} ${a.name}</b> achievement: ${a.how}.${tryBag ? '<br>👀 Trying it on in the preview.' : ''}</div>`; })() : '';
     const chips = BAG_PARTS.map(([k, n]) => `<button data-bpart="${k}" class="${k === bPart ? 'on' : ''}">${k === 'logo' ? '🏷️ ' : `<i style="background:${G[k]}"></i>`}${n}</button>`).join('');
     const label = BAG_PARTS.find(x => x[0] === bPart)[1];
     const ownLogo = !!save.ownedLook['bag-logo:custom'], cl = customLogo();
@@ -5362,13 +5429,15 @@
     document.querySelectorAll('#gTabs button').forEach(b => b.classList.toggle('on', b.dataset.gtab === gTab));
     $('gPanel').innerHTML = gTab === 'bag' ? bagPanel() : gTab === 'ball' ? ballPanel() : outfitPanel();
     if (gTab === 'ball') drawBallPreview();
-    applyLook(previewMats, save.look); applyBag(previewBagMats, save.gbag);
+    // trying something on: the preview golfer wears it, but nothing is bought or saved
+    applyLook(previewMats, tryLook ? Object.assign({}, save.look, tryLook) : save.look);
+    applyBag(previewBagMats, tryBag ? Object.assign({}, save.gbag, tryBag) : save.gbag);
   }
   function setBag(b) { Object.assign(save.gbag, b); persist(); applyBag(playerBagMats, save.gbag); applyBag(previewBagMats, save.gbag); }
   $('tab-golfer').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     ensureAudio(); sfx.click();
-    const d = b.dataset; gLockMsg = null; bLockMsg = null;
+    const d = b.dataset; gLockMsg = null; bLockMsg = null; tryLook = null; tryBag = null;
     if (d.buy) {
       const pb = pendingBuy; pendingBuy = null;
       if (pb && save.coins >= pb.price) {
@@ -5383,11 +5452,12 @@
     if (d.gtab) gTab = d.gtab;
     else if (d.preset != null) {
       const pr = LOOK_PRESETS[+d.preset];
-      if (pr.lock && !unlocked(pr.lock)) gLockMsg = pr.lock;
+      if (pr.lock && !unlocked(pr.lock)) { gLockMsg = pr.lock; tryLook = pr.look; }
       else if (pr.lock) { OUTFIT_PARTS.forEach(k => pr.look[k] && grantC(k, pr.look[k])); setLook(pr.look); }   // earned outfits come with their colours
       else if (!presetOwned(pr)) pendingBuy = { kind: 'preset', title: `${pr.name} (full outfit)`, price: pr.price, swatch: pr.look.jacket,
         grant: () => OUTFIT_PARTS.forEach(k => pr.look[k] && grantC(k, pr.look[k])), apply: () => setLook(pr.look) };
       else setLook(pr.look);
+      if (pendingBuy) tryLook = pr.look;
     }
     else if (d.gpart) gPart = d.gpart;
     else if (d.style) setLook({ style: d.style, trim: save.look.trim || '#F2C14E' });
@@ -5396,10 +5466,11 @@
       if (PRICES[part] && !ownsC(part, col)) pendingBuy = { kind: 'look', title: `${swName(SWATCHES[part], col)} ${partLabel(part, save.look).toLowerCase()}`, price: priceOf(part, col), swatch: col,
         grant: () => grantC(part, col), apply: () => setLook({ [part]: col }) };
       else setLook({ [part]: col });
+      if (pendingBuy) tryLook = { [part]: col };
     }
     else if (d.bpreset != null) {
       const bp = BAG_PRESETS[+d.bpreset];
-      if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(Object.assign({ panel: '' }, bp.bag)); } else bLockMsg = bp;
+      if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(Object.assign({ panel: '' }, bp.bag)); } else { bLockMsg = bp; tryBag = Object.assign({ panel: '' }, bp.bag); }
     }
     else if (d.bpart) bPart = d.bpart;
     else if (d.ballc) {
@@ -5589,7 +5660,7 @@
     const chips = SLOTS.map((slotName, si) => {
       const eq = CLUBS[si], lv = lvOf(eq);
       return `<button class="cchip${clubSel === si ? ' on' : ''}${anyTrackUp(eq) ? ' can' : ''}" data-sel="${si}">${clubIcon(eq)}<b>${eq.short}</b><em>${eq.putter ? stockOf(eq) + ' roll' : stockOf(eq)}</em><span class="pips">${pipRow(lv)}</span></button>`;
-    }).join('') + `<button class="cchip${clubSel === 8 ? ' on' : ''}${save.ball < MAX_LV && save.coins >= BALL_COSTS[save.ball] ? ' can' : ''}" data-sel="8">${clubIcon(null)}<b>BALL</b><em>Lv ${save.ball}</em><span class="pips">${pipRow(save.ball)}</span></button>`;
+    }).join('') + `<button class="cchip${clubSel === 8 ? ' on' : ''}${save.ball < BALL_MAX && save.coins >= BALL_COSTS[save.ball] ? ' can' : ''}" data-sel="8">${clubIcon(null)}<b>BALL</b><em>Lv ${save.ball}</em><span class="pips">${pipRow(save.ball, BALL_MAX)}</span></button>`;
     let left = '', stats = '';
     if (clubSel < 8) {
       const si = clubSel, eq = CLUBS[si], u = upOf(eq), lv = lvOf(eq), ts = tracksOf(eq), total = ts.length * MAX_LV;
@@ -5626,12 +5697,12 @@
       stats = clubBars(eq);
     } else {
       const bl = save.ball, wNow = Math.round(windMult() * 100);
-      const bbtn = bl >= MAX_LV ? '<button class="main sm" disabled>MAXED OUT</button>'
+      const bbtn = bl >= BALL_MAX ? '<button class="main sm" disabled>MAXED OUT</button>'
         : `<button class="main sm" data-ball="1"${save.coins < BALL_COSTS[bl] ? ' disabled' : ''}>Upgrade · ${money(BALL_COSTS[bl])}</button>`;
-      left = `<div class="chero">${clubIcon(null)}<div class="ht"><span>GOLF BALL</span><b>Pro Ball</b><em>Wind moves it ${wNow}%</em></div>${ringOf(bl)}</div>
-        <div class="upcard"><div class="uh">${bl >= MAX_LV ? 'FULLY UPGRADED' : `NEXT: LEVEL ${bl + 1}`}</div><ul><li>${bl >= MAX_LV ? 'Wind barely touches it' : `Wind effect ${wNow}% → ${wNow - 10}%`}</li></ul>${bbtn}</div>
+      left = `<div class="chero">${clubIcon(null)}<div class="ht"><span>GOLF BALL</span><b>Pro Ball</b><em>Wind moves it ${wNow}%</em></div>${ringOf(bl, BALL_MAX)}</div>
+        <div class="upcard"><div class="uh">${bl >= BALL_MAX ? 'FULLY UPGRADED' : `NEXT: LEVEL ${bl + 1}`}</div><ul><li>${bl >= BALL_MAX ? 'Wind only moves it 60%' : `Wind effect ${wNow}% → ${Math.round(ballWind(bl + 1) * 100)}%`}</li></ul>${bbtn}</div>
         <div class="md" style="margin-top:12px">Change your ball's color and pattern in the Golfer tab.</div>`;
-      stats = `<div class="vstat"><div class="vk"><span>Wind cut</span><em>${100 - wNow}%</em></div><i>${bl < MAX_LV ? `<u style="width:${Math.round((100 - wNow + 10) / 50 * 100)}%"></u>` : ''}<b style="width:${Math.max(4, Math.round((100 - wNow) / 50 * 100))}%"></b></i></div>`;
+      stats = `<div class="vstat"><div class="vk"><span>Wind cut</span><em>${100 - wNow}%</em></div><i>${bl < BALL_MAX ? `<u style="width:${Math.round((1 - ballWind(bl + 1)) / 0.4 * 100)}%"></u>` : ''}<b style="width:${Math.max(4, Math.round((100 - wNow) / 40 * 100))}%"></b></i></div>`;
     }
     $('clubList').innerHTML = back + `<div class="sect">YOUR BAG</div><div class="crack">${chips}</div>
       <div class="cmain${statsOpen ? '' : ' shut'}"><div class="cleft">${left}</div>
@@ -5656,7 +5727,7 @@
       if (!cb || save.coins < cb.price) { renderClubs(); return; }
       save.coins -= cb.price; save.ownedLook['club:' + cb.hex.toLowerCase()] = 1; save.clubCol[eq.id] = cb.hex;
     } else if (b.dataset.ball) {
-      const cost = BALL_COSTS[save.ball]; if (save.ball >= MAX_LV || save.coins < cost) return;
+      const cost = BALL_COSTS[save.ball]; if (save.ball >= BALL_MAX || save.coins < cost) return;
       save.coins -= cost; save.ball++;
     } else if (b.dataset.up) {
       const m = modelById(b.dataset.up), k = b.dataset.k, u = upOf(m);
@@ -6017,7 +6088,31 @@
 
   // ================= Creator tools (only for the creator's Google account; the rules enforce this too) =================
   let admView = 'live', admCid = 'pines', admMode = 'daily', admQ = '', admPres = null;
-  const admTabs = [['live', '📈 Analytics'], ['players', '👥 Players'], ['flags', '🚩 Cheat flags'], ['bans', '⛔ Bans'], ['boards', '🏆 Leaderboards']];
+  const admTabs = [['live', '📈 Analytics'], ['players', '👥 Players'], ['flags', '🚩 Cheat flags'], ['feedback', '💬 Feedback'], ['bans', '⛔ Bans'], ['boards', '🏆 Leaderboards']];
+  // a few random fun facts from everyone's "last seen" notes
+  function admFunStats(rows) {
+    if (!rows.length) return [['—', 'No players yet']];
+    const top = k => rows.reduce((a, p) => ((p[k] || 0) > (a[k] || 0) ? p : a), rows[0]), sum = k => rows.reduce((a, p) => a + (p[k] || 0), 0);
+    const nm = p => esc((p.name || 'Golfer').slice(0, 14));
+    const rich = top('coins'), earner = top('earned'), grinder = top('rounds'), acer = top('aces');
+    const hourET = ms => +new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }).format(new Date(ms)) % 24;
+    const owls = rows.filter(p => p.lastMs && (hourET(p.lastMs) >= 23 || hourET(p.lastMs) < 5));
+    const spots = {}; rows.forEach(p => { if (p.where && p.where !== 'home') spots[p.where] = (spots[p.where] || 0) + 1; });
+    const fav = Object.keys(spots).sort((a, b) => spots[b] - spots[a])[0];
+    const out = [
+      [`${nm(rich)} · ${money(rich.coins || 0)}`, '💰 Richest golfer right now'],
+      [`${nm(earner)} · ${money(earner.earned || 0)}`, '🏦 Biggest earner ever'],
+      [`${nm(grinder)} · ${grinder.rounds || 0}`, '🏌️ Most rounds played'],
+      [acer.aces ? `${nm(acer)} · ${acer.aces}` : 'Nobody yet', '🎯 Most holes in one'],
+      [money(sum('earned')), '💵 Money won by everyone'],
+      [sum('rounds').toLocaleString(), '⛳ Rounds played by everyone'],
+      [sum('aces').toLocaleString(), '🌟 Aces made by everyone'],
+      [money(Math.round(sum('coins') / rows.length)), '🏧 Average bank'],
+      [fav ? esc(courseById(fav).name) : '—', '📍 Most popular course right now'],
+      [owls.length ? `${owls.length} · ${nm(owls[0])}` : 'None', '🦉 Night owls (playing 11pm–5am)'],
+    ];
+    return out;
+  }
   async function admLoadPresence(force) {
     if (admPres && !force && Date.now() - admPres.at < 30000) return admPres.rows;
     const s = await fbDb.collection('presence').orderBy('lastMs', 'desc').limit(500).get();
@@ -6045,6 +6140,7 @@
           [rows.filter(p => p.google).length, 'Google accounts'], [rows.filter(p => !p.google).length, 'Guests'], [t.signins || 0, 'Sign-ins today'], [t.rounds || 0, 'Rounds today'],
           [t.aces || 0, 'Aces today'], [t.ctp || 0, 'CTP shots today'], [y.rounds || 0, 'Rounds yesterday'], [y.signins || 0, 'Sign-ins yesterday']];
         v.innerHTML = `<div class="tiles">${tiles.map(([n, l]) => `<div class="tile"><div class="v">${n}</div><div class="l">${l}</div></div>`).join('')}</div>
+          <div class="sect">FUN STATS</div><div class="tiles">${admFunStats(rows).map(([n, l]) => `<div class="tile"><div class="v" style="font-size:20px">${n}</div><div class="l">${l}</div></div>`).join('')}</div>
           <div class="sect">ONLINE NOW (LAST 6 MIN)</div><div class="mplist">${online.length ? online.map(p => admPlayerRow(p)).join('') : '<div class="empty">Nobody online right now.</div>'}</div>
           <div class="tnote">"Online" = the game was open in the last 6 minutes. Counts start from this update.</div>`;
       } else if (admView === 'players') {
@@ -6053,8 +6149,16 @@
           <div class="tnote">🎁 gives (or takes back) the Creator's Pick badge.</div>`;
       } else if (admView === 'flags') {
         const s = await fbDb.collection('flags').orderBy('at', 'desc').limit(100).get();
-        v.innerHTML = `<div class="mplist">${s.docs.map(d => { const f = d.data(); return `<div class="mpli"><div class="nm"><b>${esc(f.name || 'Golfer')}</b> ${f.strong ? '<span class="pill2 r">auto-banned</span>' : '<span class="pill2">flagged</span>'}<small>${esc(f.kind || '')}: ${esc(f.detail || '')} · ${f.at ? ago(f.at) : ''}${f.google ? ' · Google' : ' · guest'}</small></div>
+        v.innerHTML = (s.docs.length ? `<button class="ghost sm" data-adm-clearflags="1" style="margin-bottom:10px">🧹 Clear all flags (${s.docs.length}${s.docs.length >= 100 ? '+' : ''})</button>` : '')
+          + `<div class="mplist">${s.docs.map(d => { const f = d.data(); return `<div class="mpli"><div class="nm"><b>${esc(f.name || 'Golfer')}</b> ${f.strong ? '<span class="pill2 r">auto-banned</span>' : '<span class="pill2">flagged</span>'}<small>${esc(f.kind || '')}: ${esc(f.detail || '')} · ${f.at ? ago(f.at) : ''}${f.google ? ' · Google' : ' · guest'}</small></div>
           <button class="ghost sm" data-adm-dismiss="${d.id}">Dismiss</button>${f.strong ? '' : `<button class="main sm" data-adm-ban="${f.uid}" data-n="${esc(f.name || '')}">Ban</button>`}</div>`; }).join('') || '<div class="empty">No cheat flags. 🎉</div>'}</div>`;
+      } else if (admView === 'feedback') {
+        const s = await fbDb.collection('feedback').orderBy('at', 'desc').limit(100).get();
+        const ic = { bug: '🐞', idea: '💡', other: '💬' };
+        v.innerHTML = (s.docs.length ? `<button class="ghost sm" data-adm-clearfbk="1" style="margin-bottom:10px">🧹 Clear all feedback</button>` : '')
+          + `<div class="mplist">${s.docs.map(d => { const f = d.data(); return `<div class="mpli" style="align-items:flex-start"><div class="nm"><b>${ic[f.kind] || '💬'} ${esc(f.name || 'Golfer')}</b>
+            <small>${f.at ? ago(f.at) : ''}</small><div style="font-size:14px;color:#fff;margin-top:4px;white-space:pre-wrap">${esc(f.text || '')}</div></div>
+            <button class="ghost sm" data-adm-fbkdel="${d.id}">Done</button></div>`; }).join('') || '<div class="empty">No feedback yet.</div>'}</div>`;
       } else if (admView === 'bans') {
         const s = await fbDb.collection('bans').orderBy('at', 'desc').limit(200).get();
         v.innerHTML = `<div class="mplist">${s.docs.map(d => { const b = d.data(); return `<div class="mpli"><div class="nm"><b>${esc(b.name || 'Golfer')}</b> ${b.auto ? '<span class="pill2 r">auto</span>' : '<span class="pill2">by you</span>'}<small>${esc(b.reason || '')} · ${b.at ? ago(b.at) : ''}</small></div>
@@ -6095,6 +6199,15 @@
       else if (d.admBan) await admBan(d.admBan, d.n);
       else if (d.admUnban) { if (!confirm('Unban this golfer?')) return; await fbDb.collection('bans').doc(d.admUnban).delete(); }
       else if (d.admDismiss) await fbDb.collection('flags').doc(d.admDismiss).delete();
+      else if (d.admClearflags || d.admClearfbk) {
+        const col = d.admClearflags ? 'flags' : 'feedback';
+        if (!confirm(d.admClearflags ? 'Clear ALL cheat flags? (Bans stay.)' : 'Clear ALL feedback?')) return;
+        for (let i = 0; i < 20; i++) {
+          const snap = await fbDb.collection(col).limit(200).get(); if (snap.empty) break;
+          const batch = fbDb.batch(); snap.docs.forEach(x => batch.delete(x.ref)); await batch.commit();
+        }
+      }
+      else if (d.admFbkdel) await fbDb.collection('feedback').doc(d.admFbkdel).delete();
       else if (d.admDel) { if (!confirm('Remove this score from the board?')) return; await scoresRef(admCid, admMode === 'daily' ? etDay() : null).doc(d.admDel).delete(); tourCache = null; }
       else if (d.admGift) {
         const ref = fbDb.collection('gifts').doc(d.admGift), has = (await ref.get()).exists;
@@ -6107,6 +6220,8 @@
   $('adminBody').addEventListener('input', e => { if (e.target.id === 'admQ') { admQ = e.target.value; const l = $('admList'); if (l) l.innerHTML = admListHtml(); } });
   $('adminBody').addEventListener('keydown', e => e.stopPropagation());
 
+  if (save.resetNote) { $('resetNote').classList.remove('hidden'); }
+  $('resetOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('resetNote').classList.add('hidden'); delete save.resetNote; persist(); });
   // anything already earned by older saves is granted quietly
   AWARDS.forEach(a => { if (!save.awards[a.id] && awardDone(a)) save.awards[a.id] = Date.now(); });
   if (!BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === String(save.gbag.body).toLowerCase())) {

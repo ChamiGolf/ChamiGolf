@@ -89,6 +89,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Feedback from players (the 💬 button). Only the creator can read or clear it.
+    match /feedback/{id} {
+      allow read, delete: if isAdmin();
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 'kind', 'at', 't', 'ver'])
+        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+        && request.resource.data.kind in ['bug', 'idea', 'other'];
+    }
+
     // ---- Anti-cheat ----
     // Bans: the game bans itself when it catches cheating (auto); only the creator can ban anyone else or lift a ban.
     match /bans/{uid} {
