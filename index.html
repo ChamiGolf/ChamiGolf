@@ -633,7 +633,7 @@
   </div>
 </div>
 <button class="pill" id="exitBtn">✕ QUIT</button>
-<div id="pinBox">PIN <b id="pinYds">0</b> YDS</div>
+<div id="pinBox">PIN <b id="pinYds">0</b> <span id="pinUnit">YDS</span></div>
 <div id="mpBar" style="display:none"></div>
 <button class="pill" id="viewBtn">MAP</button>
 <div id="side" style="display:none">
@@ -859,7 +859,9 @@
   document.title = GAME_NAME; $('gameName').textContent = GAME_NAME;
 
   // ================= Rules =================
-  const CUP_R = 0.19, CUP_D = 0.42, BALL_R = 0.075, MAX_STROKES = 12;
+  // Realistic putting: the cup and ball are about 1.6x real size (a real cup is 4.25 in across, the ball 1.68 in),
+  // same proportions as the real thing, so short putts are makeable and long ones are a real challenge.
+  const CUP_R = 0.094, CUP_D = 0.3, BALL_R = 0.037, MAX_STROKES = 12;
   // cup physics: real gravity in yd/s², and how far the ball's centre must sink below the rim to catch the back wall
   const CUP_G = 10.7;
   // grass slows a rolling ball: fairway and rough grab it much harder than the green (the cart path barely slows it)
@@ -2984,6 +2986,7 @@
     holeIdx = i; hole = HOLES[i];
     const mph = Math.round(Math.random() * course.wind), ang = Math.random() * Math.PI * 2;
     hole.wind = (MP && MP.started && mpWind(i)) || hole.fixedWind || { mph, ang, x: Math.cos(ang) * mph, y: Math.sin(ang) * mph };
+    if (!hole.mini) { hole.stimp = stimpOf(course); hole.slick = STIMP_REF / hole.stimp; }
     buildHole(hole, course, preview ? 1300 : 2600);
     ball = { x: hole.tee.x, y: hole.tee.y, vx: 0, vy: 0 }; prev = { x: ball.x, y: ball.y };
     strokes = 0; flight = null; swing = null; ptr = null; splash = null; lastPutt = false; strike = null; swingAnim = null; driveYds = null;
@@ -3206,10 +3209,14 @@
     if (c.putter) {
       // A pure stroke rolls almost exactly the shown distance on the aimed line. Off the gold the
       // face is open/closed (push/pull) and the strike is off-centre, so it comes up short too.
-      const pl = lie === 'fringe' ? 1.2 : lieErr;
-      const dist = full * power * (1 - 0.08 * aoe + gauss() * (0.022 + 0.025 * aoe));
-      const ang = aimAng + (oe * 4.5 * pl + gauss() * (0.35 + 0.4 * aoe)) * DEG;
-      const v = puttSpeed(Math.max(0.05, dist), ang);
+      // Pace: the stroke sets the ball's speed for a flat Stimp-10 green, and the longer the putt the more your
+      // feel wobbles (about ±6% at 5 ft, ±9% at 20 ft, ±13% at 40 ft; a pure strike trims that by a quarter).
+      // Line: even a pure strike starts within about a degree, like a tour pro; off the gold it's pushed or pulled.
+      const pl = lie === 'fringe' ? 1.2 : lieErr, want = full * power, ft = Math.min(60, want * 3);
+      const wobble = (0.045 + 0.0022 * ft) * (oe === 0 ? 0.75 : 1 + 0.6 * aoe);
+      const dist = want * (1 - 0.08 * aoe + gauss() * wobble);
+      const ang = aimAng + (oe * 4.5 * pl + gauss() * (0.85 + 0.4 * aoe + 0.008 * ft)) * DEG;
+      const v = strokeSpeed(dist);
       ball.vx = Math.cos(ang) * v; ball.vy = Math.sin(ang) * v; ball.rollT = 0;
       state = 'rolling'; sfx.putt();
       return;
@@ -3241,6 +3248,21 @@
 
   // Speed that makes a putt stop after `dist` yards on this line, allowing for slower
   // grass (fringe, rough) along the way, so the aim line's distance is what you get.
+  // ---- Realistic putting ("Pace & Line") ----
+  // Every course has its own green speed (Stimpmeter: how many feet a ball rolls off the stimp ramp). Faster greens
+  // = the same stroke rolls further. Speeds drift a little day to day, like real greens after mowing and rain.
+  const STIMP = { par3: 9, pines: 9.5, coast: 10.5, farbor: 10, clyellow: 10.5, meribah: 12.5, hollow: 9.5, valley: 12, clblack: 13, ctp: 11 };
+  const STIMP_REF = 10;   // your stroke is calibrated on a flat, Stimp-10 green
+  function stimpOf(c) {
+    const base = STIMP[c.id] || 10, day = etDay(), seed = [...(c.id + day)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 9973, 7);
+    return Math.round((base + ((seed % 11) - 5) * 0.1) * 10) / 10;   // ±0.5
+  }
+  const stimpName = st => st < 9 ? 'slow' : st < 10.5 ? 'medium' : st < 12 ? 'fast' : st < 13 ? 'very fast' : 'lightning';
+  // speed only changes the putting surface (and the fringe); fairways and rough roll the same everywhere
+  const dK = t => hole && (hole.mini || t === 'green' || t === 'fringe') ? (hole.slick || 1) : 1;
+  // A putting stroke sets the ball's starting speed. It's sized to roll `dist` yards on the reference green (flat, Stimp 10);
+  // how far it really goes depends on this green's speed, the slope and any fringe on the way.
+  const strokeSpeed = dist => Math.sqrt(2 * DECEL.green * Math.max(0.03, dist) + 0.12 * 0.12);
   function puttSpeed(dist, ang) {
     const cx = Math.cos(ang), cy = Math.sin(ang), ds = 0.1, p = { x: 0, y: 0 };
     let v2 = 0;
@@ -3248,7 +3270,7 @@
       const step = Math.min(ds, dist - s);
       p.x = ball.x + cx * (s + step / 2); p.y = ball.y + cy * (s + step / 2);
       const t = terrainAt(p);
-      let a = (DECEL[t] || DECEL.green) * (hole.slick || 1);
+      let a = (DECEL[t] || DECEL.green) * dK(t);
       if (slopeLie(hole, t)) { const gr = slopeGrad(hole, p.x, p.y); a += SLOPE_G * (gr.x * cx + gr.y * cy); }   // uphill needs more pace, downhill less
       v2 += 2 * Math.max(0.4, a) * step;
     }
@@ -3434,6 +3456,11 @@
       if (slopeLie(hole, t)) {
         const gr = slopeGrad(hole, ball.x, ball.y);
         ball.vx -= SLOPE_G * gr.x * h; ball.vy -= SLOPE_G * gr.y * h; pull = SLOPE_G * Math.hypot(gr.x, gr.y);
+        // real greens aren't perfect: footprints, grain and tiny bumps nudge a slow ball off line
+        if (!hole.mini && t === 'green' && sp > 0.05) {
+          const nz = gauss() * 0.9 * h / Math.max(0.5, sp), nx = -ball.vy, ny = ball.vx;
+          ball.vx += nx * nz; ball.vy += ny * nz;
+        }
         sp = Math.hypot(ball.vx, ball.vy);
       } else if (ball.full && !hole.mini && sp > 0.3) {
         const gr = groundGrad(ball.x, ball.y), k = SLOPE_G * 0.6;
@@ -3441,13 +3468,13 @@
         sp = Math.hypot(ball.vx, ball.vy);
       }
       // a full shot's pace dies off naturally: quick at first, then a slow final trickle
-      let dec = DECEL[t] * (hole.slick || 1) + (ball.full ? (DRAG[t] || 0.1) * sp : 0);
+      let dec = DECEL[t] * dK(t) + (ball.full ? (DRAG[t] || 0.1) * sp : 0);
       if (ball.full && ball.rollCap) {   // past its normal run-out the grass grabs it (never a runaway roll)
         const over = ball.rollD - ball.rollCap * (t === 'path' ? 1.3 : 1);
         if (over > 0) dec += 18 + over * 6;
       }
       const ns = Math.max(0, sp - dec * h);
-      if (ns < 0.12 && pull < DECEL[t] * (hole.slick || 1) * 0.9) { ball.vx = ball.vy = 0; return stopped(); }
+      if (ns < 0.12 && pull < DECEL[t] * dK(t) * 0.9) { ball.vx = ball.vy = 0; return stopped(); }
       if (sp > 0) { ball.vx *= ns / sp; ball.vy *= ns / sp; }
     }
   }
@@ -3663,7 +3690,7 @@
     const h = flight ? flight.hgt : (ball.z || 0);
     const by = h - (ball.overCup ? ball.dip || 0 : 0);
     const camD = camera.position.distanceTo(ballV.set(ball.x, h, ball.y));
-    const r = ball.inCup ? BALL_R : clamp(camD * 0.0065, 0.07, 0.9);
+    const r = ball.inCup ? BALL_R : clamp(camD * 0.0065, BALL_R * 1.05, 0.9);
     const sy = ballGround();
     ballMesh.scale.setScalar(r); ballMesh.position.set(ball.x, by + r + sy, ball.y);
     ballMesh.visible = !(state === 'penalty' && splash);
@@ -3676,7 +3703,7 @@
     fullTarget.visible = liveTarget.visible = false;   // just the aim line, no landing circles
     if (aiming) {
       const c = CLUBS[clubIdx], full = stockNow(c), dx = Math.cos(aimAng), dy = Math.sin(aimAng);
-      const live = full;   // the aim line stays at the club's full yardage while you pull back (no "pull to here" help)
+      const live = c.putter ? Math.min(full, 1.6) : full;   // putting: just a short start line, like the line on your ball
       const cv = state === 'swinging' ? curveOf(swing.lat, live) : 0;
       setArc(live, c, cv);
       const sz = d => c.putter ? 0.4 : clamp(d * 0.028, 1.4, 7);
@@ -3782,12 +3809,21 @@
         fctx.beginPath(); fctx.moveTo(left, ty - 7); fctx.lineTo(left - 9, ty); fctx.lineTo(left, ty + 7); fctx.closePath(); fctx.fillStyle = 'rgba(242,193,78,.7)'; fctx.fill();
         fctx.textAlign = 'left';
         fctx.font = '800 13px Inter, sans-serif'; fctx.fillStyle = swing.power >= 0.99 ? '#FFE08A' : '#f3d7a8';
-        fctx.fillText(`${Math.round(swing.power * 100)}%`, left + 10, ty - hgt / 2 + 18);
-        fctx.font = '700 28px Oswald, sans-serif'; fctx.fillStyle = '#fff';
-        fctx.fillText(`${Math.round(yds)}`, left + 10, ty + 22);
-        const nw = fctx.measureText(`${Math.round(yds)}`).width;
-        fctx.font = '800 11px Inter, sans-serif'; fctx.fillStyle = '#FFE08A';
-        fctx.fillText(c.putter ? 'YDS ROLL' : 'YDS', left + 14 + nw, ty + 21);
+        if (c.putter) {
+          // putting is by feel: you see your stroke size and roughly how far it rolls on a flat, normal-speed green
+          fctx.fillText('STROKE', left + 10, ty - hgt / 2 + 18);
+          fctx.font = '700 28px Oswald, sans-serif'; fctx.fillStyle = '#fff';
+          fctx.fillText(`${Math.round(swing.power * 100)}%`, left + 10, ty + 14);
+          fctx.font = '700 10px Inter, sans-serif'; fctx.fillStyle = '#f3d7a8';
+          fctx.fillText(`~${Math.round(yds * 3)} ft flat·stimp 10`, left + 8, ty + 27);
+        } else {
+          fctx.fillText(`${Math.round(swing.power * 100)}%`, left + 10, ty - hgt / 2 + 18);
+          fctx.font = '700 28px Oswald, sans-serif'; fctx.fillStyle = '#fff';
+          fctx.fillText(`${Math.round(yds)}`, left + 10, ty + 22);
+          const nw = fctx.measureText(`${Math.round(yds)}`).width;
+          fctx.font = '800 11px Inter, sans-serif'; fctx.fillStyle = '#FFE08A';
+          fctx.fillText('YDS', left + 14 + nw, ty + 21);
+        }
       }
       fctx.textAlign = 'center';
       const cvd = c.putter ? 0 : curveOf(swing.lat, yds), fadeSide = cvd * hand() > 0;   // fade = curves away from the golfer
@@ -3839,7 +3875,7 @@
       const dt = 1 / 120; b.x += b.vx * dt; b.y += b.vy * dt;
       const t = terrainAt(b); if (t === 'water' || t === 'oob') break;
       if (slopeLie(hole, t)) { const g = slopeGrad(hole, b.x, b.y); b.vx -= SLOPE_G * g.x * dt; b.vy -= SLOPE_G * g.y * dt; }
-      const sp = Math.hypot(b.vx, b.vy), ns = sp - (DECEL[t] || DECEL.green) * (hole.slick || 1) * dt;
+      const sp = Math.hypot(b.vx, b.vy), ns = sp - (DECEL[t] || DECEL.green) * dK(t) * dt;
       if (ns < 0.12) break;
       b.vx *= ns / sp; b.vy *= ns / sp;
       if (i % 4 === 0) path.push({ x: b.x, y: b.y });
@@ -3921,7 +3957,7 @@
       g.fillStyle = grd; g.fillRect(lx, ly, lw, 8);
       g.font = '800 10px Inter, sans-serif'; g.fillStyle = '#fff'; g.textAlign = 'right'; g.fillText('LOW', lx - 4, ly + 8);
       g.textAlign = 'left'; g.fillText('HIGH', lx + lw + 4, ly + 8); }
-    $('gHead').textContent = hole.mini ? 'Carpet' : 'Green';
+    $('gHead').textContent = hole.mini ? 'Carpet' : `Green · Stimp ${hole.stimp}`;
     $('gSlope').textContent = `Max slope ${(maxS * 100).toFixed(1)}%`;
   }
   function drawMap() {
@@ -3937,7 +3973,9 @@
     g.setTransform(1, 0, 0, 1, 0, 0);
     const toC = p => { const dx = p.x - ball.x, dy = p.y - ball.y; return [bx + (dx * rt.x + dy * rt.y) * s, by - (dx * f.x + dy * f.y) * s]; };
     const land = { x: ball.x + Math.cos(aimAng) * shot, y: ball.y + Math.sin(aimAng) * shot }, L = toC(land), Pn = toC(hole.pin);
-    if (!flight) {
+    if (!flight && c.putter) {   // putting: no landing spot (that's for you to feel), just the line to the cup
+      g.strokeStyle = 'rgba(255,255,255,.75)'; g.setLineDash([6, 6]); g.lineWidth = 2; g.beginPath(); g.moveTo(bx, by); g.lineTo(Pn[0], Pn[1]); g.stroke(); g.setLineDash([]);
+    } else if (!flight) {
       g.strokeStyle = 'rgba(255,255,255,.75)'; g.setLineDash([6, 6]); g.lineWidth = 2; g.beginPath(); g.moveTo(L[0], L[1]); g.lineTo(Pn[0], Pn[1]); g.stroke(); g.setLineDash([]);
       g.strokeStyle = '#FFE08A'; g.lineWidth = 4; g.beginPath(); g.moveTo(bx, by); g.lineTo(L[0], L[1]); g.stroke();
       g.strokeStyle = '#fff'; g.lineWidth = 2.5; g.beginPath(); g.arc(L[0], L[1], 9, 0, Math.PI * 2); g.stroke();
@@ -3947,7 +3985,8 @@
     g.beginPath(); g.moveTo(Pn[0], Pn[1] - 22); g.lineTo(Pn[0] + 13, Pn[1] - 17); g.lineTo(Pn[0], Pn[1] - 12); g.closePath(); g.fill();
     g.fillStyle = '#fff'; g.strokeStyle = '#111'; g.beginPath(); g.arc(bx, by, 6, 0, Math.PI * 2); g.fill(); g.stroke();
     const left = Math.hypot(hole.pin.x - land.x, hole.pin.y - land.y), elev = (terrainH(hole, hole.pin.x, hole.pin.y) - terrainH(hole, ball.x, ball.y)) * 3;
-    setText('mmNext', `${Math.round(left)} yds`); setText('mmDist', `${Math.round(shot)} yds`);
+    if (c.putter) { setText('mmNext', '—'); setText('mmDist', `${Math.round(d * 3)} ft putt`); }
+    else { setText('mmNext', `${Math.round(left)} yds`); setText('mmDist', `${Math.round(shot)} yds`); }
     setText('mmHt', `${elev >= 0 ? '+' : ''}${elev.toFixed(1)} ft`);
   }
   function updateReader() {
@@ -3972,9 +4011,11 @@
     let lat = 0;
     for (const q of path) { const al = (q.x - ball.x) * u.x + (q.y - ball.y) * u.y; lat = (q.x - ball.x) * ur.x + (q.y - ball.y) * ur.y; if (al >= d) break; }
     const ft = Math.abs(lat) * 3, rise = (terrainH(hole, pin.x, pin.y) - terrainH(hole, ball.x, ball.y)) * 36;
-    $('readerBreak').textContent = ft < 0.15 ? 'Straight putt' : `Breaks ${ft.toFixed(1)} ft ${lat > 0 ? '▶' : '◀'}`;
-    $('readerSlope').textContent = (ft < 0.15 ? '' : `Aim ${ft.toFixed(1)} ft ${lat > 0 ? 'left' : 'right'} · `)
-      + (Math.abs(rise) < 0.5 ? 'Flat' : `${rise > 0 ? '▲ Uphill' : '▼ Downhill'} ${Math.abs(rise).toFixed(0)} in`);
+    // a caddie's read, not a laser: break in rounded cups, the slope in inches and how fast the green is
+    const cups = Math.round(ft / 0.35), side = lat > 0 ? '▶' : '◀';
+    $('readerBreak').textContent = cups < 1 ? (ft < 0.08 ? 'Straight' : 'Inside the cup') : cups > 8 ? `Big break ${side}` : `About ${cups} cup${cups > 1 ? 's' : ''} ${side}`;
+    $('readerSlope').textContent = (Math.abs(rise) < 0.5 ? 'Flat' : `${rise > 0 ? '▲ Uphill' : '▼ Downhill'} ${Math.abs(rise).toFixed(0)} in`)
+      + (hole.mini ? '' : ` · Stimp ${hole.stimp} (${stimpName(hole.stimp)})`);
   }
   $('sideToggle').addEventListener('click', () => { ensureAudio(); sfx.click(); save.ui.side = !save.ui.side; greenKey = mapKey = readerKey = ''; persist(); });
   // the floating pin marker over the flag (pinned to the screen edge when the flag is off-screen)
@@ -3990,7 +4031,7 @@
     x = clamp(x, 30, innerWidth - 30); y = clamp(y, top, innerHeight - 160);
     el.style.display = 'flex'; el.classList.toggle('edge', edge);
     el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
-    setText('pinMarkD', `${Math.round(distToPin())} yds`);
+    setText('pinMarkD', CLUBS[clubIdx].putter && greenLie(terrainAt(ball)) ? `${Math.round(distToPin() * 3)} ft` : `${Math.round(distToPin())} yds`);
   }
   function updateHud() {
     const playing = hole && state !== 'title' && state !== 'finished';
@@ -4016,7 +4057,9 @@
     const lieTxt = LIE_NAME[lie] || '';
     const adj = !c.putter && lieMult(c, lie) < 1 ? ` (${lieTxt.toLowerCase()} −${Math.round((1 - lieMult(c, lie)) * 100)}%)` : '';
     setText('clubInfo', `${lieTxt}${adj}`);
-    setText('pinYds', String(Math.round(distToPin())));
+    { const ptt = CLUBS[clubIdx].putter && greenLie(terrainAt(ball)), dd = distToPin();
+      setText('pinYds', ptt ? String(Math.round(dd * 3)) : String(Math.round(dd)));
+      setText('pinUnit', ptt ? 'FT' : 'YDS'); }
     const ready = state === 'ready';
     $('bar').classList.toggle('disabled', !ready);
     $('bar').classList.toggle('swinging', state === 'swinging' || state === 'striking');
@@ -5554,7 +5597,9 @@
         <p><b>Release left of gold → hook.</b> The ball starts left and bends hard left. Hooks curve about 50% more than slices, so the far-left red zone sends it <b>way</b> left. Hooks run out more after landing.</p>
         <p><b>Shape it on purpose:</b> while you pull back, slide your finger right for a <b>fade</b> (curves right) or left for a <b>draw</b> (curves left). The dotted line bends to show it. Putts don't curve.</p>
         <p><b>The needle gets faster</b> the harder you pull and the longer the club. Drivers are the hardest to time, wedges and putters the easiest. Every miss also loses a little distance.</p>
-        <p><b>Putting:</b> the needle pushes (right) or pulls (left) the putt off line instead of curving it. When a putt gets close, the flag is pulled out of the hole.</p>
+        <p><b>Putting is by feel.</b> There's no exact distance line on the green, just a short start line like the line on your ball. Pull back to set your <b>stroke %</b>: it tells you roughly how far that stroke rolls on a flat, normal-speed (Stimp 10) green. The PIN box shows how many <b>feet</b> you have.</p>
+        <p><b>Read it yourself:</b> every course has its own green speed (Stimp 9 is slow, 13 is lightning, and it changes a little each day). Fast greens and downhill putts roll further; uphill and slow greens need more. The Green Reader gives the slope, uphill/downhill in inches and roughly how many cups it breaks.</p>
+        <p><b>Long putts are hard:</b> the further the putt, the more your pace and line wander, real greens have little bumps, and a ball rolling too fast lips out. Get it close, don't blast it. The needle still pushes or pulls the putt off line.</p>
       </div>
       <div class="sect">HOW CLUBS DIFFER</div>
       <div class="howcard">
