@@ -18,7 +18,7 @@ Play it at https://chamigolf.github.io/
 
 - Sign in, share your 6-character friend code, and add friends by theirs (or send an invite link).
 - **1v1**: stroke play for a wager ($0 up to what you have), 3, 6 or 9 holes. Tied? Sudden-death playoff holes.
-- **2v2**: scramble, alt shot or best ball. **Foursome**: up to 4 golfers, everyone plays their own ball (lowest total wins the pot), or all four play one team scramble against par.
+- **2v2**: scramble, alt shot or best ball. **Foursome**: own ball (1v1v1v1, up to 4 golfers, lowest total wins the pot) or a 2 v 2 scramble. The host sets one buy-in that every golfer pays; a pop-up confirms it when you join, and you can't join without enough money.
 - Everyone gets the same wind. Winners split the pot. Quitting a match forfeits it for your team.
 - Needs the rules in `firestore.rules` published in the Firebase console.
 

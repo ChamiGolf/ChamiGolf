@@ -187,6 +187,54 @@
                font:700 16px Oswald,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
   button:disabled{opacity:.45;cursor:default;box-shadow:none}
 
+  /* ---------- Clubs tab: bag rack + workshop + collapsible stats ---------- */
+  .crack{display:grid;grid-template-columns:repeat(9,minmax(64px,1fr));gap:8px;overflow-x:auto;padding:2px 2px 8px;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+  .cchip{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 8px;border-radius:14px;cursor:pointer;color:#fff;
+         background:linear-gradient(180deg,#6d0a1a,#3a050d);border:2px solid rgba(242,193,78,.35);transition:transform .15s,border-color .15s}
+  .cchip svg{width:38px;height:38px}
+  .cchip b{font:700 16px/1 Oswald,sans-serif;color:var(--gold-l)}
+  .cchip em{font:700 11px Inter;font-style:normal;opacity:.85}
+  .cchip .pips{gap:2px;margin-top:3px}.cchip .pip{width:8px;height:4px}
+  .cchip.on{border-color:var(--gold-l);background:linear-gradient(180deg,#B3122B,#5c0815);transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,.45),0 0 0 2px rgba(255,224,138,.25)}
+  .cchip.can::after{content:'▲';position:absolute;top:-7px;right:-5px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--red-dd);font:900 9px/18px Inter;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+  .cmain{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:12px;align-items:start;margin-top:8px;transition:grid-template-columns .25s}
+  .cmain.shut{grid-template-columns:minmax(0,1fr) 38px}
+  .chero{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;border:2px solid var(--gold);
+         background:radial-gradient(circle at 15% 30%,rgba(242,193,78,.28),transparent 55%),linear-gradient(135deg,#9b1228,#45060f)}
+  .chero>svg{width:72px;height:72px;flex:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45))}
+  .chero .ht{flex:1;min-width:0}
+  .chero .ht span{display:block;font:800 10px Inter;letter-spacing:.18em;color:var(--gold)}
+  .chero .ht b{display:block;font:700 26px/1.05 Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.02em}
+  .chero .ht em{font:600 13px Inter;font-style:normal;opacity:.9}
+  .lvring{--p:0;flex:none;width:62px;height:62px;border-radius:50%;display:flex;align-items:baseline;justify-content:center;padding-top:16px;box-sizing:border-box;
+          background:radial-gradient(closest-side,#45060f 76%,transparent 78%),conic-gradient(var(--gold-l) calc(var(--p)*360deg),rgba(255,255,255,.15) 0)}
+  .lvring b{font:700 24px/1 Oswald,sans-serif;color:var(--gold-l)}.lvring small{font:700 11px Inter;opacity:.7}
+  .upcard{margin-top:10px;padding:12px 14px;border-radius:16px;background:rgba(79,7,18,.88);border:1px dashed rgba(242,193,78,.6);display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+  .upcard .uh{grid-column:1 / 3;font:800 11px Inter;letter-spacing:.16em;color:var(--gold)}
+  .upcard ul{margin:0;padding:0 0 0 16px;font-size:13px;color:#f3d7a8;line-height:1.5}
+  .mcard{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;border-radius:14px;background:rgba(79,7,18,.8);border:1px solid rgba(242,193,78,.25)}
+  .mcard.on{border-color:var(--gold-l);background:rgba(122,12,29,.9)}
+  .mcard>svg{width:40px;height:40px;flex:none}
+  .mcard .mi{flex:1;min-width:0}
+  .mcard .mn{font:700 16px Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase}.mcard .mn small{font:600 12px Inter;color:#fff;opacity:.75;text-transform:none}
+  .md{font-size:12px;color:#f3d7a8;line-height:1.35}
+  .dlt{display:inline-block;margin:4px 4px 0 0;padding:2px 7px;border-radius:999px;font:800 10px Inter;letter-spacing:.04em;background:rgba(255,255,255,.12)}
+  .dlt.up{background:rgba(80,190,110,.25);color:#b9f5c8}.dlt.dn{background:rgba(255,90,90,.2);color:#ffc2c2}
+  .cstats{position:sticky;top:6px;border-radius:16px;border:1px solid rgba(242,193,78,.45);background:linear-gradient(180deg,#5c0815,#2b030a);overflow:hidden}
+  .stog{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:rgba(242,193,78,.14);color:var(--gold-l);padding:10px 12px;cursor:pointer;font:800 11px Inter;letter-spacing:.18em}
+  .stog i{font-style:normal;font-size:14px}
+  .cmain.shut .stog{flex-direction:column-reverse;gap:10px;padding:12px 0;height:100%;min-height:180px;justify-content:center}
+  .cmain.shut .stog span{writing-mode:vertical-rl;transform:rotate(180deg)}
+  .cmain.shut .sbody{display:none}
+  .sbody{padding:8px 12px 12px}
+  .vstat{margin:8px 0 12px}
+  .vk{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}.vk span{color:#f3d7a8;font-weight:700}.vk em{font-style:normal;opacity:.85}
+  .vstat i{position:relative;display:block;height:9px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
+  .vstat i b,.vstat i u{position:absolute;left:0;top:0;bottom:0;border-radius:5px}
+  .vstat i b{background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
+  .vstat i u,.slegend u{background:repeating-linear-gradient(45deg,rgba(185,245,200,.55) 0 3px,rgba(185,245,200,.2) 3px 6px)}
+  .slegend{font-size:10px;opacity:.8;display:flex;align-items:center;gap:6px}.slegend u{display:inline-block;width:18px;height:8px;border-radius:4px}
+  @media (max-width:600px){.cmain{grid-template-columns:minmax(0,1fr) 170px}.chero>svg{width:52px;height:52px}.chero .ht b{font-size:20px}}
   .clubcard{display:flex;align-items:center;gap:12px;background:rgba(79,7,18,.85);border:1px solid rgba(242,193,78,.35);border-radius:14px;padding:10px 12px;margin-bottom:8px}
   .clubcard .yd{width:64px;flex:none;text-align:center;font:700 26px/1 Oswald,sans-serif;color:var(--gold-l)}
   .clubcard .yd small{display:block;font:800 9px Inter;letter-spacing:.14em;color:var(--gold);margin-top:4px}
@@ -322,6 +370,22 @@
   .gsign{display:flex;align-items:center;gap:10px;justify-content:center;width:100%;padding:11px 16px;border-radius:999px;border:0;background:#fff;color:#222;font:700 15px Inter,sans-serif;cursor:pointer}
   .ctpLb{margin-top:10px}
   .ctpLb .board td,.ctpLb .board th{padding:6px 10px}
+  .ctp[data-ctpinfo]{cursor:pointer}
+  .ctphero{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-top:10px;align-items:stretch}
+  .ctphero .hthumb{border-radius:16px;border:2px solid rgba(242,193,78,.55);background:#2f6f30 center/cover no-repeat;min-height:220px}
+  .dgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .dgrid>div{background:rgba(79,7,18,.88);border:1px solid rgba(242,193,78,.4);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+  .dgrid small{font:800 10px Inter;letter-spacing:.16em;color:var(--gold)}
+  .dgrid b{font:700 20px/1.1 Oswald,sans-serif;color:#fff}.dgrid em{font-style:normal;font-size:12px;color:#f3d7a8}
+  .warr{display:inline-block;color:var(--gold-l);font-family:Inter}
+  .podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:end}
+  .podium>div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:14px;background:rgba(79,7,18,.88);border:1px solid rgba(242,193,78,.4);text-align:center;min-width:0}
+  .podium .pd0{order:2;padding-top:18px;border-color:var(--gold-l);background:linear-gradient(180deg,rgba(242,193,78,.3),rgba(79,7,18,.9))}
+  .podium .pd1{order:1}.podium .pd2{order:3}
+  .podium span{font-size:26px}.podium b{font:700 15px Oswald,sans-serif;color:var(--gold-l);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .podium em{font-style:normal;font-weight:700;font-size:13px}.podium small{font-size:11px;color:#f3d7a8}
+  .nameWarn{margin:6px 2px 10px;font:700 12px Inter;color:#ffb3bd}
+  #gName.bad{border-color:#ff6b7d !important;box-shadow:0 0 0 2px rgba(255,107,125,.35)}
   .tnote{font-size:12px;color:#f3d7a8;text-align:center;margin:6px 0 0}
   .tnote b{color:var(--gold-l)}
   .postBox{font-size:13px;color:#f3d7a8;margin:-8px 0 14px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
@@ -551,12 +615,14 @@
       <div id="err" class="hidden">Your browser couldn't start 3D graphics. Try Chrome or Safari with hardware acceleration turned on.</div>
       <section id="tab-play"><div id="mpCard"></div><div id="ctpCard"></div><div class="sect">CHOOSE A COURSE</div><div id="courseList"></div></section>
       <section id="tab-course" class="hidden"><div id="courseDetail"></div></section>
+      <section id="tab-ctp" class="hidden"><div id="ctpDetail"></div></section>
       <section id="tab-match" class="hidden"><div id="matchBody"></div></section>
       <section id="tab-golfer" class="hidden">
         <div class="gwrap">
           <div class="gleft">
             <div class="gstage"><canvas id="gPrev"></canvas></div>
             <label class="nameRow">Name on the leaderboard<input id="gName" maxlength="14" autocomplete="off" spellcheck="false"></label>
+            <div id="gNameWarn" class="nameWarn hidden"></div>
             <div id="acctBox"></div>
           </div>
           <div class="gright">
@@ -648,6 +714,13 @@
 </div>
 
 <!-- ===== Daily tournament winnings ===== -->
+<div id="buyIn" class="overlay hidden" style="z-index:30">
+  <div class="card">
+    <h2 id="buyInTitle">Join this match?</h2>
+    <div class="sub" id="buyInBody"></div>
+    <div class="btns"><button class="main" id="buyInOk">Join</button><button class="ghost" id="buyInNo">No thanks</button></div>
+  </div>
+</div>
 <div id="prize" class="overlay hidden">
   <div class="card">
     <h2>Tournament winnings! 🏆</h2>
@@ -668,12 +741,16 @@
   // ================= Rules =================
   const CUP_R = 0.225, CUP_D = 0.42, BALL_R = 0.075, MAX_STROKES = 12;
   // cup physics: real gravity in yd/s², and how far the ball's centre must sink below the rim to catch the back wall
-  const CUP_G = 10.7, CUP_DROP = BALL_R * 1.3;
+  const CUP_G = 10.7;
   const DECEL = { green: 2.6, fringe: 5.5, fairway: 6.5, tee: 6.5, rough: 22, sand: 60, path: 3.2 };
   // Bounce: how much upward speed the ball keeps (REST) and forward speed it loses (SKID) on each landing.
   const REST = { tee: 0.42, fairway: 0.42, fringe: 0.36, green: 0.32, rough: 0.2, sand: 0.04, path: 0.66 };   // cart path: hard, big bounces
   const SKID = { tee: 0.1, fairway: 0.1, fringe: 0.14, green: 0.18, rough: 0.25, sand: 0.85, path: 0.03 };
   const GRAV = 20;
+  // Landing physics: turf friction on impact, how well backspin bites, and air/grass drag while a full shot rolls out.
+  const MU = { tee: 0.34, fairway: 0.34, fringe: 0.4, green: 0.45, rough: 0.6, sand: 0.95, path: 0.12 };
+  const GRIP = { tee: 0.6, fairway: 0.6, fringe: 0.8, green: 1, rough: 0.25, sand: 0, path: 0.05 };
+  const DRAG = { tee: 0.12, fairway: 0.12, fringe: 0.12, green: 0.08, rough: 0.3, sand: 1, path: 0.05 };
   // Sideways pull (-1 left .. 1 right) -> yards of planned curve. Pull right = fade (curves right), left = draw.
   const curveOf = (lat, carry) => { const a = Math.abs(lat || 0); return a < 0.12 ? 0 : Math.sign(lat) * (a - 0.12) / 0.88 * carry * 0.13; };
   const LIE_MULT = { tee: 1, fairway: 1, fringe: 0.97, green: 0.95, rough: 0.85, sand: 0.6, path: 1 };
@@ -774,8 +851,8 @@
   // ================= Golf bag looks =================
   // Every bag but the Chaminade bag is locked behind an achievement (see AWARDS).
   const BAG_PRESETS = [
-    // the real Chaminade team bag: white with black trim and pockets, a red front panel with gold CHAMINADE lettering
-    { name: 'Chaminade Team', bag: { body: '#eeeeea', trim: '#111113', covers: '#eeeeea', logo: 'chaminade', panel: '#B3122B' } },
+    // the real Chaminade team bag: white with black trim and pockets, a red front panel with gold CHAMI GOLF lettering
+    { name: 'Chami Team', bag: { body: '#eeeeea', trim: '#111113', covers: '#eeeeea', logo: 'chaminade', panel: '#B3122B' } },
     { name: 'Red & Gold', award: 'round1', bag: { body: '#B3122B', trim: '#F2C14E', covers: '#F2C14E', logo: 'chaminade', panel: '' } },
     { name: 'Tour Black', award: 'birdie1', bag: { body: '#111113', trim: '#B3122B', covers: '#111113', logo: 'none' } },
     { name: 'Navy Staff', award: 'underpar1', bag: { body: '#1f2c4d', trim: '#eeeeea', covers: '#B3122B', logo: 'none' } },
@@ -795,7 +872,7 @@
     trim: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['White', '#eeeeea'], ['Black', '#111113'], ['Navy', '#1f2c4d'], ['Silver', '#b8bcc4']],
     covers: [['Gold', '#F2C14E'], ['Red', '#B3122B'], ['Black', '#111113'], ['White', '#eeeeea'], ['Navy', '#1f2c4d'], ['Green', '#1f5a34']],
   };
-  const BAG_LOGOS = [['chaminade', 'Chaminade'], ['none', 'No logo'], ['custom', 'Custom logo']];
+  const BAG_LOGOS = [['chaminade', 'Chami Golf'], ['none', 'No logo'], ['custom', 'Custom logo']];
   const CUSTOM_LOGO_PRICE = 10000;
   const BAG_PARTS = [['body', 'Bag color'], ['trim', 'Trim'], ['covers', 'Headcovers'], ['logo', 'Logo']];
 
@@ -1247,6 +1324,12 @@
     const mph = 8 + Math.round(rng() * 14), ang = rng() * Math.PI * 2;
     h.fixedWind = { mph, ang, x: Math.cos(ang) * mph, y: Math.sin(ang) * mph };
     h.after = null;
+    const KIND = [['Island green', 'The green sits alone in a lake. Short is wet, long is wet.', 1.1],
+      ['Long and tight', 'A monster par 3 with water down one side and bunkers guarding the green.', 0.8],
+      ['Bunker gauntlet', 'Carry the creek, then thread it between bunkers on every side.', 0.9],
+      ['Cliff edge', 'The green hangs on the edge of the ocean. Miss on the wrong side and it\'s gone.', 1.0]][kind];
+    const diff = clamp(Math.round(1 + (real - 170) / 50 + mph / 11 + KIND[2] * 0.6), 1, 5);
+    h.ctpKind = { label: KIND[0], about: KIND[1], diff };
     ctpCache = { id: 'ctp', ctp: true, day, name: 'Daily Closest to the Pin', desc: 'One swing. Get it close.', wind: mph, pal: base.pal, holes: [h], par: 3, yds: h.yds };
     return ctpCache;
   }
@@ -1348,9 +1431,53 @@
     edge(b.x, b.y, b.x + b.w, b.y); edge(b.x + b.w, b.y, b.x + b.w, b.y + b.h); edge(b.x + b.w, b.y + b.h, b.x, b.y + b.h); edge(b.x, b.y + b.h, b.x, b.y);
     return out;
   }
+  // yellow penalty-area stakes ringing each water hazard, a couple of yards back from the edge
+  function hazardStakes(h) {
+    const out = [], gap = 9;
+    for (const e of h.water) {
+      const per = Math.PI * (3 * (e.rx + e.ry) - Math.sqrt((3 * e.rx + e.ry) * (e.rx + 3 * e.ry))), n = Math.max(6, Math.round(per / gap));
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2, p = { x: e.x + Math.cos(a) * (e.rx + 2.2), y: e.y + Math.sin(a) * (e.ry + 2.2) };
+        if (h.water.some(w => inEl(p, w, 0.5)) || inEl(p, h.green, 2) || h.bunkers.some(b => inEl(p, b, 0.5))) continue;
+        const b = h.bounds; if (p.x < b.x || p.x > b.x + b.w || p.y < b.y || p.y > b.y + b.h) continue;
+        out.push(p);
+      }
+    }
+    return out;
+  }
   const gauss = () => (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 1.73;
   const fmtRel = r => r === 0 ? 'E' : (r > 0 ? '+' + r : '' + r);
   const money = n => '$' + n.toLocaleString();
+  // ---- Name filter: no inappropriate names on leaderboards, friend codes or matches ----
+  // Catches l33t spellings (sh1t, f@ck), stretched letters (fuuuck), spaces/dots between letters,
+  // and words hidden inside a name. Short words that appear inside normal names (ass → Cassidy)
+  // are only blocked when they stand on their own or start/end the name.
+  const BAD_IN = ['fuck', 'fuk', 'fck', 'fack', 'fvck', 'phuck', 'phuk', 'fucc', 'fuq', 'shyt', 'shit', 'bitch', 'biatch', 'cunt', 'pussy', 'nigg', 'niga', 'nigr', 'faggot', 'fagot', 'retard', 'whore', 'slut',
+    'penis', 'vagina', 'porn', 'nazi', 'hitler', 'kkk', 'twat', 'wank', 'jizz', 'dildo', 'horny', 'milf', 'bastard', 'piss', 'boob', 'tits', 'titty',
+    'puta', 'puto', 'mierda', 'chink', 'kike', 'wetback', 'tranny', 'molest', 'pedo', 'rapist', 'killyourself', 'suicide', 'terrorist',
+    'cocaine', 'heroin', 'blowjob', 'handjob', 'orgasm', 'semen', 'butthole', 'asshole', 'jackass', 'dumbass', 'badass', 'smartass', 'fatass',
+    'bigass', 'kissmyass', 'goddam', 'stfu', 'thot', 'skank', 'hooker', 'stripper', 'nude', 'naked', 'boner', 'testicle', 'scrotum', 'ballsack',
+    'motherf', 'admin', 'moderator', 'dyke', 'beaner', 'gook', 'negro', 'jihad', 'swastika', 'satan', 'lucifer', 'vape', 'drunk', 'sexy',
+    'cumshot', 'dickhead', 'cocksuck', 'buttsex', 'analsex', 'deeznut', 'ligma', 'sugma', 'bofa'];
+  const BAD_WORD = ['ass', 'arse', 'cock', 'dick', 'sex', 'rape', 'cum', 'anal', 'anus', 'hoe', 'hoes', 'crap', 'coon', 'meth', 'tit', 'fap', 'fag', 'homo',
+    'lsd', 'dope', 'weed', 'crack', 'kill', 'die', 'god', 'hell', 'damn', 'hore', 'bum', 'poop', 'pee', 'kys', 'isis', 'spic', 'wtf', 'nut', 'nuts', 'balls'];
+  const LEET = { '0': 'o', '1': 'i', '!': 'i', '|': 'i', '3': 'e', '4': 'a', '@': 'a', '5': 's', '$': 's', '7': 't', '+': 't', '8': 'b', '9': 'g', '6': 'g', '2': 'z', '(': 'c', '<': 'c', '€': 'e', '£': 'l' };
+  function nameProblem(raw) {
+    const n = String(raw || '').trim();
+    if (!n) return 'Pick a name';
+    if (/[^\p{L}\p{N} ._'-]/u.test(n.replace(/[!@$|+(<€£]/g, ''))) return 'Letters, numbers and spaces only';
+    if (/(?<!\d)(69|420|666|1488|88)(?!\d)/.test(n)) return 'That name isn\'t allowed';
+    const norm = n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split('').map(ch => LEET[ch] || ch).join('');
+    const squash = norm.replace(/[^a-z]/g, ''), single = squash.replace(/(.)\1+/g, '$1');
+    if (BAD_IN.some(w => { const c = w.replace(/(.)\1+/g, '$1'); return squash.includes(w) || (c.length >= 4 && single.includes(c)); })) return 'That name isn\'t allowed';
+    // whole words: split on spaces/punctuation and on camelCase (BigAss -> big, ass)
+    const words = n.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().split('').map(ch => LEET[ch] || ch).join('').split(/[^a-z]+/).filter(Boolean);
+    const singles = words.map(w => w.replace(/(.)\1+/g, '$1'));
+    if (BAD_WORD.some(b => words.includes(b) || singles.includes(b) || squash === b || single === b)) return 'That name isn\'t allowed';
+    return '';
+  }
+  const safeName = (n, fallback = 'Golfer') => (n && !nameProblem(n) ? String(n).trim().slice(0, 14) : fallback);
+  if (save.name && nameProblem(save.name)) save.name = 'Player';
   const DEG = Math.PI / 180;
 
   // ================= Sound =================
@@ -1676,7 +1803,7 @@
       glove: new THREE.MeshLambertMaterial({ color: 0xf5f5f0 }),
       metal: new THREE.MeshPhongMaterial({ color: 0xc9cdd3, specular: 0xffffff, shininess: 90 }) };
   }
-  // the bag's skin: body color plus a vertical CHAMINADE logo down the front (u = 0.5 faces front)
+  // the bag's skin: body color plus a vertical CHAMI GOLF logo down the front (u = 0.5 faces front)
   // ---- custom bag logo: your own picture and/or words, bought for $10,000 ----
   let logoImg = null, logoSrc = '';
   function customLogo() { return save.customLogo || (save.customLogo = { img: '', text: '' }); }
@@ -1720,8 +1847,8 @@
     if (b.logo === 'chaminade') {
       g.save(); g.translate(W / 2, H * 0.5); g.rotate(-Math.PI / 2);
       g.font = `700 ${b.panel ? 42 : 50}px Oswald, Impact, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText('CHAMINADE', 0, 2);
-      g.fillStyle = b.panel ? '#F2C14E' : b.trim.toLowerCase() === b.body.toLowerCase() ? '#ffffff' : b.trim; g.fillText('CHAMINADE', 0, 0);
+      g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeText('CHAMI GOLF', 0, 2);
+      g.fillStyle = b.panel ? '#F2C14E' : b.trim.toLowerCase() === b.body.toLowerCase() ? '#ffffff' : b.trim; g.fillText('CHAMI GOLF', 0, 0);
       g.restore();
     }
     m.tex.needsUpdate = true;
@@ -2055,15 +2182,56 @@
     return new THREE.CanvasTexture(c);
   }
   const FLAG_TEX = flagTexture();
+  // The cup is drawn with its own lighting baked in: the sun (always up and to the left-front of the hole)
+  // lights the far side of the white liner and part of the bottom, and the near rim casts a soft shadow.
+  // u around the cylinder matches three.js CylinderGeometry (x = sin, z = cos).
+  const CUP_SUN = (() => { const v = [-140, 260, 110], l = Math.hypot(...v); return { x: v[0] / l, y: v[1] / l, z: v[2] / l, h: Math.hypot(v[0], v[2]) / l }; })();
+  function cupLight(px, pz, depth) {   // px,pz: point inside the cup (yards from centre), depth below the rim
+    const hx = CUP_SUN.x / CUP_SUN.h, hz = CUP_SUN.z / CUP_SUN.h, tanEl = CUP_SUN.y / CUP_SUN.h;
+    // distance from the point, toward the sun, to the cup wall
+    const b = px * hx + pz * hz, c = px * px + pz * pz - CUP_R * CUP_R, L = -b + Math.sqrt(Math.max(0, b * b - c));
+    const lit = L * tanEl - depth;                 // > 0: sunlight reaches it over the rim
+    return clamp(0.5 + lit / 0.05, 0, 1);         // soft shadow edge
+  }
   function cupTexture() {
-    const c = document.createElement('canvas'); c.width = 8; c.height = 128;
-    const g = c.getContext('2d');
-    const grd = g.createLinearGradient(0, 0, 0, 128);
-    grd.addColorStop(0, '#f4f4ef'); grd.addColorStop(0.2, '#d9d9d2'); grd.addColorStop(0.24, '#4a3725');
-    grd.addColorStop(0.6, '#2b1f14'); grd.addColorStop(1, '#100b07');
-    g.fillStyle = grd; g.fillRect(0, 0, 8, 128);
+    const W = 256, Hc = 128, c = document.createElement('canvas'); c.width = W; c.height = Hc;
+    const g = c.getContext('2d'), img = g.createImageData(W, Hc);
+    const SOIL = Math.round(Hc * 0.13);            // turf roots + soil above the liner
+    for (let x = 0; x < W; x++) {
+      const th = x / W * Math.PI * 2, sx = Math.sin(th), sz = Math.cos(th);
+      const lam = Math.max(0, -(sx * CUP_SUN.x + sz * CUP_SUN.z));   // inward-facing wall toward the sun
+      for (let y = 0; y < Hc; y++) {
+        const depth = y / Hc * CUP_D, sh = cupLight(sx * CUP_R * 0.999, sz * CUP_R * 0.999, depth);
+        const ao = 1 - 0.28 * Math.pow(y / Hc, 2);  // darker down in the corner
+        const light = (0.58 + 0.42 * sh * (0.55 + 0.45 * lam)) * ao;
+        let r, gg, bb;
+        if (y < 3) { r = 70; gg = 105; bb = 38; }                                   // the cut edge of the turf
+        else if (y < SOIL) { const n = (Math.sin(x * 1.7) * Math.sin(y * 2.3) + 1) * 10; r = 92 + n; gg = 70 + n * 0.7; bb = 44; }   // soil
+        else if (y < SOIL + 2) { r = 200; gg = 200; bb = 194; }                    // top edge of the liner
+        else { r = 236; gg = 236; bb = 230; }                                       // white plastic liner
+        const i = (y * W + x) * 4;
+        img.data[i] = r * light; img.data[i + 1] = gg * light; img.data[i + 2] = bb * light; img.data[i + 3] = 255;
+      }
+    }
+    g.putImageData(img, 0, 0);
+    const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; return t;
+  }
+  function cupBottomTexture() {
+    const N = 128, c = document.createElement('canvas'); c.width = c.height = N;
+    const g = c.getContext('2d'), img = g.createImageData(N, N);
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      // CircleGeometry uv -> local (x, y); rotated -90° about x so world z = -y
+      const px = (i / N * 2 - 1) * CUP_R, pz = -((1 - j / N) * 2 - 1) * CUP_R, rr = Math.hypot(px, pz) / CUP_R;
+      const sh = cupLight(px, pz, CUP_D), ao = 1 - 0.3 * Math.pow(clamp(rr, 0, 1), 3);
+      let col = [222, 222, 215];
+      if (rr < 0.2) col = rr < 0.15 ? [60, 58, 52] : [170, 170, 162];              // the ferrule hole for the flagstick
+      const light = (0.6 + 0.4 * sh) * ao, k = (j * N + i) * 4;
+      img.data[k] = col[0] * light; img.data[k + 1] = col[1] * light; img.data[k + 2] = col[2] * light; img.data[k + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
     return new THREE.CanvasTexture(c);
   }
+  const CUP_BOT_TEX = cupBottomTexture();
   const CUP_TEX = cupTexture();
   // tileable grass detail: grey noise + short blade strokes, averages to 0.5 so far-away turf keeps its colour
   function grassDetail() {
@@ -2396,26 +2564,40 @@
       st.forEach((p, i) => { M.makeRotationY(i * 0.7); M.setPosition(p.x, terrainH(h, p.x, p.y), p.y); inst.setMatrixAt(i, M); });
       inst.count = st.length; inst.castShadow = true;
       holeGroup.add(inst); }
+    { const st = hazardStakes(h);
+      if (st.length) {
+        const sGeo = new THREE.BoxGeometry(0.09, 1.25, 0.09); sGeo.translate(0, 0.5, 0);
+        const sMat = new THREE.MeshLambertMaterial({ color: 0xffd21a });
+        const tGeo = new THREE.BoxGeometry(0.1, 0.16, 0.1); tGeo.translate(0, 1.05, 0);   // black painted cap
+        const tMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
+        disposables.push(sGeo, sMat, tGeo, tMat);
+        const inst = new THREE.InstancedMesh(sGeo, sMat, st.length), cap = new THREE.InstancedMesh(tGeo, tMat, st.length), M = new THREE.Matrix4();
+        st.forEach((p, i) => { M.makeRotationY(i * 0.9); M.setPosition(p.x, terrainH(h, p.x, p.y), p.y); inst.setMatrixAt(i, M); cap.setMatrixAt(i, M); });
+        inst.castShadow = true; holeGroup.add(inst, cap);
+      } }
     }
 
     // cup: a real hole cut into the green. A stencil mask marks the opening, then the
     // cup's liner, dirt walls and bottom are drawn "through" the ground inside it.
-    const maskGeo = new THREE.CircleGeometry(CUP_R, 40);
+    const maskGeo = new THREE.CircleGeometry(CUP_R, 64);
     const maskMat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false, stencilWrite: true, stencilRef: 1,
       stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
     const inside = { depthFunc: THREE.AlwaysDepth, stencilWrite: true, stencilRef: 1, stencilFunc: THREE.EqualStencilFunc,
       stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp };
-    const wallGeo = new THREE.CylinderGeometry(CUP_R, CUP_R, CUP_D, 40, 1, true);
+    const wallGeo = new THREE.CylinderGeometry(CUP_R, CUP_R, CUP_D, 64, 1, true);
     const wallMat = new THREE.MeshBasicMaterial(Object.assign({ map: CUP_TEX, side: THREE.BackSide }, inside));
-    const botGeo = new THREE.CircleGeometry(CUP_R, 40);
-    const botMat = new THREE.MeshBasicMaterial(Object.assign({ color: 0x15100b }, inside));
-    const lipGeo = new THREE.RingGeometry(CUP_R, CUP_R + 0.05, 40);
-    const lipMat = new THREE.MeshBasicMaterial({ color: 0x2c3a1c, transparent: true, opacity: 0.55, depthWrite: false });
+    const botGeo = new THREE.CircleGeometry(CUP_R, 64);
+    const botMat = new THREE.MeshBasicMaterial(Object.assign({ map: CUP_BOT_TEX }, inside));
+    // a crisp, freshly cut edge: a thin dark line right at the rim and a faint trimmed collar around it
+    const lipGeo = new THREE.RingGeometry(CUP_R, CUP_R + 0.012, 64);
+    const lipMat = new THREE.MeshBasicMaterial({ color: 0x1d2a10, transparent: true, opacity: 0.9, depthWrite: false });
+    const collarGeo = new THREE.RingGeometry(CUP_R + 0.012, CUP_R + 0.045, 64);
+    const collarMat = new THREE.MeshBasicMaterial({ color: 0xb8d68a, transparent: true, opacity: 0.22, depthWrite: false });
     const poleGeo = new THREE.CylinderGeometry(0.05, 0.05, 4.2 + CUP_D, 8), poleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
     const knobGeo = new THREE.SphereGeometry(0.12, 10, 8), knobMat = new THREE.MeshStandardMaterial({ color: 0xF2C14E, metalness: 0.6, roughness: 0.3 });
     const flagGeo = new THREE.PlaneGeometry(1.7, 1.05, 8, 1); flagGeo.translate(0.85, 0, 0);
     const flagMat = new THREE.MeshLambertMaterial({ map: FLAG_TEX, side: THREE.DoubleSide });
-    disposables.push(maskGeo, maskMat, wallGeo, wallMat, botGeo, botMat, lipGeo, lipMat, poleGeo, poleMat, knobGeo, knobMat, flagGeo, flagMat);
+    disposables.push(maskGeo, maskMat, wallGeo, wallMat, botGeo, botMat, lipGeo, lipMat, collarGeo, collarMat, poleGeo, poleMat, knobGeo, knobMat, flagGeo, flagMat);
     // the cup sits square to the (sloped) green
     const cupY = h.cupY = terrainH(h, h.pin.x, h.pin.y), cg = slopeGrad(h, h.pin.x, h.pin.y);
     const cupGroup = new THREE.Group(); cupGroup.position.set(h.pin.x, cupY, h.pin.y);
@@ -2424,7 +2606,8 @@
     const bottom = new THREE.Mesh(botGeo, botMat); bottom.rotation.x = -Math.PI / 2; bottom.position.y = -CUP_D; bottom.renderOrder = 2;
     const wall = new THREE.Mesh(wallGeo, wallMat); wall.position.y = -CUP_D / 2; wall.renderOrder = 3;
     const lip = new THREE.Mesh(lipGeo, lipMat); lip.rotation.x = -Math.PI / 2; lip.position.y = 0.006;
-    cupGroup.add(mask, bottom, wall, lip);
+    const collar = new THREE.Mesh(collarGeo, collarMat); collar.rotation.x = -Math.PI / 2; collar.position.y = 0.005;
+    cupGroup.add(mask, bottom, wall, lip, collar);
     const pole = new THREE.Mesh(poleGeo, poleMat); pole.position.set(0, (4.2 - CUP_D) / 2, 0); pole.castShadow = true; pole.renderOrder = 4;
     const knob = new THREE.Mesh(knobGeo, knobMat); knob.position.set(0, 4.25, 0);
     flagMesh = new THREE.Mesh(flagGeo, flagMat); flagMesh.position.set(0, 3.6, 0); flagMesh.castShadow = true;
@@ -2732,7 +2915,7 @@
     if (course.ctp) { ctpState().tries++; persist(); }
     lastShot = { lie, dist: distToPin(), putter: !!c.putter };
     strokes++; firstShot = false; trailReset(); swing = null; lastClub = clubIdx;
-    ball.z = 0; ball.vz = 0; ball.spin = 0;
+    ball.z = 0; ball.vz = 0; ball.spin = 0; ball.full = false;
     const lieErr = lie === 'rough' ? 1.4 : lie === 'sand' ? 1.6 : 1;
     const full = stockNow(c);
     lastPutt = !!c.putter;
@@ -2769,7 +2952,7 @@
     const shapeRoll = oe === 0 ? 1 : (oe < 0 ? 1.15 : 0.9);
     const rollMul = clamp(1 + along * 0.012, 0.7, 1.35) * (oe === 0 ? 1.12 : 1 - 0.25 * aoe) * shapeRoll;
     flight = { sx: ball.x, sy: ball.y, ex, ey, qx: Q.x, qy: Q.y, t: 0, T: 0.9 + carryW / 100, h: hMax, hgt: 0, carry: carryW, club: c, ignore,
-      dirEnd: { x: tx / tl, y: ty / tl }, rollMul, q: oe === 0 ? 1 : clamp(1 - aoe, 0.2, 1) };
+      dirEnd: { x: tx / tl, y: ty / tl }, rollMul, power, q: oe === 0 ? 1 : clamp(1 - aoe, 0.2, 1) };
     state = 'flying'; sfx.swing();
   }
 
@@ -2818,22 +3001,102 @@
     sfx.land();
     if (t === 'sand') { ball.vx = ball.vy = 0; return stopped(); }
     const c = f.club, steep = clamp((c.loft - 22) / 18, 0, 1);
-    // Low clubs run out; wedges land steep with backspin and check up.
-    const rollYds = Math.max(0.3, f.carry * c.roll * 1.6 * f.rollMul * (1 - 0.45 * steep));
-    const v = Math.sqrt(2 * DECEL.fairway * rollYds);
-    ball.spin = (steep * 0.35 + (c.spin || 0)) * f.q;
-    ball.vx = f.dirEnd.x * v; ball.vy = f.dirEnd.y * v;
-    ball.z = 0; ball.vz = -(5 + f.h * 0.35); ball.rollT = 0;
-    touchdown(t);
+    // The ball comes down at the angle of its flight: low drivers come in shallow and run, high wedges
+    // come in steep and stop. Landing speed follows how hard it was hit (the carry).
+    const theta = Math.atan2(4 * f.h, Math.max(1, f.carry)), vin = 9 + 0.1 * f.carry;
+    const vh = vin * Math.cos(theta) * f.rollMul;
+    ball.spin = (steep * 0.35 + (c.spin || 0)) * f.q * clamp(f.power || 1, 0.3, 1);
+    ball.vx = f.dirEnd.x * vh; ball.vy = f.dirEnd.y * vh;
+    ball.z = 0; ball.vz = -vin * Math.sin(theta); ball.rollT = 0; ball.full = true;
     state = 'rolling';
+    if (Math.hypot(hole.pin.x - ball.x, hole.pin.y - ball.y) < CUP_R) { enterCup(ball.vz); ball.vz = 0; return; }   // dunked it
+    touchdown(t);
   }
-  // The ball meets the ground: it loses some forward speed and bounces back up depending on the surface.
+  // terrain slope (rise per yard) anywhere on the hole
+  function groundGrad(x, y) {
+    if (!hole || !hole.terr) return { x: 0, y: 0 };
+    const e = 0.4; return { x: (terrainH(hole, x + e, y) - terrainH(hole, x - e, y)) / (2 * e), y: (terrainH(hole, x, y + e) - terrainH(hole, x, y - e)) / (2 * e) };
+  }
+  // The ball meets the ground. The impact angle (flight angle plus the slope it lands on: into an upslope is
+  // steeper, onto a downslope is shallower) decides how much speed the turf takes and how high it kicks up.
+  // Backspin bites on firm, short grass and can even pull the ball back on the green.
   function touchdown(t) {
-    const vin = Math.abs(ball.vz || 0);
-    const k = Math.max(0, 1 - (SKID[t] || 0.1) - (ball.spin || 0) * (t === 'green' ? 1 : t === 'path' ? 0.05 : 0.4));
-    ball.vx *= k; ball.vy *= k; ball.spin = (ball.spin || 0) * 0.5;
-    ball.vz = vin * (REST[t] || 0.3);
+    const vin = Math.abs(ball.vz || 0), sp = Math.hypot(ball.vx, ball.vy);
+    const ux = sp ? ball.vx / sp : 0, uy = sp ? ball.vy / sp : 0;
+    const gr = hole.mini ? { x: 0, y: 0 } : groundGrad(ball.x, ball.y), up = gr.x * ux + gr.y * uy;
+    const ang = clamp(Math.atan2(vin, sp) + Math.atan(up), 0.02, 1.5);
+    const e = (REST[t] || 0.3) * (1 - 0.35 * Math.sin(ang) ** 2);
+    const vn = Math.max(vin, sp * Math.sin(Math.atan(Math.max(0, up))));   // landing into a bank adds impact
+    const spin = ball.spin || 0, grip = GRIP[t] == null ? 0.5 : GRIP[t];
+    let nh = sp - (MU[t] || 0.4) * (1 + e) * vn - spin * vn * 1.2 * grip - Math.max(0, up) * sp * 0.25;
+    nh = Math.max(nh, spin > 0.15 ? -spin * 3 * grip * (t === 'green' ? 1 : 0.5) : 0);
+    ball.vx = ux * nh; ball.vy = uy * nh; ball.spin = spin * 0.5;
+    ball.vz = vn * e;
     if (ball.vz < 1.5) { ball.vz = 0; ball.z = 0; } else ball.z = 0.001;
+  }
+  // ---- The cup ----
+  // While the ball is over the hole we track its centre in 3D (cz = height vs. resting on the green).
+  // The rim is a sharp circular edge: once the ball's centre passes it there's nothing underneath, so the
+  // ball tips over the edge and gravity pulls it toward the middle. Firm putts ride around the edge
+  // (lip outs, horseshoes) or bang the back of the liner and pop up; dying putts topple in.
+  function enterCup(vz) {
+    ball.overCup = true; ball.cz = 0; ball.vcz = vz || 0; ball.dip = 0; ball.rimC = false;
+    if (vz < 0 && !pinPulled) { ball.vx *= 0.3; ball.vy *= 0.3; ball.vcz *= 0.7; sfx.rattle(0.8); }   // flown in with the flag in: the flagstick knocks it down
+    ball.cupIn = { x: ball.vx, y: ball.vy }; ball.minCz = 0; ball.rimHit = 0; ball.cupT = 0;
+  }
+  function cupStep(h) {
+    const r = BALL_R, R = CUP_R, G = CUP_G, px = hole.pin.x, py = hole.pin.y;
+    const N = Math.max(1, Math.ceil(h / 0.0012)), k = h / N;
+    for (let i = 0; i < N; i++) {
+      ball.cupT += k;
+      ball.vcz -= (ball.rimC ? G * 5 / 7 : G) * k;                  // a ball rolling on the edge feels 5/7 of gravity
+      ball.x += ball.vx * k; ball.y += ball.vy * k; ball.cz += ball.vcz * k;
+      let dx = ball.x - px, dy = ball.y - py, d = Math.hypot(dx, dy) || 1e-6, ux = dx / d, uy = dy / d;
+      ball.rimC = false;
+      // back out on the green
+      if (d >= R && ball.cz <= 0) {
+        ball.cz = 0;
+        if (ball.vcz < -0.6) ball.vcz = -ball.vcz * 0.25; else { ball.vcz = 0; ball.dip = 0; return 'out'; }
+      }
+      if (d > R + r && ball.cz > 0) { ball.dip = -ball.cz; return 'air'; }
+      // the rim edge (a circle at green level): push the ball off it and remove the speed going into it
+      const ra = d - R, rb = ball.cz + r, dist = Math.hypot(ra, rb);
+      if (dist < r) {
+        const nx = ra / dist, nz = rb / dist, push = r - dist;
+        ball.x += ux * nx * push; ball.y += uy * nx * push; ball.cz += nz * push;
+        const vr = ball.vx * ux + ball.vy * uy, vn = vr * nx + ball.vcz * nz;
+        if (vn < 0) {
+          const e = vn < -0.7 ? 0.3 : 0, j = -(1 + e) * vn;
+          ball.vx += j * nx * ux; ball.vy += j * nx * uy; ball.vcz += j * nz;
+          if (vn < -0.35) { ball.rimHit++; sfx.rattle(Math.min(1, -vn / 3)); }
+        }
+        ball.rimC = true;
+        const f = 1 - 1.5 * k; ball.vx *= f; ball.vy *= f;          // scrubbing over the edge costs a little pace
+        dx = ball.x - px; dy = ball.y - py; d = Math.hypot(dx, dy) || 1e-6; ux = dx / d; uy = dy / d;
+      }
+      // below the rim: the liner wall and the bottom
+      if (ball.cz + r < 0 && d > R - r) {
+        ball.x = px + ux * (R - r); ball.y = py + uy * (R - r);
+        const vr = ball.vx * ux + ball.vy * uy;
+        if (vr > 0) { ball.vx -= 1.35 * vr * ux; ball.vy -= 1.35 * vr * uy; if (vr > 0.3) { ball.rimHit++; sfx.rattle(Math.min(1, vr / 3)); } }
+      }
+      ball.minCz = Math.min(ball.minCz, ball.cz);
+      ball.dip = -ball.cz;
+      if (ball.cz < -1.15 * r) { ball.dipV = -ball.vcz; return 'in'; }  // the whole ball is below the rim: it's in
+      if (ball.cupT > 4) { ball.dipV = 0; return 'in'; }
+    }
+    return 'cont';
+  }
+  function cupExit(how) {
+    ball.overCup = false;
+    const a = ball.cupIn, sp0 = Math.hypot(a.x, a.y), sp1 = Math.hypot(ball.vx, ball.vy);
+    const turn = sp0 && sp1 ? Math.acos(clamp((a.x * ball.vx + a.y * ball.vy) / (sp0 * sp1), -1, 1)) : 0;
+    const dropped = -ball.minCz / BALL_R;
+    if (how === 'air') { ball.z = Math.max(0.001, -ball.dip); ball.vz = ball.vcz; }
+    ball.dip = 0; ball.dipV = 0; ball.cz = 0; ball.vcz = 0;
+    if (how === 'air' && turn < 0.25) showRating('TOO FIRM · HOPPED IT', '#ff6b7d');
+    else if (turn > 1.6) showRating('HORSESHOE!', '#ff6b7d');
+    else if (turn > 0.12 || dropped > 0.3 || ball.rimHit) showRating(ball.rimHit && how === 'air' ? 'RATTLED OUT!' : 'LIP OUT!', '#ff6b7d');
   }
   function roll(dt) {
     let sp = Math.hypot(ball.vx, ball.vy);
@@ -2845,6 +3108,13 @@
     ball.rollT = (ball.rollT || 0) + dt;
     if (ball.rollT > 30 && !ball.overCup) { ball.vx = ball.vy = 0; return stopped(); }   // never roll forever
     for (let i = 0; i < n; i++) {
+      if (ball.overCup) {
+        // Over the hole the ball rides the rim: real 3D contact with a sharp edge, the liner wall and the bottom.
+        const r = cupStep(h);
+        if (r === 'in') return holeOut();
+        if (r !== 'cont') cupExit(r);
+        continue;
+      }
       ball.x += ball.vx * h; ball.y += ball.vy * h;
       if (hole.mini) miniCollide();
       if (air()) {
@@ -2855,6 +3125,7 @@
         if (tt === 'water') return penalty('Water hazard', true);
         if (tt === 'oob') return penalty('Out of bounds', false);
         if (tt === 'sand') { ball.vx = ball.vy = 0; ball.vz = 0; return stopped(); }
+        if (Math.hypot(hole.pin.x - ball.x, hole.pin.y - ball.y) < CUP_R) { enterCup(ball.vz); ball.vz = 0; continue; }   // straight in the hole
         touchdown(tt);
         continue;
       }
@@ -2863,44 +3134,21 @@
       if (t === 'oob') return penalty('Out of bounds', false);
       sp = Math.hypot(ball.vx, ball.vy);
       const dx = hole.pin.x - ball.x, dy = hole.pin.y - ball.y, d = Math.hypot(dx, dy);
-      if (d < CUP_R) {
-        // Over the hole there's nothing under the ball, so it starts to drop. A slow ball or one
-        // through the middle (longer path over the hole) drops far enough to catch the back wall.
-        if (!ball.overCup) { ball.overCup = true; ball.dip = 0; ball.dipV = 0; }
-        ball.dipV += CUP_G * h; ball.dip += ball.dipV * h;
-        if (ball.dip >= CUP_DROP) return holeOut();
-        continue;
-      } else if (ball.overCup) {
-        // Reached the far rim: it has to climb back out over the edge.
-        ball.overCup = false;
-        const nx = -dx / d, ny = -dy / d, vn = ball.vx * nx + ball.vy * ny;
-        const tx = ball.vx - vn * nx, ty = ball.vy - vn * ny, depth = ball.dip, hitK = depth / BALL_R;
-        ball.dip = 0; ball.dipV = 0;
-        const vn1 = Math.max(0, vn) * (1 - 0.45 * hitK), need = 2 * CUP_G * depth;
-        if (vn1 * vn1 < need) {          // not enough pace to climb out: it falls back in
-          ball.dip = depth; ball.vx = tx * 0.4 - nx * 0.4; ball.vy = ty * 0.4 - ny * 0.4;
-          sfx.rattle(0.6); return holeOut();
-        }
-        // Escapes: the rim takes speed off the part heading out, so the ball curls around the edge.
-        const vn2 = Math.sqrt(vn1 * vn1 - need), tk = 1 - 0.2 * hitK;
-        ball.vx = tx * tk + nx * vn2; ball.vy = ty * tk + ny * vn2;
-        const turn = Math.acos(clamp((ball.vx * (tx + nx * vn) + ball.vy * (ty + ny * vn)) / ((Math.hypot(ball.vx, ball.vy) * sp) || 1), -1, 1));
-        if (hitK > 0.3 && turn < 0.2) {   // straight through the middle, too firm: it hops the back edge
-          if (vn2 > 2) { ball.vz = vn2 * 0.12 * hitK; ball.z = 0.001; }
-          showRating('TOO FIRM · HOPPED IT', '#ff6b7d');
-        }
-        else if (hitK > 0.1 || turn > 0.12) showRating(turn > 0.6 ? 'HORSESHOE!' : 'LIP OUT!', '#ff6b7d');
-        if (hitK > 0.05) sfx.rattle(Math.min(1, 0.3 + hitK));
-        continue;
-      }
-      // the slope pulls the ball downhill (that's the break)
+      if (d < CUP_R) { enterCup(0); continue; }
+      // the slope pulls the ball downhill (that's the break); off the green, hills speed up or slow a rolling full shot
       let pull = 0;
       if (slopeLie(hole, t)) {
         const gr = slopeGrad(hole, ball.x, ball.y);
         ball.vx -= SLOPE_G * gr.x * h; ball.vy -= SLOPE_G * gr.y * h; pull = SLOPE_G * Math.hypot(gr.x, gr.y);
         sp = Math.hypot(ball.vx, ball.vy);
+      } else if (ball.full && !hole.mini && sp > 0.3) {
+        const gr = groundGrad(ball.x, ball.y), k = SLOPE_G * 0.6;
+        ball.vx -= k * gr.x * h; ball.vy -= k * gr.y * h; pull = k * Math.hypot(gr.x, gr.y);
+        sp = Math.hypot(ball.vx, ball.vy);
       }
-      const ns = Math.max(0, sp - DECEL[t] * h);
+      // a full shot's pace dies off naturally: quick at first, then a slow final trickle
+      const dec = DECEL[t] + (ball.full ? (DRAG[t] || 0.1) * sp : 0);
+      const ns = Math.max(0, sp - dec * h);
       if (ns < 0.12 && pull < DECEL[t] * 0.9) { ball.vx = ball.vy = 0; return stopped(); }
       if (sp > 0) { ball.vx *= ns / sp; ball.vy *= ns / sp; }
     }
@@ -3081,7 +3329,9 @@
   // How high a shot peaks. Full swings use the club's loft; short, soft swings stay low like a chip
   // instead of popping straight up like a flop shot.
   function apexOf(c, power, carry) {
-    return Math.min(c.loft * clamp(Math.sqrt(power), 0.35, 1), carry * (0.22 + 0.5 * clamp(power, 0, 1)));
+    // full swings peak at the club's loft height; soft partial swings fly lower (chip-and-runs), more so with less loft
+    const p = clamp(power, 0, 1);
+    return Math.min(c.loft * clamp(Math.sqrt(p), 0.35, 1), carry * (0.06 + 0.55 * p * p) * clamp(c.loft / 30, 0.75, 1.6));
   }
 
   // ================= Render =================
@@ -3219,15 +3469,31 @@
       fctx.lineCap = 'round';
       fctx.beginPath(); fctx.arc(bs.x, bs.y, pr, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * swing.power); fctx.stroke();
       fctx.lineCap = 'butt';
+      // yardage readout: a measuring tag on the right side of the ball that updates as you pull back
+      { const tx = Math.min(bs.x + pr + 22, innerWidth - 132), ty = bs.y, w = 118, hgt = 70, left = tx;
+        const diff = Math.round(yds) - Math.round(pin), near = Math.abs(diff) <= Math.max(2, pin * 0.03);
+        fctx.fillStyle = 'rgba(30,3,8,.82)'; fctx.strokeStyle = near ? '#FFE08A' : 'rgba(242,193,78,.7)'; fctx.lineWidth = 2;
+        fctx.beginPath(); fctx.roundRect ? fctx.roundRect(left, ty - hgt / 2, w, hgt, 12) : fctx.rect(left, ty - hgt / 2, w, hgt); fctx.fill(); fctx.stroke();
+        fctx.beginPath(); fctx.moveTo(left, ty - 7); fctx.lineTo(left - 9, ty); fctx.lineTo(left, ty + 7); fctx.closePath(); fctx.fillStyle = near ? '#FFE08A' : 'rgba(242,193,78,.7)'; fctx.fill();
+        // ruler ticks filling with the pull
+        const rx0 = left + 10, rw = w - 20, ry = ty + hgt / 2 - 12;
+        fctx.fillStyle = 'rgba(255,255,255,.15)'; fctx.fillRect(rx0, ry, rw, 5);
+        fctx.fillStyle = swing.power >= 0.99 ? '#FFE08A' : '#F2C14E'; fctx.fillRect(rx0, ry, rw * clamp(swing.power, 0, 1), 5);
+        if (!c.putter && pin < full * 1.05) { const px = rx0 + rw * clamp(pin / full, 0, 1); fctx.fillStyle = '#fff'; fctx.fillRect(px - 1, ry - 4, 2, 13); }
+        fctx.textAlign = 'left';
+        fctx.font = '700 30px Oswald, sans-serif'; fctx.fillStyle = '#fff';
+        fctx.fillText(`${Math.round(yds)}`, left + 10, ty + 2);
+        const nw = fctx.measureText(`${Math.round(yds)}`).width;
+        fctx.font = '800 11px Inter, sans-serif'; fctx.fillStyle = '#FFE08A';
+        fctx.fillText(c.putter ? 'YDS ROLL' : 'YDS', left + 14 + nw, ty + 1);
+        fctx.font = '700 10px Inter, sans-serif'; fctx.fillStyle = near ? '#FFE08A' : '#f3d7a8';
+        fctx.fillText(`${Math.round(swing.power * 100)}% · pin ${Math.round(pin)}${diff ? ` (${diff > 0 ? '+' : ''}${diff})` : ' ✓'}`, left + 10, ty - hgt / 2 + 14);
+      }
       fctx.textAlign = 'center';
-      fctx.font = '700 22px Oswald, sans-serif'; fctx.fillStyle = '#fff';
-      fctx.fillText(`${Math.round(yds)} YDS`, bs.x, bs.y + pr + 28);
-      fctx.font = '700 13px Inter, sans-serif'; fctx.fillStyle = '#FFE08A';
-      fctx.fillText(`${Math.round(swing.power * 100)}% of ${Math.round(full)} · pin ${Math.round(pin)}`, bs.x, bs.y + pr + 47);
       const cvd = c.putter ? 0 : curveOf(swing.lat, yds);
       if (Math.abs(cvd) >= 1) {
         fctx.font = '800 14px Inter, sans-serif'; fctx.fillStyle = cvd > 0 ? '#ffab8a' : '#a8dcff';
-        fctx.fillText(cvd > 0 ? `FADE ${Math.round(cvd)} YDS ▶` : `◀ DRAW ${Math.round(-cvd)} YDS`, bs.x, bs.y + pr + 67);
+        fctx.fillText(cvd > 0 ? `FADE ${Math.round(cvd)} YDS ▶` : `◀ DRAW ${Math.round(-cvd)} YDS`, bs.x, bs.y + pr + 28);
       }
 
       const gx = bs.x, gy = bs.y - 70, R = 78, span = Math.PI * 0.8;
@@ -3452,14 +3718,15 @@
   let tab = 'play';
   function setTab(t) {
     tab = t;
-    const navTab = t === 'course' || t === 'match' ? 'play' : t;
+    const navTab = t === 'course' || t === 'match' || t === 'ctp' ? 'play' : t;
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === navTab));
-    ['play', 'course', 'match', 'golfer', 'clubs', 'awards', 'stats'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
+    ['play', 'course', 'ctp', 'match', 'golfer', 'clubs', 'awards', 'stats'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
     if (t === 'match') renderMatchTab();
     if (t === 'play') { renderCourses(); renderMpCard(); }
     if (t === 'course') renderCourse();
+    if (t === 'ctp') renderCtpTab();
     if (t === 'golfer') renderGolfer();
-    document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer');
+    document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer' || t === 'clubs');
     $('miniBtn').classList.toggle('hidden', t !== 'play');
     if (t === 'clubs') renderClubs();
     if (t === 'stats') { renderStats(); renderHow(); }
@@ -3514,7 +3781,7 @@
   });
   function recordScore(rel, strokes) {
     const list = save.board[course.id] || (save.board[course.id] = []);
-    const entry = { name: save.name || 'Player', rel, strokes, date: Date.now() };
+    const entry = { name: safeName(save.name, 'Player'), rel, strokes, date: Date.now() };
     list.push(entry); list.sort((a, b) => a.rel - b.rel || a.date - b.date);
     const rank = list.indexOf(entry) + 1;
     save.board[course.id] = list.slice(0, 10); lastEntry = entry;
@@ -3542,7 +3809,7 @@
   const scoresRef = (cid, day) => day ? fbDb.collection('courses').doc(cid).collection('days').doc(day).collection('scores')
     : fbDb.collection('courses').doc(cid).collection('scores');
   const ctpRef = day => fbDb.collection('ctp').doc(day).collection('shots');
-  const boardName = () => (save.name && save.name !== 'Player' ? save.name : (fbUser && fbUser.displayName || 'Player').split(' ')[0]).slice(0, 14);
+  const boardName = () => safeName(save.name && save.name !== 'Player' && !nameProblem(save.name) ? save.name : (fbUser && fbUser.displayName || 'Golfer').split(' ')[0]);
 
   // One row per golfer per board: their best score. Ties go to whoever posted it first.
   async function fetchBoard(cid, day, limit = 10) {
@@ -3685,7 +3952,7 @@
       fbUser = u; cloudReady = false; renderAcct();
       if (u) { await syncFromCloud(); renderAcct(); claimPrizes(); }
       mpOnAuth();
-      if (!$('home').classList.contains('hidden')) { if (tab === 'course') fillBoard(course); renderCtpCard(); }
+      if (!$('home').classList.contains('hidden')) { if (tab === 'course') fillBoard(course); if (tab === 'ctp') renderCtpTab(); renderCtpCard(); }
     });
   }
 
@@ -3729,11 +3996,43 @@
   // always agree, and a golfer who reloads can rejoin where their team is.
   const MP_FMT = { stroke: 'Stroke play', scramble: 'Scramble', alt: 'Alt shot', best: 'Best ball' };
   const MP_MODES = { 1: { name: '1v1', fmts: ['stroke'], sub: 'You vs a friend' }, 2: { name: '2v2', fmts: ['scramble', 'alt', 'best'], sub: 'Teams of 2' },
-    4: { name: 'Foursome', fmts: ['stroke', 'scramble'], sub: '2 to 4 golfers in one group' } };
-  const isGroup = m => +m.mode === 4;
-  const fmtName = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'Team scramble' : 'Own ball') : MP_FMT[fmt] || '';
-  const fmtHow = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'All of you hit every shot and play the best ball together, as one team against par. No wager: everyone collects the hole payouts.'
-    : 'Everyone plays their own ball. Lowest total wins the pot; a tie for the lead goes to a sudden-death playoff.') : FMT_HOW[fmt];
+    4: { name: 'Foursome', fmts: ['stroke', 'scramble'], sub: 'One group of golfers, everyone puts up the same buy-in' } };
+  // Foursome "own ball" is every golfer for themselves (1v1v1v1, 2 to 4 golfers); Foursome scramble is two teams of two.
+  const isGroup = m => +m.mode === 4 && m.fmt !== 'scramble';
+  const teamSize = m => +m.mode === 4 ? 2 : +m.mode;
+  const fmtName = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'Scramble (2 v 2)' : 'Own ball (1v1v1v1)') : MP_FMT[fmt] || '';
+  const fmtHow = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'Four golfers, two teams of two. Everyone hits, each team plays its best ball every shot. The lower team splits the pot.'
+    : 'Every golfer for themselves (2 to 4 golfers). Lowest total takes the whole pot; a tie for the lead goes to a sudden-death playoff.') : FMT_HOW[fmt];
+  // Buy-ins are held as soon as you join a lobby (so nobody can spend it before tee off) and handed back if the match never starts.
+  // Pop-up when joining: shows the buy-in the host set, the pot, and your bank. Not enough money = can't join.
+  function confirmBuyIn(m, players) {
+    return new Promise(res => {
+      const c = courseById(m.cid), w = m.wager || 0, short = save.coins < w, ov = $('buyIn');
+      $('buyInTitle').textContent = short ? 'Not enough money' : w ? `${money(w)} buy-in` : 'Join this match?';
+      $('buyInBody').innerHTML = `<div class="chips" style="justify-content:center;margin:6px 0 10px"><span><b>${MP_MODES[m.mode] ? MP_MODES[m.mode].name : ''}</b></span><span>${fmtName(m.mode, m.fmt)}</span><span>${esc(c.name)}</span><span><b>${m.n}</b> holes</span></div>`
+        + (w ? `<div class="earn"><div><span>Buy-in (set by the host, same for everyone)</span><span>${money(w)}</span></div>
+          <div><span>Pot with you in it</span><span>${money(w * (players + 1))}${isGroup(m) && players + 1 < 4 ? ' and growing' : ''}</span></div>
+          <div class="sum"><span>Your bank</span><span>${money(save.coins)}</span></div></div>
+          <div style="margin-top:10px;font-size:13px;color:${short ? '#ffb3bd' : '#f3d7a8'}">${short ? `You need ${money(w - save.coins)} more to join. Play some rounds and come back!` : `${money(w)} is held when you join and comes back if the match never starts. Quitting mid-match loses it.`}</div>`
+          : '<div style="font-size:13px;color:#f3d7a8">No money on this one, just for fun.</div>');
+      $('buyInOk').style.display = short ? 'none' : '';
+      $('buyInOk').textContent = w ? `I'm in · ${money(w)}` : 'Join';
+      $('buyInNo').textContent = short ? 'OK' : 'No thanks';
+      ov.classList.remove('hidden');
+      const done = v => { ov.classList.add('hidden'); $('buyInOk').onclick = $('buyInNo').onclick = null; ensureAudio(); sfx.click(); res(v); };
+      $('buyInOk').onclick = () => done(!short); $('buyInNo').onclick = () => done(false);
+    });
+  }
+  function holdBuyIn(id, wager) {
+    const rec = save.mp[id] || (save.mp[id] = { at: Date.now() });
+    if (!rec.paid && wager > 0) { rec.paid = 1; rec.held = 1; rec.wager = wager; save.coins = Math.max(0, save.coins - wager); persist(); $('homeCoins').textContent = money(save.coins); }
+    else if (!rec.paid) { rec.paid = 1; rec.wager = 0; }
+  }
+  function refundBuyIn(id) {
+    const rec = save.mp[id]; if (!rec || !rec.paid || rec.started || rec.settled) return;
+    if (rec.wager) save.coins += rec.wager;
+    delete save.mp[id]; persist(); $('homeCoins').textContent = money(save.coins);
+  }
   const teamsOf = m => [m.t0, m.t1, m.t2, m.t3].slice(0, m.nt || 2).map(t => t || []);
   const FMT_HOW = { stroke: 'Lowest total strokes wins.', scramble: 'Everyone hits, the team plays the best ball every shot.',
     alt: 'Teammates take turns hitting one ball (tee shots rotate).', best: 'Everyone plays their own ball; the team takes the best score on each hole.' };
@@ -3841,13 +4140,13 @@
   // ---- Matches: create, join, lobby ----
   async function createMatch() {
     const f = mpForm;
-    if (f.mode === 4 && f.fmt === 'scramble') f.wager = 0;
     if (f.wager > save.coins) return `You only have ${money(save.coins)}`;
     for (let i = 0; i < 6; i++) {
       const id = newCode(), ref = matchRef(id);
       if ((await ref.get()).exists) continue;
       await ref.set({ host: fbUser.uid, status: 'lobby', mode: f.mode, fmt: f.fmt, cid: f.cid, n: f.n, wager: f.wager, seed: 0,
         players: { [fbUser.uid]: { name: boardName(), team: 0, at: Date.now() } }, t0: [], t1: [], nt: 2, log: {}, at: Date.now() });
+      holdBuyIn(id, f.wager);
       openMatch(id); return '';
     }
     return 'Could not create a match. Try again.';
@@ -3860,11 +4159,16 @@
     const m = s.data();
     if (m.players[fbUser.uid] && !m.players[fbUser.uid].left && m.status !== 'cancelled') { openMatch(id); return ''; }
     if (m.status !== 'lobby') return m.status === 'cancelled' ? 'The host cancelled that match' : 'That match already started';
-    if (save.coins < m.wager) return `This match has a ${money(m.wager)} wager. You have ${money(save.coins)}.`;
-    const cnt = [0, 0]; Object.values(m.players).forEach(p => cnt[p.team]++);
-    if (isGroup(m) ? cnt[0] + cnt[1] >= 4 : cnt[0] >= m.mode && cnt[1] >= m.mode) return 'That match is full';
-    const team = isGroup(m) ? 0 : cnt[0] >= m.mode ? 1 : cnt[1] >= m.mode ? 0 : cnt[1] < cnt[0] ? 1 : 0;
+    const cnt = [0, 0]; Object.values(m.players).forEach(p => { if (!p.left) cnt[p.team]++; });
+    const ts = teamSize(m);
+    if (isGroup(m) ? cnt[0] + cnt[1] >= 4 : cnt[0] >= ts && cnt[1] >= ts) return 'That match is full';
+    // the buy-in pop-up: you have to OK the amount, and you can't join without enough money
+    const ok = await confirmBuyIn(m, cnt[0] + cnt[1]);
+    if (!ok) return '';
+    if (save.coins < m.wager) return `You need ${money(m.wager)} to join. You have ${money(save.coins)}.`;
+    const team = isGroup(m) ? 0 : cnt[0] >= ts ? 1 : cnt[1] >= ts ? 0 : cnt[1] < cnt[0] ? 1 : 0;
     await matchRef(id).update(FP('players', fbUser.uid), { name: boardName(), team, at: Date.now() });
+    holdBuyIn(id, m.wager);
     openMatch(id); return '';
   }
   function openMatch(id) {
@@ -3886,6 +4190,7 @@
       if (m.host === fbUser.uid) await matchRef(MP.id).update({ status: 'cancelled' });
       else await matchRef(MP.id).update(FP('players', fbUser.uid), firebase.firestore.FieldValue.delete());
     } catch (e) {}
+    refundBuyIn(MP.id);
     save.mpActive = null; persist();
     closeMatch(); setTab('play');
   }
@@ -3898,8 +4203,7 @@
     const m = MP.doc, t = lobbyTeams(m), up = { status: 'playing', seed: 1 + Math.floor(Math.random() * 200000), startedAt: Date.now() };
     if (isGroup(m)) {
       const all = t[0].concat(t[1]); if (all.length < 2) return;
-      if (m.fmt === 'scramble') Object.assign(up, { nt: 1, t0: all });
-      else { up.nt = all.length; all.forEach((u, i) => up['t' + i] = [u]); }
+      up.nt = all.length; all.forEach((u, i) => up['t' + i] = [u]);
     } else {
       if (!t[0].length || t[0].length !== t[1].length) return;
       Object.assign(up, { nt: 2, t0: t[0], t1: t[1] });
@@ -3914,12 +4218,14 @@
     if (!MP.started) {
       if (m.status === 'cancelled' || !me) {
         const why = m.status === 'cancelled' ? 'The host cancelled the match.' : 'You left the match.';
-        save.mpActive = null; persist(); closeMatch(); setMsg(why);
+        const rec = save.mp[MP.id], back = rec && rec.paid && !rec.started && rec.wager ? ` Your ${money(rec.wager)} buy-in was returned.` : '';
+        refundBuyIn(MP.id);
+        save.mpActive = null; persist(); closeMatch(); setMsg(why + back);
         if (!$('home').classList.contains('hidden')) setTab('match');
         return;
       }
       if ((m.status === 'playing' || m.status === 'done') && teamsOf(m).some(t => t.includes(fbUser.uid)) && !me.left) return beginMatch();
-      if (m.status === 'done' || m.status === 'playing') { save.mpActive = null; persist(); closeMatch(); setMsg('That match already finished.'); setTab('match'); return; }
+      if (m.status === 'done' || m.status === 'playing') { refundBuyIn(MP.id); save.mpActive = null; persist(); closeMatch(); setMsg('That match already finished.'); setTab('match'); return; }
       if (tab === 'match') renderMatchTab();
       return;
     }
@@ -3934,6 +4240,7 @@
     MP.team = MP.teams.findIndex(t => t.includes(uid)); MP.mates = MP.teams[MP.team]; MP.myIdx = MP.mates.indexOf(uid);
     const rec = save.mp[MP.id] || (save.mp[MP.id] = { at: Date.now() });
     if (!rec.paid) { rec.paid = 1; rec.wager = m.wager; save.coins = Math.max(0, save.coins - m.wager); }
+    rec.started = 1;
     const keys = Object.keys(save.mp).sort((a, b) => (save.mp[b].at || 0) - (save.mp[a].at || 0));
     keys.slice(30).forEach(k => delete save.mp[k]);
     persist();
@@ -4230,14 +4537,14 @@
     if (!courses.some(c => c.id === f.cid)) f.cid = courses[0].id;
     f.wager = Math.max(0, Math.min(f.wager, save.coins));
     const opt = (k, v, label, on) => `<button data-${k}="${v}" class="${on ? 'on' : ''}">${label}</button>`;
-    const chips = [0, 100, 250, 500, 1000, 2500, 5000].filter(v => v <= save.coins), coop = f.mode === 4 && f.fmt === 'scramble';
+    const chips = [0, 100, 250, 500, 1000, 2500, 5000].filter(v => v <= save.coins), coop = false;
     box.innerHTML = back + `<div class="mpbox">
         <div class="lh">GAME</div><div class="opts">${Object.keys(MP_MODES).map(k => opt('fm', k, MP_MODES[k].name, +k === f.mode)).join('')}</div>
         <div class="lh">FORMAT</div><div class="opts">${md.fmts.map(k => opt('ff', k, fmtName(f.mode, k), k === f.fmt)).join('')}</div>
         <div class="gnote" style="margin-top:6px">${md.sub} · ${fmtHow(f.mode, f.fmt)}</div>
         <div class="lh">COURSE</div><div class="opts">${courses.map(c => opt('fc', c.id, c.mini ? '⭐ Mini Golf' : c.name, c.id === f.cid)).join('')}</div>
         <div class="lh">HOLES</div><div class="opts">${[3, 6, 9].map(n => opt('fn', n, n + ' holes', n === f.n)).join('')}</div>
-        ${coop ? '' : `<div class="lh">WAGER (EACH GOLFER) · YOU HAVE ${money(save.coins)}</div>
+        ${coop ? '' : `<div class="lh">BUY-IN (EVERY GOLFER PUTS UP THE SAME) · YOU HAVE ${money(save.coins)}</div>
         <div class="mprow"><input class="mpin" id="mpWager" type="number" inputmode="numeric" min="0" max="${save.coins}" step="25" value="${f.wager}"></div>
         <div class="opts" style="margin-top:8px">${chips.map(v => opt('fw', v, v ? money(v) : 'No bet', v === f.wager)).join('')}${save.coins > 0 && !chips.includes(save.coins) ? opt('fw', save.coins, 'All in', f.wager === save.coins) : ''}</div>
         <div class="gnote">Winners split the pot. Tied after ${f.n} holes? Sudden-death playoff holes until someone wins.</div>`}
@@ -4282,11 +4589,11 @@
     const m = MP.doc, t = lobbyTeams(m), host = m.host === fbUser.uid, myTeam = m.players[fbUser.uid].team, md = MP_MODES[m.mode];
     const col = k => {
       const names = t[k].map(u => `<div>${u === m.host ? '👑 ' : ''}${esc(u === fbUser.uid ? 'You' : m.players[u].name)}</div>`);
-      for (let i = t[k].length; i < m.mode; i++) names.push('<div class="open">Open spot</div>');
+      for (let i = t[k].length; i < teamSize(m); i++) names.push('<div class="open">Open spot</div>');
       return `<div class="teamc${k === myTeam ? ' mine' : ''}"><h4>TEAM ${k ? 'B' : 'A'}</h4>${names.join('')}</div>`;
     };
     const players = t[0].length + t[1].length, grp = isGroup(m);
-    const ready = grp ? players >= 2 : t[0].length > 0 && t[0].length === t[1].length, full = grp ? players === 4 : t[0].length === m.mode && t[1].length === m.mode;
+    const ts = teamSize(m), ready = grp ? players >= 2 : t[0].length > 0 && t[0].length === t[1].length && (+m.mode !== 4 || players === 4), full = grp ? players === 4 : t[0].length === ts && t[1].length === ts;
     const all = t[0].concat(t[1]), grpCol = `<div class="teamc mine" style="grid-column:1 / -1"><h4>GOLFERS · ${players} / 4</h4>${all.map(u => `<div>${u === m.host ? '👑 ' : ''}${esc(u === fbUser.uid ? 'You' : m.players[u].name)}</div>`).join('')}${'<div class="open">Open spot</div>'.repeat(Math.max(0, 4 - players))}</div>`;
     const c = courseById(m.cid);
     box.innerHTML = back + `<div class="mpbox">
@@ -4294,9 +4601,9 @@
         <div class="chips" style="justify-content:center"><span><b>${md.name}</b></span><span>${fmtName(m.mode, m.fmt)}</span><span>${esc(c.name)}</span><span><b>${m.n}</b> holes</span>${m.wager ? `<span>Wager <b>${money(m.wager)}</b></span><span>Pot <b>${money(m.wager * Math.max(players, 2))}</b></span>` : '<span>No wager</span>'}</div>
         <div class="gnote" style="text-align:center">${fmtHow(m.mode, m.fmt)}</div>
         <div class="lh" style="margin-top:14px">${grp ? 'GROUP' : 'TEAMS'}</div><div class="teams">${grp ? grpCol : col(0) + col(1)}</div>
-        <div class="mpbtns">${!grp && t[1 - myTeam].length < m.mode ? '<button class="ghost sm" data-swap="1">Switch team</button>' : ''}<button class="ghost sm" data-sharematch="1">Share invite link</button></div>
+        <div class="mpbtns">${!grp && t[1 - myTeam].length < ts ? '<button class="ghost sm" data-swap="1">Switch team</button>' : ''}<button class="ghost sm" data-sharematch="1">Share invite link</button></div>
         ${host ? `<button class="main" data-start="1" style="width:100%;margin-top:12px"${ready ? '' : ' disabled'}>${ready ? (full || grp ? `Start ${grp ? players + '-golfer ' : ''}match` : `Start ${t[0].length}v${t[1].length}`) : 'Waiting for golfers…'}</button>`
-          + (ready || m.mode === 1 ? '' : `<div class="gnote" style="text-align:center">${grp ? 'Need at least 2 golfers.' : 'Teams must be even to start.'}</div>`)
+          + (ready || m.mode === 1 ? '' : `<div class="gnote" style="text-align:center">${grp ? 'Need at least 2 golfers.' : +m.mode === 4 ? 'Scramble foursomes need all 4 golfers, 2 on each team.' : 'Teams must be even to start.'}</div>`)
           : '<div class="tnote" style="margin-top:12px">Waiting for the host to start…</div>'}
         <button class="ghost sm" data-leave="1" style="width:100%;margin-top:10px">${host ? 'Cancel match' : 'Leave match'}</button>
         <div class="mpmsg${mpMsg.ok ? ' ok' : ''}" id="mpMsg">${esc(mpMsg.t)}</div>
@@ -4338,7 +4645,7 @@
     if (d.sharematch) { const msg = await shareLink(`${siteUrl()}?join=${MP.id}`, `Join my ${MP_MODES[m.mode].name} golf match on Red & Gold Golf! Code ${MP.id}${m.wager ? ` · ${money(m.wager)} wager` : ''}`); if (msg) setMsg(msg, true); return; }
     if (d.swap) {
       const t = lobbyTeams(m), my = m.players[fbUser.uid].team;
-      if (t[1 - my].length >= m.mode) return setMsg('The other team is full');
+      if (t[1 - my].length >= teamSize(m)) return setMsg('The other team is full');
       return run(() => matchRef(MP.id).update(FP('players', fbUser.uid, 'team'), 1 - my).then(() => ''));
     }
     if (d.start) return run(() => startMatch().then(() => ''));
@@ -4585,7 +4892,15 @@
     };
     fr.readAsDataURL(e.target.files[0]);
   });
-  $('gName').addEventListener('input', e => { save.name = e.target.value.trim().slice(0, 14); persist(); });
+  $('gName').addEventListener('input', e => {
+    const v = e.target.value.trim().slice(0, 14), bad = v ? nameProblem(v) : '';
+    const w = $('gNameWarn'); if (w) { w.textContent = bad; w.classList.toggle('hidden', !bad); }
+    e.target.classList.toggle('bad', !!bad);
+    if (!bad) { save.name = v; persist(); }
+  });
+  $('gName').addEventListener('blur', e => {
+    if (nameProblem(e.target.value)) { e.target.value = save.name || ''; e.target.classList.remove('bad'); const w = $('gNameWarn'); if (w) w.classList.add('hidden'); }
+  });
   $('gName').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); e.stopPropagation(); });
 
   // ---- How to play ----
@@ -4635,7 +4950,7 @@
         <p><b>Daily Closest to the Pin:</b> a brutal new par 3 every day with ${CTP_TRIES} tries. Land it within ${CTP_UNLOCK_FT} feet to unlock the Senior Sweater.</p>
         <p><b>Gold Star Mini Golf:</b> tap the ⭐ button on the home screen for 18 holes of putt-putt.</p>
         <p><b>Hole payouts:</b> hole-in-one $1,500 · albatross $1,000 · eagle $250 · birdie $100 · par $25 · bogey or worse $0, plus a round bonus.</p>
-        <p><b>Play Friends:</b> add friends with their friend code, then play a 1v1 for a wager (3, 6 or 9 holes, sudden-death playoff if tied), 2v2 (scramble, alt shot or best ball) or a Foursome (up to 4 golfers: everyone plays their own ball for the pot, or all play one team scramble). Winners split the pot.</p>
+        <p><b>Play Friends:</b> add friends with their friend code, then play a 1v1 for a wager (3, 6 or 9 holes, sudden-death playoff if tied), 2v2 (scramble, alt shot or best ball) or a Foursome (own ball 1v1v1v1 for up to 4 golfers, or a 2 v 2 scramble; the host sets one buy-in everyone pays). Winners split the pot.</p>
         <p><b>Money</b> buys gear: spend it in <b>Clubs</b> on new models and upgrades. Customize your outfit and golf bag in <b>Golfer</b>.</p>
       </div>`;
   }
@@ -4670,68 +4985,87 @@
 
   // ---- Clubs tab: shop, equip and upgrades ----
   const pipRow = (n, of = MAX_LV) => Array.from({ length: of }, (_, i) => `<span class="pip${i < n ? ' on' : ''}"></span>`).join('');
-  function clubBars(c) {
-    const lv = lvOf(c), zone = perfectZone(c), spd = c.speed * needleMult(c);
-    const bar = (label, v, txt) => `<div class="sbar"><span>${label}</span><i><b style="width:${Math.round(clamp(v, 0.04, 1) * 100)}%"></b></i><em>${txt}</em></div>`;
+  // stat rows for a club at a given level (used for the current bars and the "next level" ghost marker)
+  function clubStats(c, lv) {
+    const dist = Math.round(c.carry * (c.putter ? 1 : 0.92 + 0.04 * lv)), zone = c.zone + 0.014 * lv, spd = c.speed * Math.pow(0.88, lv);
     const rows = [];
-    if (c.putter) rows.push(bar('Roll', stockOf(c) / 45, `${stockOf(c)} yds`));
-    else rows.push(bar('Power', stockOf(c) / 280, `${stockOf(c)} yds`));
-    rows.push(bar('Accuracy', zone / 0.24, `${Math.round(zone * 100)}% gold`));
-    rows.push(bar('Control', (1.65 - spd) / 1.25, spd < 0.75 ? 'slow needle' : spd < 1.05 ? 'medium needle' : 'fast needle'));
+    if (c.putter) rows.push({ k: 'Roll', v: dist / 45, t: `${dist} yds` });
+    else rows.push({ k: 'Power', v: dist / 280, t: `${dist} yds` });
+    rows.push({ k: 'Accuracy', v: zone / 0.24, t: `${Math.round(zone * 100)}% gold` });
+    rows.push({ k: 'Control', v: (1.65 - spd) / 1.25, t: spd < 0.75 ? 'slow needle' : spd < 1.05 ? 'medium needle' : 'fast needle' });
     if (!c.putter) {
-      rows.push(bar('Straight', 1 - c.curve / 1.5, c.curve >= 1.1 ? 'big misses' : c.curve >= 0.8 ? 'normal misses' : 'small misses'));
-      rows.push(bar('Spin', ((c.loft - 20) / 32) * 0.6 + (c.spin || 0), c.spin >= 0.2 ? 'stops fast' : c.loft >= 33 ? 'soft landing' : 'runs out'));
+      rows.push({ k: 'Straight', v: 1 - c.curve / 1.5, t: c.curve >= 1.1 ? 'big misses' : c.curve >= 0.8 ? 'normal misses' : 'small misses' });
+      rows.push({ k: 'Spin', v: ((c.loft - 20) / 32) * 0.6 + (c.spin || 0), t: c.spin >= 0.2 ? 'stops fast' : c.loft >= 33 ? 'soft landing' : 'runs out' });
     }
-    return rows.join('');
+    return rows;
   }
-  let clubsReturn = null;
-  const openSlots = new Set();
+  function clubBars(c) {
+    const lv = lvOf(c), now = clubStats(c, lv), nxt = lv < MAX_LV ? clubStats(c, lv + 1) : null;
+    const pct = v => Math.round(clamp(v, 0.04, 1) * 100);
+    return now.map((r, i) => {
+      const ghost = nxt && nxt[i].v > r.v + 0.001 ? `<u style="width:${pct(nxt[i].v)}%"></u>` : '';
+      return `<div class="vstat"><div class="vk"><span>${r.k}</span><em>${r.t}</em></div><i>${ghost}<b style="width:${pct(r.v)}%"></b></i></div>`;
+    }).join('');
+  }
+  // little club-head drawings for the bag rack
+  function clubIcon(c) {
+    const g = '#FFE08A', d = '#C9962B', s = '#e9e4d6';
+    if (!c) return `<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15" fill="#fff" stroke="${d}" stroke-width="2"/>${[[19, 19], [27, 18], [24, 25], [17, 27], [30, 26], [22, 32], [29, 32]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#d7d2c4"/>`).join('')}</svg>`;
+    const shaft = `<path d="M38 4 L26 30" stroke="${s}" stroke-width="2.4" stroke-linecap="round"/>`;
+    if (c.putter) return `<svg viewBox="0 0 48 48">${shaft}<rect x="8" y="29" width="24" height="9" rx="${c.id === 'mallet' ? 4.5 : 1.5}" fill="${g}" stroke="${d}" stroke-width="1.5"/><path d="M14 33h12" stroke="${d}" stroke-width="1.5"/></svg>`;
+    if (c.slot <= 1) { const r = c.slot === 0 ? 12 : 9; return `<svg viewBox="0 0 48 48">${shaft}<ellipse cx="${26 - r * 0.6}" cy="${36 - r * 0.25}" rx="${r + 3}" ry="${r * 0.72}" fill="${g}" stroke="${d}" stroke-width="1.5"/><path d="M${14 - r * 0.4} ${37} q${r} 4 ${r * 2} -1" stroke="${d}" stroke-width="1.4" fill="none"/></svg>`; }
+    const loft = 6 + c.slot * 3;
+    return `<svg viewBox="0 0 48 48">${shaft}<path d="M27 29 L10 ${30 - loft * 0.25} L8 ${38} L28 38 Z" fill="${g}" stroke="${d}" stroke-width="1.5" stroke-linejoin="round"/>${[0, 1, 2].map(k => `<path d="M${12 + k * 1} ${33 + k * 1.6}h13" stroke="${d}" stroke-width=".9"/>`).join('')}</svg>`;
+  }
+  let clubsReturn = null, clubSel = 0, statsOpen = true;
   function renderClubs() {
     const back = clubsReturn ? `<button class="back" data-back="1">← Back to ${courseById(clubsReturn).name}</button>` : '';
-    const cards = SLOTS.map((slotName, si) => {
-      const eq = CLUBS[si], lv = lvOf(eq), cost = COSTS[lv];
-      const up = lv >= MAX_LV ? '<button class="main sm" disabled>MAX</button>'
-        : `<button class="main sm" data-up="${eq.id}"${save.coins < cost ? ' disabled' : ''}>Upgrade ${money(cost)}</button>`;
-      const nextTxt = lv >= MAX_LV ? 'Fully upgraded' : eq.putter ? 'Next: wider gold zone, slower needle'
-        : `Next: ${Math.round(eq.carry * (distMult(eq) + 0.04))} yds, wider gold zone, slower needle`;
+    const ringOf = n => `<div class="lvring" style="--p:${n / MAX_LV}"><b>${n}</b><small>/${MAX_LV}</small></div>`;
+    // the bag rack: every club as a chip, plus the ball
+    const chips = SLOTS.map((slotName, si) => {
+      const eq = CLUBS[si], lv = lvOf(eq), can = lv < MAX_LV && save.coins >= COSTS[lv];
+      return `<button class="cchip${clubSel === si ? ' on' : ''}${can ? ' can' : ''}" data-sel="${si}">${clubIcon(eq)}<b>${eq.short}</b><em>${eq.putter ? stockOf(eq) + ' roll' : stockOf(eq)}</em><span class="pips">${pipRow(lv)}</span></button>`;
+    }).join('') + `<button class="cchip${clubSel === 8 ? ' on' : ''}${save.ball < MAX_LV && save.coins >= COSTS[save.ball] ? ' can' : ''}" data-sel="8">${clubIcon(null)}<b>BALL</b><em>Lv ${save.ball}</em><span class="pips">${pipRow(save.ball)}</span></button>`;
+    let left = '', stats = '';
+    if (clubSel < 8) {
+      const si = clubSel, eq = CLUBS[si], lv = lvOf(eq), cost = COSTS[lv];
+      const up = lv >= MAX_LV ? '<button class="main sm" disabled>MAXED OUT</button>'
+        : `<button class="main sm" data-up="${eq.id}"${save.coins < cost ? ' disabled' : ''}>Upgrade · ${money(cost)}</button>`;
+      const perks = lv >= MAX_LV ? ['Every upgrade unlocked'] : [
+        ...(eq.putter ? [] : [`+${Math.round(eq.carry * 0.04)} yds (${Math.round(eq.carry * (distMult(eq) + 0.04))} total)`]),
+        `Gold zone +1.4%`, `Needle 12% slower`];
       const others = MODELS.filter(m => m.slot === si).map(m => {
         const own = save.owned.includes(m.id), on = m.id === eq.id;
         const btn = on ? '<span class="tagon">IN BAG</span>'
           : own ? `<button class="ghost sm" data-eq="${m.id}">Equip</button>`
           : `<button class="main sm" data-buy="${m.id}"${save.coins < m.price ? ' disabled' : ''}>${money(m.price)}</button>`;
-        const yd = m.putter ? `${Math.round(m.carry * distMult(m))} yd roll` : `${Math.round(m.carry * distMult(m))} yds`;
-        return `<div class="model${on ? ' on' : ''}"><div class="mi"><div class="mn">${m.name} <small>${yd}</small></div><div class="md">${m.desc}</div></div>${btn}</div>`;
+        const dy = Math.round(m.carry * distMult(m)) - stockOf(eq);
+        const diff = on ? '' : `<span class="dlt ${dy > 0 ? 'up' : dy < 0 ? 'dn' : ''}">${dy > 0 ? '+' : ''}${dy} yds</span>${m.zone > eq.zone ? '<span class="dlt up">bigger gold</span>' : m.zone < eq.zone ? '<span class="dlt dn">smaller gold</span>' : ''}${m.speed < eq.speed ? '<span class="dlt up">slower needle</span>' : m.speed > eq.speed ? '<span class="dlt dn">faster needle</span>' : ''}`;
+        return `<div class="mcard${on ? ' on' : ''}">${clubIcon(m)}<div class="mi"><div class="mn">${m.name} <small>${Math.round(m.carry * distMult(m))}${m.putter ? ' yd roll' : ' yds'}</small></div><div class="md">${m.desc}</div><div>${diff}</div></div>${btn}</div>`;
       }).join('');
-      const open = openSlots.has(si), yd = eq.putter ? `${stockOf(eq)} yd roll` : `${stockOf(eq)} yds`;
-      return `<div class="slot${open ? ' open' : ''}"><button class="slothead" data-slot="${si}" aria-expanded="${open}">
-          <span>${slotName.toUpperCase()}</span><b>${eq.name}</b><em>${yd}</em><i class="chev">▾</i></button>
-        <div class="slotbody">
-        <div class="bars">${clubBars(eq)}</div>
-        <div class="uprow"><div><div class="pips">${pipRow(lv)}</div><div class="nx">${nextTxt}</div></div>${up}</div>
-        <div class="models">${others}</div></div></div>`;
-    }).join('');
-    const wNow = Math.round(windMult() * 100), bl = save.ball;
-    const bbtn = bl >= MAX_LV ? '<button class="main sm" disabled>MAX</button>'
-      : `<button class="main sm" data-ball="1"${save.coins < COSTS[bl] ? ' disabled' : ''}>${money(COSTS[bl])}</button>`;
-    const ballOpen = openSlots.has(8);
-    const ballCard = `<div class="slot${ballOpen ? ' open' : ''}"><button class="slothead" data-slot="8" aria-expanded="${ballOpen}">
-      <span>GOLF BALL</span><b>Pro Ball</b><em>Lv ${bl}</em><i class="chev">▾</i></button>
-      <div class="slotbody"><div class="uprow"><div><div class="pips">${pipRow(bl)}</div><div class="nx">Wind effect ${wNow}%${bl < MAX_LV ? ` · next: ${wNow - 12}%` : ''}</div></div>${bbtn}</div></div></div>`;
-    const allOpen = openSlots.size >= 9;
-    $('clubList').innerHTML = back + `<div class="sect" style="display:flex;justify-content:space-between;align-items:center">YOUR BAG · 8 CLUBS
-      <button class="back" data-all="1" style="padding:0;letter-spacing:.04em">${allOpen ? 'Collapse all' : 'Expand all'}</button></div>` + cards + ballCard;
+      left = `<div class="chero">${clubIcon(eq)}<div class="ht"><span>${SLOTS[si].toUpperCase()}</span><b>${eq.name}</b><em>${eq.putter ? stockOf(eq) + ' yd roll' : stockOf(eq) + ' yard carry'}</em></div>${ringOf(lv)}</div>
+        <div class="upcard"><div class="uh">${lv >= MAX_LV ? 'FULLY UPGRADED' : `NEXT: LEVEL ${lv + 1}`}</div><ul>${perks.map(t => `<li>${t}</li>`).join('')}</ul>${up}</div>
+        <div class="sect" style="margin-top:16px">${SLOTS[si].toUpperCase()} MODELS</div>${others}`;
+      stats = clubBars(eq);
+    } else {
+      const bl = save.ball, wNow = Math.round(windMult() * 100);
+      const bbtn = bl >= MAX_LV ? '<button class="main sm" disabled>MAXED OUT</button>'
+        : `<button class="main sm" data-ball="1"${save.coins < COSTS[bl] ? ' disabled' : ''}>Upgrade · ${money(COSTS[bl])}</button>`;
+      left = `<div class="chero">${clubIcon(null)}<div class="ht"><span>GOLF BALL</span><b>Pro Ball</b><em>Wind moves it ${wNow}%</em></div>${ringOf(bl)}</div>
+        <div class="upcard"><div class="uh">${bl >= MAX_LV ? 'FULLY UPGRADED' : `NEXT: LEVEL ${bl + 1}`}</div><ul><li>${bl >= MAX_LV ? 'Wind barely touches it' : `Wind effect ${wNow}% → ${wNow - 12}%`}</li></ul>${bbtn}</div>
+        <div class="md" style="margin-top:12px">Change your ball's color and pattern in the Golfer tab.</div>`;
+      stats = `<div class="vstat"><div class="vk"><span>Wind cut</span><em>${100 - wNow}%</em></div><i>${bl < MAX_LV ? `<u style="width:${Math.round((100 - wNow + 12) / 60 * 100)}%"></u>` : ''}<b style="width:${Math.max(4, Math.round((100 - wNow) / 60 * 100))}%"></b></i></div>`;
+    }
+    $('clubList').innerHTML = back + `<div class="sect">YOUR BAG</div><div class="crack">${chips}</div>
+      <div class="cmain${statsOpen ? '' : ' shut'}"><div class="cleft">${left}</div>
+      <aside class="cstats"><button class="stog" data-stats="1" aria-expanded="${statsOpen}"><span>STATS</span><i>${statsOpen ? '▸' : '◂'}</i></button>
+      <div class="sbody">${stats}<div class="slegend"><u></u> next level</div></div></aside></div>`;
   }
   $('clubList').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b || b.disabled) return;
     ensureAudio();
-    if (b.dataset.slot != null) {
-      const k = +b.dataset.slot; openSlots.has(k) ? openSlots.delete(k) : openSlots.add(k);
-      sfx.click(); renderClubs(); return;
-    }
-    if (b.dataset.all) {
-      if (openSlots.size >= 9) openSlots.clear(); else for (let i = 0; i <= 8; i++) openSlots.add(i);
-      sfx.click(); renderClubs(); return;
-    }
+    if (b.dataset.sel != null) { clubSel = +b.dataset.sel; sfx.click(); renderClubs(); return; }
+    if (b.dataset.stats) { statsOpen = !statsOpen; sfx.click(); renderClubs(); return; }
     if (b.dataset.back) { const c = courseById(clubsReturn); clubsReturn = null; openCourse(c); return; }
     if (b.dataset.ball) {
       const cost = COSTS[save.ball]; if (save.ball >= MAX_LV || save.coins < cost) return;
@@ -5003,32 +5337,73 @@
     setTimeout(() => $('ctpEnd').classList.remove('hidden'), yd == null ? 300 : 1100);
   }
   $('ctpAgain').addEventListener('click', () => { ensureAudio(); sfx.click(); startCtp(); });
-  $('ctpHome').addEventListener('click', () => { ensureAudio(); sfx.click(); showHome(); setTab('play'); });
+  $('ctpHome').addEventListener('click', () => { ensureAudio(); sfx.click(); showHome(); setTab('ctp'); });
+  const DIFF_NAMES = ['', 'Easy', 'Medium', 'Hard', 'Very hard', 'Brutal'];
+  const stars = n => '★'.repeat(n) + '<span style="opacity:.3">' + '★'.repeat(5 - n) + '</span>';
+  // where the wind is blowing, from the golfer's point of view on the tee
+  function windWords(h) {
+    const w = h.fixedWind || h.wind; if (!w || !w.mph) return 'Calm';
+    const L = Math.hypot(h.pin.x - h.tee.x, h.pin.y - h.tee.y) || 1, dx = (h.pin.x - h.tee.x) / L, dy = (h.pin.y - h.tee.y) / L;
+    const along = (w.x * dx + w.y * dy) / w.mph, across = (w.x * -dy + w.y * dx) / w.mph;
+    const a = Math.abs(along) > 0.92 ? (along > 0 ? 'Helping (downwind)' : 'Into your face') : Math.abs(across) > 0.92 ? (across > 0 ? 'Left to right' : 'Right to left')
+      : `${along > 0 ? 'Helping' : 'Into you'}, ${across > 0 ? 'left to right' : 'right to left'}`;
+    return a;
+  }
+  function windArrow(h) {
+    const w = h.fixedWind || h.wind; if (!w || !w.mph) return '';
+    const L = Math.hypot(h.pin.x - h.tee.x, h.pin.y - h.tee.y) || 1, dx = (h.pin.x - h.tee.x) / L, dy = (h.pin.y - h.tee.y) / L;
+    const along = (w.x * dx + w.y * dy) / w.mph, across = (w.x * -dy + w.y * dx) / w.mph, deg = Math.atan2(across, along) * 180 / Math.PI;
+    return `<span class="warr" style="transform:rotate(${deg}deg)">↑</span>`;
+  }
   function renderCtpCard() {
-    const c = ctpCourse(), h = c.holes[0], st = ctpState(), left = CTP_TRIES - st.tries;
-    $('ctpCard').innerHTML = `<div class="ctp">
+    const c = ctpCourse(), h = c.holes[0], st = ctpState(), left = CTP_TRIES - st.tries, k = h.ctpKind;
+    $('ctpCard').innerHTML = `<div class="ctp" data-ctpinfo="1" role="button">
       <div class="thumb" style="background-image:url('${holeThumb(c, 0)}')"></div>
-      <div class="ci"><div class="ctag">🎯 DAILY CLOSEST TO THE PIN</div><div class="cn">${h.name}</div>
-        <div class="cm">${h.yds} yds · Wind ${h.fixedWind.mph} mph · ${CTP_TRIES} tries a day · New hole in ${resetsIn()}</div>
+      <div class="ci"><div class="ctag">🎯 DAILY CHALLENGE · CLOSEST TO THE PIN</div><div class="cn">${h.name}</div>
+        <div class="cm">${h.yds} yds · Wind ${h.fixedWind.mph} mph · <span style="color:#FFE08A">${stars(k.diff)}</span> ${DIFF_NAMES[k.diff]}</div>
         <div class="cm" style="color:#FFE08A;margin-top:3px">Best today: ${st.best == null ? '—' : st.best === 0 ? 'Ace!' : fmtFt(st.best)} · Tries left: ${left}</div>
-        ${unlocked('senior') ? '' : `<div class="cm" style="margin-top:3px">Within ${CTP_UNLOCK_FT} ft unlocks the 🔒 Senior Sweater</div>`}
-        <div class="act">${left > 0 ? '<button class="main sm" data-ctp="1">Take your shot</button>' : '<div class="lock">Come back tomorrow for a new hole</div>'}</div></div></div>`
-      + (ONLINE ? '<div class="ctpLb" id="ctpLb"><div class="empty">Loading today\'s leaders…</div></div>' : '');
+        <div class="act"><button class="main sm" data-ctpinfo="1">Hole details & leaderboard ›</button></div></div></div>`;
+  }
+  function renderCtpTab() {
+    const c = ctpCourse(), h = c.holes[0], st = ctpState(), left = CTP_TRIES - st.tries, k = h.ctpKind;
+    const pays = CTP_PAY.map(([f, m]) => `<span>${f === 0 ? 'In the cup' : `Inside ${f} ft`} <b>${money(m)}</b></span>`).join('');
+    $('ctpDetail').innerHTML = `<button class="back" data-cback="1">← All courses</button>
+      <div class="ctag" style="font:800 11px Inter;letter-spacing:.16em;color:var(--gold);margin-top:6px">🎯 DAILY CHALLENGE · ${c.day}</div>
+      <div class="cdname">${h.name}</div><div class="cddesc">${k.about} Everyone in the world gets the same hole and the same wind today.</div>
+      <div class="ctphero"><div class="hthumb" style="background-image:url('${holeThumb(c, 0)}')"></div>
+      <div class="dgrid">
+        <div><small>DIFFICULTY</small><b style="color:#FFE08A">${stars(k.diff)}</b><em>${DIFF_NAMES[k.diff]}</em></div>
+        <div><small>WIND</small><b>${windArrow(h)} ${h.fixedWind.mph} mph</b><em>${windWords(h)}</em></div>
+        <div><small>LENGTH</small><b>${h.yds} yds</b><em>Par 3 · ${k.label}</em></div>
+        <div><small>TRIES LEFT</small><b>${left} / ${CTP_TRIES}</b><em>New hole in ${resetsIn()}</em></div>
+      </div></div>
+      <div class="chips" style="margin-top:10px"><span>Your best today <b>${st.best == null ? '—' : st.best === 0 ? 'Ace!' : fmtFt(st.best)}</b></span>${pays}</div>
+      ${unlocked('senior') ? '' : `<div class="tnote" style="text-align:left;margin-top:8px">Within ${CTP_UNLOCK_FT} ft unlocks the 🔒 Senior Sweater</div>`}
+      <div class="cdbtns">${left > 0 ? '<button class="main" data-ctp="1">Take your shot</button>' : '<div class="lock" style="flex:1;text-align:center">Out of tries. Come back tomorrow for a new hole.</div>'}</div>
+      ${ONLINE ? `<div class="sect">TODAY'S LEADERBOARD</div><div id="ctpLb"><div class="empty">Loading today's leaders…</div></div>
+      <div class="sect">YESTERDAY'S WINNERS</div><div id="ctpYest"><div class="empty">Loading…</div></div>` : '<div class="tnote" style="margin-top:14px">Leaderboards need an internet connection.</div>'}`;
     if (ONLINE) fillCtpBoard(c.day);
   }
   async function fillCtpBoard(day) {
     try {
-      const [rows, yest] = await Promise.all([fetchCtp(day, 5), fetchCtp(prevDay(day), 1)]);
-      const box = $('ctpLb'); if (!box) return;
-      box.innerHTML = (rows.length ? '<table class="board"><tr><th></th><th>TODAY\'S CLOSEST</th><th>DISTANCE</th></tr>' + rows.map((r, i) =>
+      const [rows, yest] = await Promise.all([fetchCtp(day, 10), fetchCtp(prevDay(day), 3)]);
+      const box = $('ctpLb'), yb = $('ctpYest'); if (!box) return;
+      box.innerHTML = (rows.length ? '<table class="board"><tr><th></th><th>GOLFER</th><th>DISTANCE</th></tr>' + rows.map((r, i) =>
         `<tr class="${fbUser && r.pid === fbUser.uid ? 'me' : ''}"><td class="rk">${i + 1}</td><td>${esc(r.name)}</td><td><b>${r.yd === 0 ? 'Ace!' : fmtFt(r.yd)}</b></td></tr>`).join('') + '</table>'
         : '<div class="empty">No shots posted today yet. Be the first!</div>')
         + `<div class="tnote">Top 3 at midnight ET win 🥇 <b>${money(CTP_PRIZES[0])}</b> · 🥈 <b>${money(CTP_PRIZES[1])}</b> · 🥉 <b>${money(CTP_PRIZES[2])}</b></div>`
-        + (yest.length ? `<div class="tnote">Yesterday's winner: <b>${esc(yest[0].name)}</b> (${yest[0].yd === 0 ? 'Ace' : fmtFt(yest[0].yd)})</div>` : '')
         + (fbUser ? '' : '<div class="tnote" style="margin-top:8px"><button class="main sm" data-signin="1">Sign in with Google</button> to compete</div>');
-    } catch (e) { const box = $('ctpLb'); if (box) box.innerHTML = '<div class="empty">Couldn\'t reach the online leaderboard.</div>'; }
+      if (yb) yb.innerHTML = yest.length ? `<div class="podium">${yest.map((r, i) => `<div class="pd${i}"><span>${['🥇', '🥈', '🥉'][i]}</span><b>${esc(r.name)}</b><em>${r.yd === 0 ? 'Ace!' : fmtFt(r.yd)}</em><small>won ${money(CTP_PRIZES[i])}</small></div>`).join('')}</div>`
+        : '<div class="empty">Nobody posted a shot yesterday.</div>';
+    } catch (e) { const box = $('ctpLb'); if (box) box.innerHTML = '<div class="empty">Couldn\'t reach the online leaderboard.</div>'; const yb = $('ctpYest'); if (yb) yb.innerHTML = ''; }
   }
-  $('ctpCard').addEventListener('click', e => { if (e.target.closest('[data-ctp]')) { ensureAudio(); sfx.click(); startCtp(); } });
+  $('ctpDetail').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    ensureAudio();
+    if (b.dataset.ctp) { sfx.click(); startCtp(); }
+    else if (b.dataset.cback) { sfx.click(); setTab('play'); }
+  });
+  $('ctpCard').addEventListener('click', e => { if (e.target.closest('[data-ctpinfo]')) { ensureAudio(); sfx.click(); setTab('ctp'); } });
 
   $('againBtn').addEventListener('click', () => startRound(course));
   $('homeBtn').addEventListener('click', () => { showHome(); setTab('course'); });

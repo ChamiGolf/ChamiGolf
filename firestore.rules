@@ -4,7 +4,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isMe(uid) { return request.auth != null && request.auth.uid == uid; }
-    function okName(n) { return n is string && n.size() > 0 && n.size() <= 14; }
+    // Names: 1-14 characters, and none of the worst words (the game also runs a much bigger filter before posting).
+    function okName(n) { return n is string && n.size() > 0 && n.size() <= 14
+      && !n.lower().matches('.*(fuck|shit|bitch|cunt|nigg|faggot|retard|whore|slut|penis|vagina|porn|nazi|hitler|dildo|pussy|rapist|molest|pedo|asshole|kkk).*'); }
 
     // Each golfer's saved progress (only they can read or write it).
     match /users/{uid} {
