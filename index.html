@@ -370,6 +370,54 @@
   .aw .ap i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden;display:block}
   .aw .ap i b{display:block;height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold-l))}
   .aw .ar{font:700 11px Inter;color:#FFE08A;margin-top:5px}
+
+  /* ---------- Play Friends: 1v1 wagers, 2v2, Foursomes ---------- */
+  .mpc{background:linear-gradient(135deg,#1f4f8a,#7A0C1D 60%,#45060F);border:2px solid var(--gold-l);border-radius:18px;padding:12px 12px 12px;margin:8px 0 4px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .mpc .ctag{font:800 10px Inter;letter-spacing:.16em;color:var(--gold-l)}
+  .mpc .cn{font:700 23px/1.1 Oswald,sans-serif;color:#fff;text-transform:uppercase;letter-spacing:.03em;margin:3px 0 4px}
+  .mpc .cm{font-size:12px;color:#fff;opacity:.9}
+  .mpbtns{display:flex;gap:8px;margin-top:10px}
+  .mpbtns button{flex:1;padding:10px 6px}
+  .mpnote{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;background:rgba(0,0,0,.3);border:1px solid rgba(242,193,78,.5);border-radius:12px;padding:8px 10px;font-size:13px;color:var(--cream)}
+  .mpnote b{color:var(--gold-l)}
+  .mpbox{background:rgba(79,7,18,.88);border:1px solid rgba(242,193,78,.4);border-radius:16px;padding:12px 14px;margin-bottom:12px}
+  .mpbox .lh{font:800 10px Inter;letter-spacing:.16em;color:var(--gold);margin:10px 2px 7px;text-transform:uppercase}
+  .mpbox .lh:first-child{margin-top:0}
+  .mpbox .opts{flex-wrap:wrap}
+  .mpbox .opts button{padding:9px 6px;font-size:13px;min-width:70px}
+  .mpin{width:100%;padding:10px 12px;border-radius:12px;border:2px solid rgba(242,193,78,.55);background:var(--red-dd);color:#fff;font:700 17px Oswald,sans-serif;
+        letter-spacing:.06em;-webkit-user-select:text;user-select:text;touch-action:auto}
+  .mprow{display:flex;gap:8px;align-items:center}
+  .mprow .mpin{flex:1;min-width:0}
+  .mpmsg{font-size:12px;color:#ffb4bf;margin-top:6px;min-height:0}
+  .mpmsg:empty{display:none}
+  .mpmsg.ok{color:var(--gold-l)}
+  .bigcode{font:700 34px/1 Oswald,sans-serif;letter-spacing:.18em;color:var(--gold-l);text-align:center;margin:4px 0 8px}
+  .mplist{display:flex;flex-direction:column;gap:6px}
+  .mpli{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.25);border-radius:12px;padding:8px 10px;font-size:13px;color:var(--cream)}
+  .mpli .nm{flex:1;min-width:0;line-height:1.3}
+  .mpli .nm b{color:#fff;font:700 15px Oswald,sans-serif;letter-spacing:.03em;text-transform:uppercase}
+  .mpli .nm small{display:block;color:#f3d7a8;font-size:11.5px}
+  .mpli button{flex:none}
+  .xbtn{background:none;border:0;color:#d9b98a;font-size:18px;cursor:pointer;padding:2px 6px}
+  .teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .teamc{background:rgba(0,0,0,.25);border:2px solid rgba(242,193,78,.35);border-radius:14px;padding:8px 10px;min-height:84px}
+  .teamc.mine{border-color:var(--gold-l)}
+  .teamc h4{margin:0 0 6px;font:800 10px Inter;letter-spacing:.16em;color:var(--gold)}
+  .teamc div{font:700 16px Oswald,sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#fff;padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .teamc div.open{color:rgba(255,255,255,.35)}
+  #mpBar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 142px);z-index:3;pointer-events:none;max-width:calc(100% - 20px);
+         background:rgba(20,40,80,.88);border:1px solid var(--gold);border-radius:14px;padding:5px 12px;font:700 13px Inter,sans-serif;color:#fff;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #mpBar b{color:var(--gold-l)}
+  #mpBar .ms{display:block;font:600 11px Inter;color:#cfe3ff}
+  #mpBar .ms:empty{display:none}
+  .mptab{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0 10px}
+  .mptab td,.mptab th{padding:5px 3px;text-align:center;border-bottom:1px solid rgba(242,193,78,.25)}
+  .mptab td:first-child,.mptab th:first-child{text-align:left;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+  .mptab tr.mine td{color:var(--gold-l)}
+  .mptab td.w{font-weight:800;color:#8fe086}
+  .mpstat{font-size:13px;color:#f3d7a8;margin:4px 0 12px}
+  .mpstat b{color:var(--gold-l)}
   .reset{margin:20px auto 0;display:block;background:none;border:0;color:#c79a7a;font-size:12px;text-decoration:underline;cursor:pointer}
 
   /* scorecard between holes */
@@ -452,6 +500,7 @@
 </div>
 <button class="pill" id="exitBtn">✕ QUIT</button>
 <div id="pinBox">PIN <b id="pinYds">0</b> YDS</div>
+<div id="mpBar" style="display:none"></div>
 <button class="pill" id="viewBtn">MAP</button>
 <div id="side" style="display:none">
   <button class="shead" id="sideToggle"><span>🗺️ GREEN &amp; HOLE MAP</span><b>▾</b></button>
@@ -500,8 +549,9 @@
   <main class="hbody">
     <div class="wrap">
       <div id="err" class="hidden">Your browser couldn't start 3D graphics. Try Chrome or Safari with hardware acceleration turned on.</div>
-      <section id="tab-play"><div id="ctpCard"></div><div class="sect">CHOOSE A COURSE</div><div id="courseList"></div></section>
+      <section id="tab-play"><div id="mpCard"></div><div id="ctpCard"></div><div class="sect">CHOOSE A COURSE</div><div id="courseList"></div></section>
       <section id="tab-course" class="hidden"><div id="courseDetail"></div></section>
+      <section id="tab-match" class="hidden"><div id="matchBody"></div></section>
       <section id="tab-golfer" class="hidden">
         <div class="gwrap">
           <div class="gleft">
@@ -540,6 +590,19 @@
 </div>
 
 <div id="toast" class="toast"></div>
+
+
+<!-- ===== Match scorecard between holes / match result ===== -->
+<div id="mpOv" class="overlay hidden">
+  <div class="card" style="max-width:560px">
+    <h2 id="mpTitle">Match</h2>
+    <div class="sub" id="mpSub"></div>
+    <div id="mpTable"></div>
+    <div class="earn" id="mpEarn"></div>
+    <div class="mpstat" id="mpStat"></div>
+    <div class="btns"><button class="main" id="mpGo">Next hole ▶</button><button class="ghost" id="mpHome" style="display:none">Home</button></div>
+  </div>
+</div>
 
 <!-- ===== Scorecard between holes ===== -->
 <div id="scOv" class="overlay hidden">
@@ -854,9 +917,9 @@
   const needleMult = c => Math.pow(0.88, lvOf(c));
   const perfectZone = c => c.zone + 0.014 * lvOf(c);
   const windMult = () => 1 - 0.12 * save.ball;
-  const PAY = { '-3': 400, '-2': 250, '-1': 100, '0': 50, '1': 15 };
+  const PAY = { '-4': 1000, '-3': 1000, '-2': 250, '-1': 100, '0': 25 };   // bogey or worse pays nothing
   const ROUND_BONUS = 50, UNDER_PAR_BONUS = 40;
-  const payFor = (s, p) => s === 1 ? 500 : (PAY[String(s - p)] || 0);
+  const payFor = (s, p) => s === 1 ? 1500 : (PAY[String(s - p)] || 0);   // hole-in-one $1,500
 
   // ================= Courses (yards; x = right, y = toward the tee) =================
   function makeRng(seed) { return () => (seed = (seed * 9301 + 49297) % 233280) / 233280; }
@@ -968,7 +1031,7 @@
 
   const COURSES = [
     { id: 'pines', name: 'Chami Links', desc: 'The easiest course. Wide, friendly parkland modeled on Bethpage Black. Learn your yardages here.', wind: 8,
-      pal: { outer: '#2f6f30', rough: '#3f8b3c', fairEdge: '#4f9d48', fair: '#66c05c', fringe: '#5cb854', green: '#88da7f', sand: '#ead6a1', sandRim: '#a99260',
+      pal: { outer: '#2f6f30', rough: '#3f8b3c', fairEdge: '#4f9d48', fair: '#66c05c', fringe: '#5cb854', green: '#88da7f', sand: '#f7ebc8', sandRim: '#7d6638',
              tee: '#74cd6a', far: 0x2f6f30, sky: ['#3f8fd6', '#b9dcf3', '#eef6fb'], fog: 0xd3e8f4, sun: 0xfff0d0, leaves: [0x2d6e2f, 0x245f29, 0x387a34], style: 'round' },
       holes: [
         BB(1, 'The Turn', 4, 430, { p: [[0, 0], [0, 260], [70, 430]], bk: [['v1+15', -26, 9, 7], ['g-14', 16, 7, 6]], wd: [['v1-50', 55, 24, 5]] }),
@@ -980,7 +1043,7 @@
         BB(18, 'The Squeeze', 4, 411, { fw: [[0.08, 0.93, 34]], bk: [[0.6, -24, 14, 7], [0.6, 24, 14, 7], ['g-14', -15, 7, 8], ['g-14', 15, 7, 8]] }),
       ] },
     { id: 'coast', name: 'TPC Saragosa', unlock: 'pines', desc: 'Stadium golf modeled on TPC Sawgrass. Water everywhere, doglegs around lakes and the famous island green.', wind: 14,
-      pal: { outer: '#6f8f4a', rough: '#8fa54f', fairEdge: '#6fae55', fair: '#7cc663', fringe: '#6dbd5c', green: '#93de86', sand: '#efdfb0', sandRim: '#b49f68',
+      pal: { outer: '#6f8f4a', rough: '#8fa54f', fairEdge: '#6fae55', fair: '#7cc663', fringe: '#6dbd5c', green: '#93de86', sand: '#f8eecd', sandRim: '#806a3a',
              tee: '#80d070', far: 0x3f6f35, sky: ['#2f86d6', '#a9d8f5', '#f3f9fb'], fog: 0xdcecf5, sun: 0xfff6e0, leaves: [0x3e6b3a, 0x4b7a40, 0x35602f], style: 'pine' },
       holes: [
         TPC(4, 'Lagoon Left', 4, 384, { p: [[0, 0], [0, 240], [-40, 384]], wt: [['g-30', -36, 40, 16]], bk: [['g+2', 18, 6, 9], ['v1', 26, 10, 6]] }),
@@ -992,7 +1055,7 @@
         TPC(18, 'Water Left', 4, 462, { p: [[0, 0], [0, 230], [-110, 420]], wt: [['v1+40', -50, 70, 40]], t: [0, 50], bk: [['g-6', 20, 7, 8], ['v1', 30, 12, 7]] }),
       ] },
     { id: 'meribah', name: 'Meribah Country Club', unlock: 'coast', desc: '18 holes modeled on Augusta National. Sharp doglegs through tall pines, creeks and white sand.', wind: 12,
-      pal: { outer: '#2c6a34', rough: '#3d8a3f', fairEdge: '#55a84c', fair: '#6cc95f', fringe: '#62bf57', green: '#8fe086', sand: '#f4ecd8', sandRim: '#b9ab88',
+      pal: { outer: '#2c6a34', rough: '#3d8a3f', fairEdge: '#55a84c', fair: '#6cc95f', fringe: '#62bf57', green: '#8fe086', sand: '#fbf6ea', sandRim: '#857552',
              tee: '#78d06c', far: 0x2c5f30, sky: ['#d9714a', '#f4c296', '#fde9d2'], fog: 0xf0d2b2, sun: 0xffd9a8, leaves: [0x24502a, 0x2d5e2f, 0x1f4524], style: 'pine' },
       holes: [
         AU(1, 'Tea Olive', 4, 445, { p: [[0, 0], [0, 270], [55, 445]], bk: [['v1', 24, 12, 8], ['g-14', -16, 8, 7]] }),
@@ -1022,7 +1085,7 @@
           bk: [['v1-10', -22, 8, 6], ['v1+5', -26, 7, 6], ['g-12', -15, 7, 8], ['g-4', 18, 5, 7]], wd: [['v1-40', 55, 22, 6]] }),
       ] },
     { id: 'hollow', name: 'Brothers Hollow', unlock: 'meribah', desc: '18 holes modeled on the Old Course at St Andrews. Hidden pot bunkers, gorse, the Road Hole and wild wind.', wind: 22,
-      pal: { outer: '#a99a62', rough: '#9aa45a', fairEdge: '#7fa95a', fair: '#8fbf68', fringe: '#86b862', green: '#a2d68a', sand: '#dccb98', sandRim: '#9c8a5c',
+      pal: { outer: '#a99a62', rough: '#9aa45a', fairEdge: '#7fa95a', fair: '#8fbf68', fringe: '#86b862', green: '#a2d68a', sand: '#f2e5bd', sandRim: '#6e5a32',
              tee: '#93c76d', far: 0x5f7d4a, sky: ['#6f8fae', '#c3d3df', '#eef2f4'], fog: 0xd8e0e6, sun: 0xfff4e0, leaves: [0x5b6b2a, 0x6e7a2e, 0x4c5c24], style: 'round' },
       holes: [
         SA(1, 'Burn', 4, 376, { fw: [[0.06, 0.86, 66]], g: [16, 22], wt: [['g-24', 0, 4, 60]] }),
@@ -1052,7 +1115,7 @@
         SA(18, 'Tom Morris', 4, 357, { fw: [[0.05, 0.93, 70]], g: [18, 26], m: [64, 36], t: [44, 0], wt: [[0.14, 0, 4, 80]] }),
       ] },
     { id: 'valley', name: 'Deans Valley', unlock: 'hollow', desc: 'The hardest course. 18 holes modeled on Pebble Beach: narrow fairways, tiny greens, sharp doglegs and the ocean.', wind: 24,
-      pal: { outer: '#4f8a45', rough: '#5f9e48', fairEdge: '#5aa84f', fair: '#6fc462', fringe: '#66bb5a', green: '#8cdc82', sand: '#efe2bd', sandRim: '#ad9a6c',
+      pal: { outer: '#4f8a45', rough: '#5f9e48', fairEdge: '#5aa84f', fair: '#6fc462', fringe: '#66bb5a', green: '#8cdc82', sand: '#f8efd2', sandRim: '#7d6a42',
              tee: '#7bd06d', far: 0x1f6aa8, sky: ['#2a7fcf', '#a6d4f2', '#f1f8fb'], fog: 0xd6e8f3, sun: 0xfff3dc, leaves: [0x2a4f2c, 0x335a32, 0x223f24], style: 'pine' },
       holes: [
         PB(1, 'Opening Bend', 4, 380, { p: [[0, 0], [0, 230], [140, 330]], g: [12, 14], bk: [['v1+10', -24, 8, 6], ['g-4', -16, 6, 6]], wd: [['v1-30', 55, 30, 10]] }),
@@ -1826,7 +1889,24 @@
     fairLayer(0, true);    // full width, slightly darker: leaves a soft inner rim
     fairLayer(-3, false);  // main fairway on top
 
-    for (const e of h.water) { ell(g, e, 1.4); g.fillStyle = '#5e7f45'; g.fill(); ell(g, e); g.fillStyle = '#1d5a8c'; g.fill(); }
+    // water: a dark shadow line and a muddy stone bank so the edge pops against the grass, then deep blue
+    const ellK = (gg, e, k, pad = 0) => { gg.beginPath(); gg.ellipse(e.x, e.y, Math.max(0.1, e.rx * k + pad), Math.max(0.1, e.ry * k + pad), 0, 0, Math.PI * 2); };
+    for (const e of h.water) {
+      ell(g, e, 2.4); g.fillStyle = 'rgba(10,25,5,.55)'; g.fill();
+      ell(g, e, 1.3); g.fillStyle = '#6e5a3a'; g.fill();
+      ellK(g, e, 1, 0.5); g.fillStyle = '#b8a77c'; g.fill();
+      ellK(g, e, 0.955); g.fillStyle = '#0d3f78'; g.fill();
+      const wg = g.createRadialGradient(e.x, e.y, 0, e.x, e.y, 1);
+      wg.addColorStop(0, '#0a3368'); wg.addColorStop(0.75, '#11508f'); wg.addColorStop(1, '#2a7fc9');
+      g.save(); g.translate(e.x, e.y); g.scale(e.rx * 0.955, e.ry * 0.955); g.translate(-e.x, -e.y);
+      g.fillStyle = wg; g.beginPath(); g.arc(e.x, e.y, 1, 0, Math.PI * 2); g.fill(); g.restore();
+      g.save(); ellK(g, e, 0.95); g.clip(); g.strokeStyle = 'rgba(255,255,255,.14)'; g.lineWidth = 0.35;
+      for (let i = 0, n = Math.min(400, e.rx * e.ry / 6); i < n; i++) {
+        const a = rng() * Math.PI * 2, r = Math.sqrt(rng()) * 0.9, x = e.x + Math.cos(a) * e.rx * r, y = e.y + Math.sin(a) * e.ry * r, l = 1 + rng() * 3;
+        g.beginPath(); g.moveTo(x - l, y); g.quadraticCurveTo(x, y - 0.5, x + l, y); g.stroke();
+      }
+      g.restore();
+    }
 
     // cart path: grey asphalt with a darker worn edge, centre wear and fine grit
     const cp = cartPath(h);
@@ -1873,8 +1953,9 @@
 
     for (const e of h.bunkers) {
       // grass lip: darker, shaggier turf rolling over the edge
-      ell(g, e, 1.6); g.fillStyle = 'rgba(10,40,5,.16)'; g.fill();
+      ell(g, e, 1.9); g.fillStyle = 'rgba(10,30,5,.42)'; g.fill();
       ell(g, e, 0.9); g.fillStyle = pal.sandRim; g.fill();
+      ell(g, e, 0.3); g.fillStyle = 'rgba(255,250,230,.55)'; g.fill();
       const S = mk(); ell(S, e); S.fillStyle = pal.sand; S.fill();
       S.globalCompositeOperation = 'source-atop';
       const bx = e.x - e.rx - 1, by = e.y - e.ry - 1, bw = e.rx * 2 + 2, bh = e.ry * 2 + 2, ba = bw * bh;
@@ -1906,7 +1987,7 @@
       grain(S, Math.min(ba * 40, cap / 40), 'rgba(110,80,35,.22)', 'rgba(255,255,250,.28)', 0.12, bx, by, bw, bh);
       // shade toward the walls so the bunker reads as a hollow
       const sg = S.createRadialGradient(e.x, e.y, 0, e.x, e.y, 1);
-      sg.addColorStop(0, 'rgba(255,250,235,.10)'); sg.addColorStop(0.6, 'rgba(255,250,235,0)'); sg.addColorStop(0.88, 'rgba(90,65,30,.12)'); sg.addColorStop(1, 'rgba(70,50,20,.32)');
+      sg.addColorStop(0, 'rgba(255,250,235,.10)'); sg.addColorStop(0.6, 'rgba(255,250,235,0)'); sg.addColorStop(0.88, 'rgba(90,65,30,.08)'); sg.addColorStop(1, 'rgba(70,50,20,.2)');
       S.save(); S.translate(e.x, e.y); S.scale(e.rx, e.ry); S.translate(-e.x, -e.y); S.fillStyle = sg; S.fillRect(e.x - 1, e.y - 1, 2, 2); S.restore();
       blit(g, S);
     }
@@ -2232,7 +2313,7 @@
         + sh.fragmentShader.replace('#include <map_fragment>',
         '#include <map_fragment>\n  float gd = texture2D(detailMap, vUv * detailRep).r;\n  float gd2 = texture2D(detailMap, vUv * detailRep * 0.21 + 0.37).g;\n'
         + '  float gm = (0.85 + 0.30 * gd) * (0.93 + 0.14 * gd2);\n'
-        + (bowl ? '  float sd = texture2D(sandMap, vUv * detailRep * 1.6).r;\n  diffuseColor.rgb *= mix(gm, 0.8 + 0.4 * sd, vSandK);' : '  diffuseColor.rgb *= gm;'));
+        + (bowl ? '  float sd = texture2D(sandMap, vUv * detailRep * 1.6).r;\n  diffuseColor.rgb *= mix(gm, 0.9 + 0.3 * sd, vSandK);' : '  diffuseColor.rgb *= gm;'));
     };
     gMat.onBeforeCompile = sh => detailShader(sh, true);
     disposables.push(tex, gGeo, gMat);
@@ -2268,7 +2349,7 @@
         shape.holes.push(hp);
       }
       const geo = new THREE.ShapeGeometry(shape, 48);
-      const mat = new THREE.MeshPhongMaterial({ color: 0x2a80cf, shininess: 110, specular: 0xffffff, transparent: true, opacity: 0.88 });
+      const mat = new THREE.MeshPhongMaterial({ color: 0x1565c8, emissive: 0x06224a, shininess: 120, specular: 0xffffff, transparent: true, opacity: 0.95 });
       disposables.push(geo, mat);
       const m = new THREE.Mesh(geo, mat);
       m.rotation.x = -Math.PI / 2; m.position.set(e.x, 0.06, e.y); m.receiveShadow = true;
@@ -2360,6 +2441,7 @@
   }
 
   // ================= Game state =================
+  var MP = null;   // the live friends match (Play Friends section below), or null
   let course = courseById(save.course), HOLES = course.holes;
   let holeIdx = 0, hole = null, ball = { x: 0, y: 0, vx: 0, vy: 0 }, prev = null, strokes = 0, scores = [], earned = [];
   let state = 'title', clubIdx = 0, recIdx = 0, aimAng = 0, flight = null, swing = null, ptr = null, strike = null, swingAnim = null;
@@ -2438,7 +2520,7 @@
   function loadHole(i, preview = false) {
     holeIdx = i; hole = HOLES[i];
     const mph = Math.round(Math.random() * course.wind), ang = Math.random() * Math.PI * 2;
-    hole.wind = hole.fixedWind || { mph, ang, x: Math.cos(ang) * mph, y: Math.sin(ang) * mph };
+    hole.wind = (MP && MP.started && mpWind(i)) || hole.fixedWind || { mph, ang, x: Math.cos(ang) * mph, y: Math.sin(ang) * mph };
     buildHole(hole, course, preview ? 1300 : 2600);
     ball = { x: hole.tee.x, y: hole.tee.y, vx: 0, vy: 0 }; prev = { x: ball.x, y: ball.y };
     strokes = 0; flight = null; swing = null; ptr = null; splash = null; lastPutt = false; strike = null; swingAnim = null;
@@ -2609,7 +2691,10 @@
   });
   if (save.ui.wheelMin) { $('bar').classList.add('min'); $('cMin').textContent = '+'; }
   $('viewBtn').addEventListener('click', () => { if (state !== 'ready') return; viewMode = viewMode === 'overview' ? 'normal' : 'overview'; sfx.click(); });
-  $('exitBtn').addEventListener('click', () => { if (confirm('Quit this round? Your progress on this round will be lost.')) showHome(); });
+  $('exitBtn').addEventListener('click', () => {
+    if (MP && MP.started) { if (confirm(MP.doc && MP.doc.wager ? `Leave the match? Your team forfeits and you lose your ${money(MP.doc.wager)} wager.` : 'Leave the match? Your team forfeits.')) mpQuit(); return; }
+    if (confirm('Quit this round? Your progress on this round will be lost.')) showHome();
+  });
   window.addEventListener('keydown', e => {
     if (state === 'title' || state === 'finished') return;
     if (e.key === 'ArrowLeft') setClub(clubIdx - 1);
@@ -2828,6 +2913,7 @@
     }
     lastClub = -1;
     if (course.ctp) return ctpDone(Math.hypot(ball.x - hole.pin.x, ball.y - hole.pin.y));
+    if (mpTeamFmt()) return mpAfterShot(false);
     if (strokes >= maxStrokes()) return pickUp();
     readyForShot();
   }
@@ -2904,14 +2990,17 @@
       if (lastShot && lastShot.putter && lastShot.dist >= 10) st.longPutts++;
     } else if (strokes === 1) st.miniAces++;
     const pay = course.mini ? (MINI_PAY[String(Math.max(-2, d))] || 0) : payFor(strokes, hole.par); earned[holeIdx] = pay;
-    showBanner(term(strokes, hole.par), `${strokes} stroke${strokes === 1 ? '' : 's'}${pay ? ` · +${money(pay)}` : ''}`, 2.3);
+    const mate = MP && MP.remote ? MP.remote : '';
+    showBanner(term(strokes, hole.par), `${mate ? mate + ' · ' : ''}${strokes} stroke${strokes === 1 ? '' : 's'}${pay ? ` · +${money(pay)}` : ''}`, 2.3);
     if (d <= -1 || strokes === 1) burst(140);
     persist(); checkAwards();
     state = 'holeDone'; doneT = 2.4;
+    if (MP && MP.started) mpHoleFinished();
   }
   function pickUp() {
     scores[holeIdx] = maxStrokes(); earned[holeIdx] = 0; if (!course.mini) save.stats.holes++;
     showBanner('Picked up', `Max ${maxStrokes()} strokes`, 2); state = 'holeDone'; doneT = 2.1;
+    if (MP && MP.started) { strokes = maxStrokes(); mpHoleFinished(); }
   }
   function nextHole() { if (holeIdx + 1 < HOLES.length) loadHole(holeIdx + 1); else showFinal(); }
   // Between holes: the team scorecard, nine holes to a row, with circles for birdies and squares for bogeys
@@ -2981,9 +3070,10 @@
       if (penT <= 0 && course.ctp) { splash = null; ctpDone(null); }
       else if (penT <= 0) {
         ball = { x: prev.x, y: prev.y, vx: 0, vy: 0 }; splash = null; trailReset();
-        if (strokes >= maxStrokes()) pickUp(); else readyForShot();
+        if (mpTeamFmt()) mpAfterShot(true);
+        else if (strokes >= maxStrokes()) pickUp(); else readyForShot();
       }
-    } else if (state === 'holeDone') { doneT -= dt; if (doneT <= 0) { if (holeIdx + 1 < HOLES.length) showScorecard(); else nextHole(); } }
+    } else if (state === 'holeDone') { doneT -= dt; if (doneT <= 0) { if (MP && MP.started) showMpCard(); else if (holeIdx + 1 < HOLES.length) showScorecard(); else nextHole(); } }
     for (const p of confetti) { p.life -= dt; p.vy += 900 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.99; p.r += dt * 8; }
     confetti = confetti.filter(p => p.life > 0 && p.y < innerHeight + 20);
   }
@@ -3044,7 +3134,7 @@
     }
 
     // golfer: stands beside the ball (target to his left) and swings with the pull
-    const gReady = state === 'ready' || state === 'swinging' || state === 'striking' || state === 'title';
+    const gReady = state === 'ready' || state === 'swinging' || state === 'striking' || state === 'title' || state === 'wait';
     golfer.root.visible = viewMode !== 'overview' || state !== 'ready';
     if (gReady) {
       const c = CLUBS[clubIdx], kind = clubKind(c), dx = Math.cos(aimAng), dz = Math.sin(aimAng), B = golfer.B[kind];
@@ -3277,7 +3367,7 @@
     setText('mmHt', `${elev >= 0 ? '+' : ''}${elev.toFixed(1)} ft`);
   }
   function updateReader() {
-    const playing = hole && state !== 'title' && state !== 'finished' && state !== 'card' && viewMode === 'normal';
+    const playing = hole && state !== 'title' && state !== 'finished' && state !== 'card' && state !== 'mpCard' && viewMode === 'normal';
     $('side').style.display = playing ? '' : 'none';
     if (!playing) return;
     $('side').classList.toggle('closed', !save.ui.side);
@@ -3321,6 +3411,7 @@
   function updateHud() {
     const playing = hole && state !== 'title' && state !== 'finished';
     ['hud', 'bar', 'viewBtn', 'exitBtn', 'pinBox'].forEach(id => $(id).style.display = playing ? '' : 'none');
+    $('mpBar').style.display = playing && MP && MP.started && state !== 'mpCard' ? '' : 'none';
     if (!playing) { $('side').style.display = 'none'; $('pinMark').style.display = 'none'; return; }
     setText('hHole', `${holeIdx + 1}/${HOLES.length}`);
     setText('hPar', String(hole.par));
@@ -3344,7 +3435,7 @@
     $('bar').classList.toggle('disabled', !ready);
     $('bar').classList.toggle('swinging', state === 'swinging' || state === 'striking');
     $('viewBtn').classList.toggle('disabled', !ready);
-    $('exitBtn').classList.toggle('disabled', !(ready || state === 'flying' || state === 'rolling'));
+    $('exitBtn').classList.toggle('disabled', !(ready || state === 'flying' || state === 'rolling' || state === 'wait'));
     setText('viewBtn', viewMode === 'overview' ? 'BACK' : 'MAP');
     updateReader(); updatePinMark();
   }
@@ -3361,10 +3452,11 @@
   let tab = 'play';
   function setTab(t) {
     tab = t;
-    const navTab = t === 'course' ? 'play' : t;
+    const navTab = t === 'course' || t === 'match' ? 'play' : t;
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === navTab));
-    ['play', 'course', 'golfer', 'clubs', 'awards', 'stats'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
-    if (t === 'play') renderCourses();
+    ['play', 'course', 'match', 'golfer', 'clubs', 'awards', 'stats'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
+    if (t === 'match') renderMatchTab();
+    if (t === 'play') { renderCourses(); renderMpCard(); }
     if (t === 'course') renderCourse();
     if (t === 'golfer') renderGolfer();
     document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer');
@@ -3592,6 +3684,7 @@
     fbAuth.onAuthStateChanged(async u => {
       fbUser = u; cloudReady = false; renderAcct();
       if (u) { await syncFromCloud(); renderAcct(); claimPrizes(); }
+      mpOnAuth();
       if (!$('home').classList.contains('hidden')) { if (tab === 'course') fillBoard(course); renderCtpCard(); }
     });
   }
@@ -3629,6 +3722,635 @@
       if ($('boardBox') === box) box.innerHTML = `<div class="empty">Couldn't reach the online leaderboard. Your best here: ${save.stats.bestBy[c.id] == null ? '—' : fmtRel(save.stats.bestBy[c.id])}</div>`;
     }
   }
+
+  // ================= Play Friends: friend codes, 1v1 wagers, 2v2 and Foursomes (Firebase) =================
+  // Everything about a match lives in one Firestore doc (matches/{CODE}). Each golfer only appends to its
+  // "log" map, and every device replays the log the same way, so scores, scramble picks and alt-shot turns
+  // always agree, and a golfer who reloads can rejoin where their team is.
+  const MP_FMT = { stroke: 'Stroke play', scramble: 'Scramble', alt: 'Alt shot', best: 'Best ball' };
+  const MP_MODES = { 1: { name: '1v1', fmts: ['stroke'], sub: 'You vs a friend' }, 2: { name: '2v2', fmts: ['scramble', 'alt', 'best'], sub: 'Teams of 2' },
+    4: { name: 'Foursome', fmts: ['stroke', 'scramble'], sub: '2 to 4 golfers in one group' } };
+  const isGroup = m => +m.mode === 4;
+  const fmtName = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'Team scramble' : 'Own ball') : MP_FMT[fmt] || '';
+  const fmtHow = (mode, fmt) => +mode === 4 ? (fmt === 'scramble' ? 'All of you hit every shot and play the best ball together, as one team against par. No wager: everyone collects the hole payouts.'
+    : 'Everyone plays their own ball. Lowest total wins the pot; a tie for the lead goes to a sudden-death playoff.') : FMT_HOW[fmt];
+  const teamsOf = m => [m.t0, m.t1, m.t2, m.t3].slice(0, m.nt || 2).map(t => t || []);
+  const FMT_HOW = { stroke: 'Lowest total strokes wins.', scramble: 'Everyone hits, the team plays the best ball every shot.',
+    alt: 'Teammates take turns hitting one ball (tee shots rotate).', best: 'Everyone plays their own ball; the team takes the best score on each hole.' };
+  const PLAYOFF_MAX = 9, INVITE_HOURS = 12;
+  const CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const newCode = () => Array.from({ length: 6 }, () => CODE_CH[Math.floor(Math.random() * CODE_CH.length)]).join('');
+  const cleanCode = v => String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  const FP = (...p) => new firebase.firestore.FieldPath(...p);
+  const matchRef = id => fbDb.collection('matches').doc(id);
+  const inboxRef = uid => fbDb.collection('inbox').doc(uid).collection('items');
+  const r2 = v => Math.round(v * 100) / 100;
+  save.friends = save.friends || []; save.mp = save.mp || {};
+  let mpForm = { mode: 1, fmt: 'stroke', cid: 'pines', n: 3, wager: 0 };
+  let inbox = [], inboxUnsub = null, pendingLink = null, mpMsg = { t: '', ok: false };
+  try {
+    const q = new URLSearchParams(location.search), j = cleanCode(q.get('join')), f = cleanCode(q.get('friend'));
+    if (j) pendingLink = { join: j }; else if (f) pendingLink = { friend: f };
+  } catch (e) {}
+
+  const mpTeamFmt = () => !!(MP && MP.started && (MP.fmt === 'alt' || MP.fmt === 'scramble'));
+  const mpName = uid => (MP && MP.doc && MP.doc.players[uid] && MP.doc.players[uid].name) || 'Golfer';
+  const teamLabel = t => MP.teams[t].map(u => u === fbUser.uid ? 'You' : mpName(u)).join(MP.teams[t].length > 2 ? ', ' : ' & ');
+  const gone = u => !MP.doc.players[u] || MP.doc.players[u].left;
+  const teamOut = t => MP.coop ? MP.teams[t].every(gone) : MP.teams[t].some(gone);
+  const aliveTeams = () => MP.teams.map((_, i) => i).filter(t => !teamOut(t));
+  const mpHole = h => MP.course.holes[h % MP.course.holes.length];
+  function mpWind(i) {
+    const r = makeRng((MP.doc.seed + i * 7919) % 233280), mph = Math.round(r() * MP.course.wind), ang = r() * Math.PI * 2;
+    return { mph, ang, x: Math.cos(ang) * mph, y: Math.sin(ang) * mph };
+  }
+  function mpLog(key, val) {
+    const id = MP.id;
+    (MP.doc.log || (MP.doc.log = {}))[key] = val;   // apply locally right away so turns and scores stay consistent
+    const send = (tries) => matchRef(id).update(FP('log', key), val).catch(() => { if (tries < 8 && MP && MP.id === id) setTimeout(() => send(tries + 1), 1500); });
+    send(0);
+  }
+
+  // ---- Friend codes and the inbox (friend adds + match invites) ----
+  async function ensureFriendCode() {
+    if (!fbUser) return;
+    try {
+      if (save.friendCode) {
+        const ref = fbDb.collection('codes').doc(save.friendCode), s = await ref.get();
+        if (s.exists && s.data().uid === fbUser.uid) { if (s.data().name !== boardName()) ref.set({ uid: fbUser.uid, name: boardName() }).catch(() => {}); return; }
+      }
+      for (let i = 0; i < 6; i++) {
+        const c = newCode(), ref = fbDb.collection('codes').doc(c);
+        if ((await ref.get()).exists) continue;
+        await ref.set({ uid: fbUser.uid, name: boardName() });
+        save.friendCode = c; persist(); break;
+      }
+    } catch (e) {}
+    if (tab === 'match') renderMatchTab();
+  }
+  function listenInbox() {
+    if (inboxUnsub) { inboxUnsub(); inboxUnsub = null; }
+    inbox = [];
+    if (!fbUser) return;
+    inboxUnsub = inboxRef(fbUser.uid).orderBy('at', 'desc').limit(25).onSnapshot(s => {
+      const old = Date.now() - INVITE_HOURS * 3600e3;
+      inbox = s.docs.map(d => Object.assign({ id: d.id }, d.data()));
+      inbox.filter(x => x.at < old).forEach(x => inboxRef(fbUser.uid).doc(x.id).delete().catch(() => {}));
+      inbox = inbox.filter(x => x.at >= old);
+      renderMpCard(); renderInbox();
+    }, () => {});
+  }
+  function addFriendLocal(uid, name, code) {
+    const ex = save.friends.find(x => x.uid === uid);
+    if (ex) { ex.name = name || ex.name; ex.code = code || ex.code; } else save.friends.push({ uid, name: name || 'Golfer', code: code || '' });
+    persist();
+  }
+  async function addFriend(code) {
+    code = cleanCode(code);
+    if (code.length < 6) return 'Friend codes are 6 letters/numbers';
+    if (code === save.friendCode) return "That's your own code";
+    const s = await fbDb.collection('codes').doc(code).get();
+    if (!s.exists) return 'No golfer has that code';
+    const f = s.data();
+    if (f.uid === fbUser.uid) return "That's your own code";
+    addFriendLocal(f.uid, f.name, code);
+    inboxRef(f.uid).add({ type: 'friend', from: fbUser.uid, name: boardName(), code: save.friendCode || '', at: Date.now() }).catch(() => {});
+    return '';
+  }
+  async function shareLink(url, text) {
+    try { if (navigator.share) { await navigator.share({ title: 'Red & Gold Golf', text, url }); return ''; } }
+    catch (e) { if (e && e.name === 'AbortError') return ''; }
+    try { await navigator.clipboard.writeText(url); return 'Link copied — paste it to your friend'; }
+    catch (e) { prompt('Copy this link and send it to your friend:', url); return ''; }
+  }
+  const siteUrl = () => location.origin + location.pathname;
+
+  async function mpOnAuth() {
+    listenInbox();
+    if (!fbUser) { renderMpCard(); if (tab === 'match') renderMatchTab(); return; }
+    await ensureFriendCode();
+    if (pendingLink) {
+      const pl = pendingLink; pendingLink = null;
+      try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      if (pl.friend) { const err = await addFriend(pl.friend); setMsg(err || 'Friend added!', !err); setTab('match'); }
+      else if (pl.join && !(MP && MP.started)) { const err = await joinMatch(pl.join); if (err) { setMsg(err); setTab('match'); } }
+    }
+    renderMpCard(); if (tab === 'match') renderMatchTab();
+  }
+
+  // ---- Matches: create, join, lobby ----
+  async function createMatch() {
+    const f = mpForm;
+    if (f.mode === 4 && f.fmt === 'scramble') f.wager = 0;
+    if (f.wager > save.coins) return `You only have ${money(save.coins)}`;
+    for (let i = 0; i < 6; i++) {
+      const id = newCode(), ref = matchRef(id);
+      if ((await ref.get()).exists) continue;
+      await ref.set({ host: fbUser.uid, status: 'lobby', mode: f.mode, fmt: f.fmt, cid: f.cid, n: f.n, wager: f.wager, seed: 0,
+        players: { [fbUser.uid]: { name: boardName(), team: 0, at: Date.now() } }, t0: [], t1: [], nt: 2, log: {}, at: Date.now() });
+      openMatch(id); return '';
+    }
+    return 'Could not create a match. Try again.';
+  }
+  async function joinMatch(id) {
+    id = cleanCode(id);
+    if (id.length < 6) return 'Match codes are 6 letters/numbers';
+    const s = await matchRef(id).get();
+    if (!s.exists) return 'No match with that code';
+    const m = s.data();
+    if (m.players[fbUser.uid] && !m.players[fbUser.uid].left && m.status !== 'cancelled') { openMatch(id); return ''; }
+    if (m.status !== 'lobby') return m.status === 'cancelled' ? 'The host cancelled that match' : 'That match already started';
+    if (save.coins < m.wager) return `This match has a ${money(m.wager)} wager. You have ${money(save.coins)}.`;
+    const cnt = [0, 0]; Object.values(m.players).forEach(p => cnt[p.team]++);
+    if (isGroup(m) ? cnt[0] + cnt[1] >= 4 : cnt[0] >= m.mode && cnt[1] >= m.mode) return 'That match is full';
+    const team = isGroup(m) ? 0 : cnt[0] >= m.mode ? 1 : cnt[1] >= m.mode ? 0 : cnt[1] < cnt[0] ? 1 : 0;
+    await matchRef(id).update(FP('players', fbUser.uid), { name: boardName(), team, at: Date.now() });
+    openMatch(id); return '';
+  }
+  function openMatch(id) {
+    if (MP && MP.id === id) { setTab('match'); return; }
+    closeMatch();
+    MP = { id, doc: null, started: false, invited: {} };
+    save.mpActive = id; persist();
+    MP.unsub = matchRef(id).onSnapshot(s => onMatchSnap(s), () => {});
+    setTab('match');
+  }
+  function closeMatch() {
+    if (MP && MP.unsub) MP.unsub();
+    MP = null;
+    $('mpOv').classList.add('hidden'); $('mpBar').style.display = 'none';
+  }
+  async function leaveLobby() {
+    const m = MP && MP.doc; if (!m) { closeMatch(); return; }
+    try {
+      if (m.host === fbUser.uid) await matchRef(MP.id).update({ status: 'cancelled' });
+      else await matchRef(MP.id).update(FP('players', fbUser.uid), firebase.firestore.FieldValue.delete());
+    } catch (e) {}
+    save.mpActive = null; persist();
+    closeMatch(); setTab('play');
+  }
+  function lobbyTeams(m) {
+    const t = [[], []];
+    Object.keys(m.players).sort((a, b) => m.players[a].at - m.players[b].at).forEach(u => { if (!m.players[u].left) t[m.players[u].team].push(u); });
+    return t;
+  }
+  async function startMatch() {
+    const m = MP.doc, t = lobbyTeams(m), up = { status: 'playing', seed: 1 + Math.floor(Math.random() * 200000), startedAt: Date.now() };
+    if (isGroup(m)) {
+      const all = t[0].concat(t[1]); if (all.length < 2) return;
+      if (m.fmt === 'scramble') Object.assign(up, { nt: 1, t0: all });
+      else { up.nt = all.length; all.forEach((u, i) => up['t' + i] = [u]); }
+    } else {
+      if (!t[0].length || t[0].length !== t[1].length) return;
+      Object.assign(up, { nt: 2, t0: t[0], t1: t[1] });
+    }
+    await matchRef(MP.id).update(up);
+  }
+  function onMatchSnap(s) {
+    if (!MP) return;
+    if (!s.exists) { closeMatch(); setMsg('That match no longer exists.'); setTab('match'); return; }
+    MP.doc = s.data();
+    const m = MP.doc, me = m.players[fbUser.uid];
+    if (!MP.started) {
+      if (m.status === 'cancelled' || !me) {
+        const why = m.status === 'cancelled' ? 'The host cancelled the match.' : 'You left the match.';
+        save.mpActive = null; persist(); closeMatch(); setMsg(why);
+        if (!$('home').classList.contains('hidden')) setTab('match');
+        return;
+      }
+      if ((m.status === 'playing' || m.status === 'done') && teamsOf(m).some(t => t.includes(fbUser.uid)) && !me.left) return beginMatch();
+      if (m.status === 'done' || m.status === 'playing') { save.mpActive = null; persist(); closeMatch(); setMsg('That match already finished.'); setTab('match'); return; }
+      if (tab === 'match') renderMatchTab();
+      return;
+    }
+    mpTick();
+  }
+
+  // ---- Playing the match ----
+  function beginMatch() {
+    const m = MP.doc, uid = fbUser.uid;
+    Object.assign(MP, { started: true, over: false, teams: teamsOf(m), fmt: m.fmt, n: m.n, course: courseById(m.cid), seq: -1, h: 0, holeDone: false, remote: '' });
+    MP.coop = MP.teams.length === 1;
+    MP.team = MP.teams.findIndex(t => t.includes(uid)); MP.mates = MP.teams[MP.team]; MP.myIdx = MP.mates.indexOf(uid);
+    const rec = save.mp[MP.id] || (save.mp[MP.id] = { at: Date.now() });
+    if (!rec.paid) { rec.paid = 1; rec.wager = m.wager; save.coins = Math.max(0, save.coins - m.wager); }
+    const keys = Object.keys(save.mp).sort((a, b) => (save.mp[b].at || 0) - (save.mp[a].at || 0));
+    keys.slice(30).forEach(k => delete save.mp[k]);
+    persist();
+    course = MP.course; HOLES = []; applyCourseLook(course);
+    scores = []; earned = []; firstShot = false;
+    $('home').classList.add('hidden'); $('final').classList.add('hidden'); slidesOn(false);
+    // rejoining: pick up at the first hole this golfer's ball (or team) hasn't finished
+    let h0 = 0;
+    for (;; h0++) {
+      const v = myBallScore(h0); if (v == null) break;
+      scores[h0] = v; const hh = mpHole(h0); earned[h0] = hh.mini ? (MINI_PAY[String(Math.max(-2, v - hh.par))] || 0) : payFor(v, hh.par);
+    }
+    while (HOLES.length <= h0) HOLES.push(mpHole(HOLES.length));
+    const res = mpResult();
+    if (res.done) { MP.h = Math.max(0, h0 - 1); loadHole(MP.h); MP.holeDone = true; return mpFinish(res); }
+    if (h0 > 0 && res.next < h0) { MP.h = h0 - 1; loadHole(MP.h); MP.holeDone = true; showMpCard(); return; }
+    mpLoadHole(h0);
+  }
+  function mpLoadHole(h) {
+    MP.h = h; MP.seq = -1; MP.holeDone = false; MP.remote = '';
+    while (HOLES.length <= h) HOLES.push(mpHole(HOLES.length));
+    $('mpOv').classList.add('hidden');
+    loadHole(h);
+    if (h >= MP.n) showBanner('PLAYOFF', `Sudden death · Hole ${h + 1} · Par ${hole.par}`, 2.6);
+    if (mpTeamFmt()) { state = 'wait'; mpTeamSync(); }
+    mpBar();
+  }
+  function myBallScore(h) {
+    if (MP.fmt === 'stroke' || MP.fmt === 'best') { const v = (MP.doc.log || {})[`h${h}u${fbUser.uid}`]; return v == null ? null : v; }
+    return teamScore(h, MP.team);
+  }
+  // Replays one team's log for a hole: where the team ball is, strokes so far, whose turn, or whether it's holed.
+  function teamState(h, t) {
+    const L = MP.doc.log || {}, mates = MP.coop ? MP.teams[t].filter(u => !gone(u)) : MP.teams[t], H = mpHole(h), max = H.mini ? 7 : MAX_STROKES;
+    if (MP.fmt === 'alt') {
+      let st = { seq: 0, x: H.tee.x, y: H.tee.y, n: 0, turn: h % mates.length, holed: false };
+      for (let s = 0; s < 60; s++) {
+        const e = L[`h${h}t${t}s${s}`]; if (!e) break;
+        st = { seq: s + 1, x: e.x, y: e.y, n: e.n, turn: e.turn, holed: !!e.holed, by: e.by };
+        if (st.holed) break;
+      }
+      return st;
+    }
+    let st = { seq: 0, x: H.tee.x, y: H.tee.y, n: 0, holed: false, posted: [], by: null };
+    for (let s = 0; s < 60; s++) {
+      const shots = mates.map(u => [u, L[`h${h}t${t}s${s}u${u}`]]).filter(x => x[1]);
+      const ace = shots.find(x => x[1].holed);
+      if (ace) return { seq: s + 1, x: H.pin.x, y: H.pin.y, n: st.n + 1, holed: true, by: ace[0], posted: [] };
+      if (shots.length < mates.length) return Object.assign(st, { seq: s, posted: shots.map(x => x[0]) });
+      const ok = shots.filter(x => !x[1].pen), dp = e => Math.hypot(e.x - H.pin.x, e.y - H.pin.y);
+      ok.sort((a, b) => dp(a[1]) - dp(b[1]) || (a[0] < b[0] ? -1 : 1));
+      st = ok.length ? { x: ok[0][1].x, y: ok[0][1].y, n: st.n + 1, by: ok[0][0] } : { x: st.x, y: st.y, n: st.n + 2, by: null };
+      Object.assign(st, { seq: s + 1, holed: false, posted: [] });
+      if (st.n >= max) return Object.assign(st, { holed: true, n: max, pick: true });
+    }
+    return st;
+  }
+  function teamScore(h, t) {
+    const L = MP.doc.log || {};
+    if (MP.fmt === 'stroke' || MP.fmt === 'best') {
+      const v = MP.teams[t].map(u => L[`h${h}u${u}`]);
+      return v.some(x => x == null) ? null : Math.min(...v);
+    }
+    const st = teamState(h, t); return st.holed ? st.n : null;
+  }
+  function mpResult() {
+    const N = MP.n;
+    if (MP.coop) {
+      for (let h = 0; h < N; h++) if (teamScore(h, 0) == null) return { done: false, next: h, lead: [0] };
+      return { done: true, win: 0, coop: true };
+    }
+    const alive = aliveTeams();
+    if (alive.length <= 1) return { done: true, forfeit: true, win: alive.length ? alive[0] : -1, lead: alive };
+    const tot = {};
+    for (let h = 0; h < N; h++) for (const t of alive) {
+      const v = teamScore(h, t); if (v == null) return { done: false, next: h, lead: alive, tot };
+      tot[t] = (tot[t] || 0) + v;
+    }
+    const low = Math.min(...alive.map(t => tot[t]));
+    let lead = alive.filter(t => tot[t] === low);
+    if (lead.length === 1) return { done: true, win: lead[0], lead, tot };
+    for (let k = 0; k < PLAYOFF_MAX; k++) {
+      const h = N + k, v = {};
+      for (const t of lead) { v[t] = teamScore(h, t); if (v[t] == null) return { done: false, next: h, playoff: true, lead, tot }; }
+      const b = Math.min(...lead.map(t => v[t])); lead = lead.filter(t => v[t] === b);
+      if (lead.length === 1) return { done: true, win: lead[0], lead, tot, playoff: k + 1 };
+    }
+    return { done: true, win: -1, lead, tot, playoff: PLAYOFF_MAX };
+  }
+  function mpTick() {
+    if (!MP || !MP.started || MP.over) return;
+    const res = mpResult();
+    if (res.done && (res.forfeit || state === 'mpCard')) return mpFinish(res);
+    if (mpTeamFmt() && (state === 'wait' || state === 'ready')) mpTeamSync();
+    if (state === 'mpCard') renderMpOv();
+    mpBar();
+  }
+  // Team formats: move the ball to where the team is playing from, and hand over turns.
+  function mpTeamSync() {
+    if (!MP || MP.holeDone || !hole || holeIdx !== MP.h) return;
+    const st = teamState(MP.h, MP.team), me = fbUser.uid;
+    if (st.holed) {
+      if (state !== 'wait' && state !== 'ready') return;
+      MP.remote = st.pick ? 'Team picked up' : st.by && st.by !== me ? `${mpName(st.by)} holed it` : 'Holed';
+      strokes = st.n; lastShot = null; flight = null; ball.vx = ball.vy = 0;
+      return finishHole();
+    }
+    if (state !== 'wait') return;
+    const moved = st.seq !== MP.seq;
+    if (moved) {
+      MP.seq = st.seq;
+      ball = { x: st.x, y: st.y, vx: 0, vy: 0 }; prev = { x: st.x, y: st.y }; strokes = st.n; trailReset();
+      aimAng = Math.atan2(hole.pin.y - ball.y, hole.pin.x - ball.x);
+    }
+    if (MP.fmt === 'alt') {
+      if (st.turn === MP.myIdx) { readyForShot(); if (moved && st.seq > 0) showBanner('Your shot', `${strokes} stroke${strokes === 1 ? '' : 's'} so far`, 1.6); }
+    } else if (!st.posted.includes(me)) {
+      readyForShot();
+      if (moved && st.seq > 0) showBanner(st.by === me ? 'Your ball is best' : st.by ? `Playing ${mpName(st.by)}'s ball` : 'Replay from the same spot', `Team on ${strokes}`, 1.8);
+    }
+    mpBar();
+  }
+  function mpAfterShot(pen) {
+    const t = MP.team, h = MP.h, uid = fbUser.uid;
+    if (MP.fmt === 'alt') {
+      const st = teamState(h, t), pick = strokes >= maxStrokes();
+      mpLog(`h${h}t${t}s${st.seq}`, { x: r2(ball.x), y: r2(ball.y), n: pick ? maxStrokes() : strokes, turn: (MP.myIdx + 1) % MP.mates.length, by: uid, holed: pick ? 1 : 0 });
+    } else {
+      mpLog(`h${h}t${t}s${Math.max(0, MP.seq)}u${uid}`, { x: r2(ball.x), y: r2(ball.y), pen: pen ? 1 : 0, holed: 0 });
+    }
+    state = 'wait';
+    mpTeamSync(); mpBar();
+  }
+  function mpHoleFinished() {
+    if (MP.holeDone) return;
+    MP.holeDone = true;
+    const h = MP.h, t = MP.team, uid = fbUser.uid;
+    if (MP.remote) return;   // a teammate holed it (or the team picked up): already in the log
+    if (MP.fmt === 'alt') mpLog(`h${h}t${t}s${teamState(h, t).seq}`, { x: 0, y: 0, n: strokes, turn: 0, by: uid, holed: 1 });
+    else if (MP.fmt === 'scramble') mpLog(`h${h}t${t}s${Math.max(0, MP.seq)}u${uid}`, { x: 0, y: 0, pen: 0, holed: 1 });
+    else mpLog(`h${h}u${uid}`, strokes);
+  }
+  function relOf(t, upTo) {
+    let r = 0, k = 0;
+    for (let h = 0; h < Math.min(MP.n, upTo); h++) { const v = teamScore(h, t); if (v != null) { r += v - mpHole(h).par; k++; } }
+    return { r, k };
+  }
+  function mpBar() {
+    if (!MP || !MP.started) return;
+    let st = '';
+    if (state === 'wait' && mpTeamFmt() && !MP.holeDone) {
+      const ts = teamState(MP.h, MP.team);
+      if (MP.fmt === 'alt') st = `${mpName(MP.mates[ts.turn])} is hitting…`;
+      else { const left = MP.mates.filter(u => !ts.posted.includes(u) && u !== fbUser.uid).map(mpName); st = left.length ? `Waiting for ${left.join(', ')}…` : 'Picking the best ball…'; }
+    } else if (mpTeamFmt() && MP.fmt === 'scramble' && !MP.holeDone) st = 'Scramble: everyone hits, best ball is played';
+    const fmt = MP.fmt === 'stroke' ? '' : fmtName(MP.doc.mode, MP.fmt) + ' · ';
+    const me = relOf(MP.team, MP.n), others = MP.teams.map((_, t) => t).filter(t => t !== MP.team);
+    const one = (t, r) => `${esc(teamLabel(t))} ${fmtRel(r.r)}${MP.teams.length <= 2 ? ` <span style="opacity:.7">(thru ${r.k})</span>` : ''}${!MP.coop && teamOut(t) ? ' (left)' : ''}`;
+    $('mpBar').innerHTML = `⚔️ ${fmt}<b>${one(MP.team, me)}</b>${others.map(t => ' · ' + one(t, relOf(t, MP.n))).join('')}`
+      + `<span class="ms">${esc(st)}</span>`;
+  }
+
+  // Between holes: the match card. "Next hole" waits until every team has finished this hole.
+  function showMpCard() {
+    state = 'mpCard';
+    const res = mpResult();
+    if (res.done) return mpFinish(res);
+    renderMpOv(); $('mpOv').classList.remove('hidden');
+  }
+  function matchTable() {
+    const last = Math.max(MP.n, MP.h + 1), idx = [...Array(last).keys()];
+    const head = idx.map(h => `<th>${h < MP.n ? h + 1 : 'P' + (h - MP.n + 1)}</th>`).join('');
+    const par = idx.map(h => `<td>${mpHole(h).par}</td>`).join('');
+    const row = t => {
+      const cells = idx.map(h => {
+        const v = teamScore(h, t), all = MP.teams.map((_, k) => teamScore(h, k)).filter(x => x != null);
+        const best = !MP.coop && v != null && all.length > 1 && v === Math.min(...all) && all.filter(x => x === v).length === 1;
+        return `<td class="${best ? 'w' : ''}">${v == null ? '–' : v}</td>`;
+      }).join('');
+      const tot = relOf(t, MP.n);
+      return `<tr class="${t === MP.team ? 'mine' : ''}"><td>${esc(teamLabel(t))}</td>${cells}<td><b>${tot.k ? fmtRel(tot.r) : '–'}</b></td></tr>`;
+    };
+    return `<table class="mptab"><tr><th>HOLE</th>${head}<th>+/-</th></tr><tr><td>Par</td>${par}<td></td></tr>${MP.teams.map((_, t) => row(t)).join('')}</table>`;
+  }
+  function renderMpOv() {
+    const m = MP.doc, res = mpResult(), hDone = res.done || res.next > MP.h;
+    $('mpTitle').textContent = MP.h >= MP.n ? 'Playoff' : `Hole ${MP.h + 1} of ${MP.n}`;
+    $('mpSub').textContent = `${MP_MODES[m.mode].name} · ${fmtName(m.mode, m.fmt)} · ${MP.course.name}${m.wager ? ` · ${money(m.wager)} wager` : ''}`;
+    $('mpTable').innerHTML = matchTable();
+    $('mpEarn').innerHTML = '';
+    $('mpHome').style.display = 'none';
+    let stat;
+    if (!hDone) {
+      const waiting = (res.lead || []).filter(t => teamScore(MP.h, t) == null).map(t => teamLabel(t));
+      stat = `Waiting for <b>${esc(waiting.join(' and '))}</b> to finish hole ${MP.h + 1}…`;
+    } else if (MP.coop) {
+      const r = relOf(0, MP.n); stat = `Team is <b>${fmtRel(r.r)}</b> thru ${r.k}`;
+    } else if (res.playoff) {
+      stat = res.lead.includes(MP.team) ? `<b>Tied for the lead!</b> Sudden-death playoff${res.lead.length > 2 ? ` with ${esc(res.lead.filter(t => t !== MP.team).map(teamLabel).join(', '))}` : ''}: win a hole to win it all.`
+        : `Playoff between <b>${esc(res.lead.map(teamLabel).join(' and '))}</b>. Waiting for the result…`;
+    } else {
+      const mine = relOf(MP.team, MP.n).r, rs = aliveTeams().filter(t => t !== MP.team).map(t => relOf(t, MP.n).r);
+      if (rs.length === 1) { const d = rs[0] - mine; stat = d > 0 ? `You lead by <b>${d}</b>` : d < 0 ? `You trail by <b>${-d}</b>` : '<b>All square</b>'; }
+      else { const pos = 1 + rs.filter(r => r < mine).length, tied = rs.some(r => r === mine); stat = `You're <b>${tied ? 'T' : ''}${pos}${['st', 'nd', 'rd'][pos - 1] || 'th'}</b> at ${fmtRel(mine)}`; }
+    }
+    const out = res.playoff && !res.lead.includes(MP.team);
+    $('mpStat').innerHTML = stat;
+    const go = $('mpGo');
+    go.style.display = ''; go.disabled = !hDone || out;
+    go.textContent = !hDone || out ? 'Waiting…' : res.next >= MP.n ? 'Playoff hole ▶' : 'Next hole ▶';
+  }
+  $('mpGo').addEventListener('click', () => {
+    ensureAudio(); sfx.click();
+    if (!MP) { $('mpOv').classList.add('hidden'); showHome(); return; }
+    if (MP.over) return;
+    const res = mpResult();
+    if (res.done) return mpFinish(res);
+    if (res.playoff && !res.lead.includes(MP.team)) return;
+    if (res.next > MP.h) mpLoadHole(res.next);
+  });
+  $('mpHome').addEventListener('click', () => { ensureAudio(); sfx.click(); closeMatch(); showHome(); setTab('play'); });
+
+  function mpFinish(res) {
+    if (MP.over) return;
+    MP.over = true; state = 'finished';
+    const m = MP.doc, rec = save.mp[MP.id] || (save.mp[MP.id] = { at: Date.now() });
+    const players = MP.teams.reduce((a, t) => a + t.length, 0), pot = m.wager * players;
+    const holeMoney = earned.reduce((a, b) => a + (b || 0), 0);
+    const winners = res.coop ? [] : res.win >= 0 ? [res.win] : (res.lead || []);
+    const tie = res.win === -1, won = !res.coop && res.win === MP.team, split = tie && winners.includes(MP.team);
+    const prize = winners.includes(MP.team) ? Math.floor(pot / winners.reduce((a, t) => a + MP.teams[t].length, 0)) : 0;
+    if (!rec.settled) {
+      rec.settled = 1; save.coins += prize + holeMoney;
+      save.stats.earnedTotal += holeMoney + Math.max(0, prize - m.wager);
+      save.stats.mpWins = (save.stats.mpWins || 0) + (won ? 1 : 0); save.stats.mpPlayed = (save.stats.mpPlayed || 0) + 1;
+      persist(); checkAwards();
+    }
+    save.mpActive = null; persist();
+    if (m.host === fbUser.uid && m.status === 'playing') matchRef(MP.id).update({ status: 'done' }).catch(() => {});
+    $('mpTitle').textContent = res.coop ? `Round complete · ${fmtRel(relOf(0, MP.n).r)}` : tie ? (split ? 'Tied · pot split' : 'You lost') : won ? (res.forfeit ? 'You win · forfeit' : 'You win! 🏆') : (res.forfeit ? 'Match forfeited' : res.win >= 0 && MP.teams.length > 2 ? `${teamLabel(res.win)} won` : 'You lost');
+    $('mpSub').textContent = `${MP_MODES[m.mode].name} · ${fmtName(m.mode, m.fmt)} · ${MP.course.name} · ${m.n} holes${res.playoff && !tie ? ` · won on playoff hole ${res.playoff}` : ''}`;
+    $('mpTable').innerHTML = matchTable();
+    let lines = `<div><span>Hole payouts</span><span>${money(holeMoney)}</span></div>`;
+    if (m.wager) lines += `<div><span>${prize ? `${split ? 'Split pot' : 'Pot'} (${money(pot)})` : 'Wager'}</span><span>${prize ? '+' + money(prize) : '−' + money(m.wager)}</span></div>`;
+    lines += `<div class="sum"><span>Collected</span><span>+${money(prize + holeMoney)}</span></div>`;
+    $('mpEarn').innerHTML = lines;
+    $('mpStat').innerHTML = (tie ? `Still tied after ${PLAYOFF_MAX} playoff holes, so the leaders split the pot.` : '') + ` Bank: <b>${money(save.coins)}</b>`;
+    $('mpGo').style.display = 'none'; $('mpHome').style.display = '';
+    $('mpOv').classList.remove('hidden');
+    if (won) { burst(160); sfx.perfect(); }
+  }
+  async function mpQuit() {
+    const id = MP.id;
+    try { await matchRef(id).update(FP('players', fbUser.uid, 'left'), true); } catch (e) {}
+    const rec = save.mp[id] || (save.mp[id] = {}); rec.settled = 1; save.mpActive = null; persist();
+    closeMatch(); showHome(); setTab('play');
+  }
+
+  // ---- Screens: the Play Friends card on the Play tab, and the match tab (create / join / lobby / friends) ----
+  function setMsg(t, ok) { mpMsg = { t: t || '', ok: !!ok }; const e = $('mpMsg'); if (e) { e.textContent = mpMsg.t; e.className = 'mpmsg' + (mpMsg.ok ? ' ok' : ''); } }
+  function renderMpCard() {
+    const box = $('mpCard'); if (!box) return;
+    const inv = inbox.filter(x => x.type === 'match').length, fr = inbox.filter(x => x.type === 'friend').length;
+    const active = MP && !MP.started ? `<div class="mpnote"><span>⏳ You're in match <b>${MP.id}</b></span><button class="main sm" data-mpopen="1">Lobby</button></div>`
+      : !MP && save.mpActive && fbUser ? `<div class="mpnote"><span>⛳ Match <b>${esc(save.mpActive)}</b> in progress</span><button class="main sm" data-mprejoin="1">Rejoin</button></div>` : '';
+    box.innerHTML = `<div class="mpc"><div class="ctag">⚔️ PLAY FRIENDS</div><div class="cn">Head to head</div>
+      <div class="cm">1v1 for a wager · 2v2 scramble, alt shot or best ball · 4-golfer groups · ${save.friends.length} friend${save.friends.length === 1 ? '' : 's'}</div>
+      <div class="mpbtns"><button class="main sm" data-mpmode="1">1v1</button><button class="main sm" data-mpmode="2">2v2</button><button class="main sm" data-mpmode="4">Foursome</button></div>
+      ${active}
+      ${inv || fr ? `<div class="mpnote"><span>📨 ${inv ? `<b>${inv}</b> match invite${inv > 1 ? 's' : ''}` : ''}${inv && fr ? ' · ' : ''}${fr ? `<b>${fr}</b> friend request${fr > 1 ? 's' : ''}` : ''}</span><button class="main sm" data-mpopen="1">View</button></div>` : ''}
+      <div class="mpbtns"><button class="ghost sm" data-mpopen="1">👥 Friends &amp; join code</button></div></div>`;
+  }
+  $('mpCard').addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b) return;
+    ensureAudio(); sfx.click();
+    if (b.dataset.mpmode) { const md = +b.dataset.mpmode; mpForm.mode = md; if (!MP_MODES[md].fmts.includes(mpForm.fmt)) mpForm.fmt = MP_MODES[md].fmts[0]; setMsg(''); }
+    if (b.dataset.mprejoin) { const id = save.mpActive, err = await joinMatch(id); if (err) { save.mpActive = null; persist(); setMsg(err); } return setTab('match'); }
+    setTab('match');
+  });
+
+  function renderMatchTab() {
+    const box = $('matchBody'); if (!box) return;
+    const back = '<button class="back" data-mpback="1">← Back</button>';
+    if (!ONLINE) { box.innerHTML = back + '<div class="empty">Play Friends needs the internet. Check your connection and reload.</div>'; return; }
+    if (!fbUser) {
+      box.innerHTML = back + `<div class="mpbox"><div class="lh">PLAY FRIENDS</div><div class="cm" style="font-size:14px;color:var(--cream);margin-bottom:10px">Sign in so friends can find you, invite you to matches and settle wagers.${pendingLink ? ` <b style="color:var(--gold-l)">You'll join ${pendingLink.join ? 'match ' + pendingLink.join : 'your friend'} right after.</b>` : ''}</div>
+        <button class="main" data-signin="1" style="width:100%">Sign in with Google</button></div>`;
+      return;
+    }
+    if (MP && MP.doc && !MP.started) return renderLobby(box, back);
+    if (MP && !MP.doc) { box.innerHTML = back + '<div class="empty">Loading match…</div>'; return; }
+    const f = mpForm, md = MP_MODES[f.mode];
+    const courses = COURSES.filter(isUnlocked).concat([MINI]);
+    if (!courses.some(c => c.id === f.cid)) f.cid = courses[0].id;
+    f.wager = Math.max(0, Math.min(f.wager, save.coins));
+    const opt = (k, v, label, on) => `<button data-${k}="${v}" class="${on ? 'on' : ''}">${label}</button>`;
+    const chips = [0, 100, 250, 500, 1000, 2500, 5000].filter(v => v <= save.coins), coop = f.mode === 4 && f.fmt === 'scramble';
+    box.innerHTML = back + `<div class="mpbox">
+        <div class="lh">GAME</div><div class="opts">${Object.keys(MP_MODES).map(k => opt('fm', k, MP_MODES[k].name, +k === f.mode)).join('')}</div>
+        <div class="lh">FORMAT</div><div class="opts">${md.fmts.map(k => opt('ff', k, fmtName(f.mode, k), k === f.fmt)).join('')}</div>
+        <div class="gnote" style="margin-top:6px">${md.sub} · ${fmtHow(f.mode, f.fmt)}</div>
+        <div class="lh">COURSE</div><div class="opts">${courses.map(c => opt('fc', c.id, c.mini ? '⭐ Mini Golf' : c.name, c.id === f.cid)).join('')}</div>
+        <div class="lh">HOLES</div><div class="opts">${[3, 6, 9].map(n => opt('fn', n, n + ' holes', n === f.n)).join('')}</div>
+        ${coop ? '' : `<div class="lh">WAGER (EACH GOLFER) · YOU HAVE ${money(save.coins)}</div>
+        <div class="mprow"><input class="mpin" id="mpWager" type="number" inputmode="numeric" min="0" max="${save.coins}" step="25" value="${f.wager}"></div>
+        <div class="opts" style="margin-top:8px">${chips.map(v => opt('fw', v, v ? money(v) : 'No bet', v === f.wager)).join('')}${save.coins > 0 && !chips.includes(save.coins) ? opt('fw', save.coins, 'All in', f.wager === save.coins) : ''}</div>
+        <div class="gnote">Winners split the pot. Tied after ${f.n} holes? Sudden-death playoff holes until someone wins.</div>`}
+        <button class="main" data-mpcreate="1" style="width:100%;margin-top:12px">Create ${md.name} match</button>
+        <div class="lh" style="margin-top:16px">GOT A MATCH CODE?</div>
+        <div class="mprow"><input class="mpin" id="mpJoinCode" maxlength="6" placeholder="ABC123" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="main sm" data-mpjoin="1">Join</button></div>
+        <div class="mpmsg${mpMsg.ok ? ' ok' : ''}" id="mpMsg">${esc(mpMsg.t)}</div>
+      </div>
+      <div class="mpbox" id="mpInbox"></div>
+      <div class="mpbox" id="mpFriends"></div>`;
+    renderInbox(); renderFriends();
+  }
+  function renderInbox() {
+    const box = $('mpInbox'); if (!box) return;
+    box.style.display = inbox.length ? '' : 'none';
+    box.innerHTML = '<div class="lh">INVITES</div><div class="mplist">' + inbox.map(x => {
+      if (x.type === 'friend') {
+        const has = save.friends.some(f => f.uid === x.from);
+        return `<div class="mpli"><div class="nm"><b>${esc(x.name)}</b><small>added you as a friend</small></div>${has ? '' : `<button class="main sm" data-addback="${x.id}">Add back</button>`}<button class="xbtn" data-dismiss="${x.id}">✕</button></div>`;
+      }
+      const c = courseById(x.cid);
+      return `<div class="mpli"><div class="nm"><b>${esc(x.name)}</b><small>${MP_MODES[x.mode] ? MP_MODES[x.mode].name : ''} · ${fmtName(x.mode, x.fmt)} · ${x.n} holes · ${esc(c ? c.name : '')}${x.wager ? ` · ${money(x.wager)} wager` : ''}</small></div>`
+        + `<button class="main sm" data-joininv="${x.id}">Join</button><button class="xbtn" data-dismiss="${x.id}">✕</button></div>`;
+    }).join('') + '</div>';
+  }
+  function renderFriends() {
+    const box = $('mpFriends'); if (!box) return;
+    const inLobby = MP && MP.doc && !MP.started;
+    const list = save.friends.length ? save.friends.map(f => {
+      const inMatch = inLobby && MP.doc.players[f.uid];
+      const btn = !inLobby ? `<button class="xbtn" data-unfriend="${f.uid}" title="Remove">✕</button>`
+        : inMatch ? '<span class="tagon">IN</span>' : MP.invited[f.uid] ? '<span class="tagon">SENT</span>' : `<button class="main sm" data-invite="${f.uid}">Invite</button>`;
+      return `<div class="mpli"><div class="nm"><b>${esc(f.name)}</b><small>${esc(f.code || '')}</small></div>${btn}</div>`;
+    }).join('') : '<div class="gnote" style="margin:0">No friends yet. Share your code or add theirs.</div>';
+    box.innerHTML = `<div class="lh">FRIENDS</div><div class="mplist">${list}</div>`
+      + (inLobby ? '' : `<div class="lh" style="margin-top:14px">YOUR FRIEND CODE</div><div class="bigcode">${save.friendCode || '······'}</div>
+        <div class="mprow"><button class="main sm" data-sharecode="1" style="flex:1"${save.friendCode ? '' : ' disabled'}>Share my code</button></div>
+        <div class="lh" style="margin-top:14px">ADD A FRIEND</div>
+        <div class="mprow"><input class="mpin" id="mpFriendCode" maxlength="6" placeholder="FRIEND CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="main sm" data-addfriend="1">Add</button></div>`);
+  }
+  function renderLobby(box, back) {
+    const m = MP.doc, t = lobbyTeams(m), host = m.host === fbUser.uid, myTeam = m.players[fbUser.uid].team, md = MP_MODES[m.mode];
+    const col = k => {
+      const names = t[k].map(u => `<div>${u === m.host ? '👑 ' : ''}${esc(u === fbUser.uid ? 'You' : m.players[u].name)}</div>`);
+      for (let i = t[k].length; i < m.mode; i++) names.push('<div class="open">Open spot</div>');
+      return `<div class="teamc${k === myTeam ? ' mine' : ''}"><h4>TEAM ${k ? 'B' : 'A'}</h4>${names.join('')}</div>`;
+    };
+    const players = t[0].length + t[1].length, grp = isGroup(m);
+    const ready = grp ? players >= 2 : t[0].length > 0 && t[0].length === t[1].length, full = grp ? players === 4 : t[0].length === m.mode && t[1].length === m.mode;
+    const all = t[0].concat(t[1]), grpCol = `<div class="teamc mine" style="grid-column:1 / -1"><h4>GOLFERS · ${players} / 4</h4>${all.map(u => `<div>${u === m.host ? '👑 ' : ''}${esc(u === fbUser.uid ? 'You' : m.players[u].name)}</div>`).join('')}${'<div class="open">Open spot</div>'.repeat(Math.max(0, 4 - players))}</div>`;
+    const c = courseById(m.cid);
+    box.innerHTML = back + `<div class="mpbox">
+        <div class="lh">MATCH CODE · TELL YOUR FRIENDS</div><div class="bigcode">${MP.id}</div>
+        <div class="chips" style="justify-content:center"><span><b>${md.name}</b></span><span>${fmtName(m.mode, m.fmt)}</span><span>${esc(c.name)}</span><span><b>${m.n}</b> holes</span>${m.wager ? `<span>Wager <b>${money(m.wager)}</b></span><span>Pot <b>${money(m.wager * Math.max(players, 2))}</b></span>` : '<span>No wager</span>'}</div>
+        <div class="gnote" style="text-align:center">${fmtHow(m.mode, m.fmt)}</div>
+        <div class="lh" style="margin-top:14px">${grp ? 'GROUP' : 'TEAMS'}</div><div class="teams">${grp ? grpCol : col(0) + col(1)}</div>
+        <div class="mpbtns">${!grp && t[1 - myTeam].length < m.mode ? '<button class="ghost sm" data-swap="1">Switch team</button>' : ''}<button class="ghost sm" data-sharematch="1">Share invite link</button></div>
+        ${host ? `<button class="main" data-start="1" style="width:100%;margin-top:12px"${ready ? '' : ' disabled'}>${ready ? (full || grp ? `Start ${grp ? players + '-golfer ' : ''}match` : `Start ${t[0].length}v${t[1].length}`) : 'Waiting for golfers…'}</button>`
+          + (ready || m.mode === 1 ? '' : `<div class="gnote" style="text-align:center">${grp ? 'Need at least 2 golfers.' : 'Teams must be even to start.'}</div>`)
+          : '<div class="tnote" style="margin-top:12px">Waiting for the host to start…</div>'}
+        <button class="ghost sm" data-leave="1" style="width:100%;margin-top:10px">${host ? 'Cancel match' : 'Leave match'}</button>
+        <div class="mpmsg${mpMsg.ok ? ' ok' : ''}" id="mpMsg">${esc(mpMsg.t)}</div>
+      </div>
+      <div class="mpbox" id="mpFriends"></div>`;
+    renderFriends();
+  }
+  $('matchBody').addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    ensureAudio(); sfx.click();
+    const d = b.dataset, f = mpForm;
+    const run = async fn => { b.disabled = true; try { const err = await fn(); if (err) setMsg(err); } catch (er) { setMsg(er && er.code === 'permission-denied' ? "Online matches aren't switched on yet: the Firestore rules need updating." : 'Something went wrong. Check your connection and try again.'); } b.disabled = false; };
+    if (d.mpback) { setTab('play'); return; }
+    if (d.fm) { f.mode = +d.fm; if (!MP_MODES[f.mode].fmts.includes(f.fmt)) f.fmt = MP_MODES[f.mode].fmts[0]; return renderMatchTab(); }
+    if (d.ff) { f.fmt = d.ff; return renderMatchTab(); }
+    if (d.fc) { f.cid = d.fc; return renderMatchTab(); }
+    if (d.fn) { f.n = +d.fn; return renderMatchTab(); }
+    if (d.fw) { f.wager = +d.fw; return renderMatchTab(); }
+    if (d.mpcreate) { const w = $('mpWager') ? Math.floor(+$('mpWager').value || 0) : 0; f.wager = Math.max(0, w); setMsg(''); return run(createMatch); }
+    if (d.mpjoin) { setMsg(''); return run(() => joinMatch($('mpJoinCode').value)); }
+    if (d.addfriend) { return run(async () => { const err = await addFriend($('mpFriendCode').value); if (!err) { setMsg('Friend added! They\'ll get a note to add you back.', true); renderFriends(); renderMpCard(); } return err; }); }
+    if (d.sharecode) { const msg = await shareLink(`${siteUrl()}?friend=${save.friendCode}`, `Add me on Red & Gold Golf! My friend code is ${save.friendCode}`); if (msg) setMsg(msg, true); return; }
+    if (d.unfriend) { const fr = save.friends.find(x => x.uid === d.unfriend); if (fr && confirm(`Remove ${fr.name} from your friends?`)) { save.friends = save.friends.filter(x => x.uid !== d.unfriend); persist(); renderFriends(); renderMpCard(); } return; }
+    if (d.dismiss) { inboxRef(fbUser.uid).doc(d.dismiss).delete().catch(() => {}); return; }
+    if (d.addback) { const x = inbox.find(i => i.id === d.addback); if (x) { addFriendLocal(x.from, x.name, x.code); inboxRef(fbUser.uid).doc(x.id).delete().catch(() => {}); setMsg(`${x.name} added!`, true); renderFriends(); } return; }
+    if (d.joininv) {
+      const x = inbox.find(i => i.id === d.joininv); if (!x) return;
+      return run(async () => { const err = await joinMatch(x.match); inboxRef(fbUser.uid).doc(x.id).delete().catch(() => {}); return err; });
+    }
+    if (!MP || !MP.doc) return;
+    const m = MP.doc;
+    if (d.invite) {
+      const fr = save.friends.find(x => x.uid === d.invite); if (!fr) return;
+      MP.invited[fr.uid] = true; renderFriends();
+      inboxRef(fr.uid).add({ type: 'match', from: fbUser.uid, name: boardName(), match: MP.id, mode: m.mode, fmt: m.fmt, n: m.n, cid: m.cid, wager: m.wager, at: Date.now() })
+        .catch(() => { delete MP.invited[fr.uid]; setMsg(`Couldn't invite ${fr.name}`); renderFriends(); });
+      return;
+    }
+    if (d.sharematch) { const msg = await shareLink(`${siteUrl()}?join=${MP.id}`, `Join my ${MP_MODES[m.mode].name} golf match on Red & Gold Golf! Code ${MP.id}${m.wager ? ` · ${money(m.wager)} wager` : ''}`); if (msg) setMsg(msg, true); return; }
+    if (d.swap) {
+      const t = lobbyTeams(m), my = m.players[fbUser.uid].team;
+      if (t[1 - my].length >= m.mode) return setMsg('The other team is full');
+      return run(() => matchRef(MP.id).update(FP('players', fbUser.uid, 'team'), 1 - my).then(() => ''));
+    }
+    if (d.start) return run(() => startMatch().then(() => ''));
+    if (d.leave) { if (confirm(m.host === fbUser.uid ? 'Cancel this match for everyone?' : 'Leave this match?')) leaveLobby(); }
+  });
+  $('matchBody').addEventListener('input', e => { if (e.target.id === 'mpWager') mpForm.wager = Math.max(0, Math.min(save.coins, Math.floor(+e.target.value || 0))); });
+  $('matchBody').addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const id = e.target.id, btn = id === 'mpJoinCode' ? '[data-mpjoin]' : id === 'mpFriendCode' ? '[data-addfriend]' : null;
+    if (btn) { const b = document.querySelector(btn); if (b) b.click(); }
+  });
+  if (pendingLink && !fbUser) setTimeout(() => { if (!fbUser && $('home') && !$('home').classList.contains('hidden')) setTab('match'); }, 0);
 
   // ---- Golfer page ----
   let prev3 = null;
@@ -3912,7 +4634,9 @@
         <p><b>Greens slope.</b> On the green, the <b>Green Reader</b> (top right) shows the slope (arrows point downhill), how much the putt breaks and which way to aim. Chami Links has the gentlest greens, Deans Valley the wildest.</p>
         <p><b>Daily Closest to the Pin:</b> a brutal new par 3 every day with ${CTP_TRIES} tries. Land it within ${CTP_UNLOCK_FT} feet to unlock the Senior Sweater.</p>
         <p><b>Gold Star Mini Golf:</b> tap the ⭐ button on the home screen for 18 holes of putt-putt.</p>
-        <p><b>Money</b> comes from par or better plus a round bonus. Spend it in <b>Clubs</b> on new models and upgrades. Customize your outfit and golf bag in <b>Golfer</b>.</p>
+        <p><b>Hole payouts:</b> hole-in-one $1,500 · albatross $1,000 · eagle $250 · birdie $100 · par $25 · bogey or worse $0, plus a round bonus.</p>
+        <p><b>Play Friends:</b> add friends with their friend code, then play a 1v1 for a wager (3, 6 or 9 holes, sudden-death playoff if tied), 2v2 (scramble, alt shot or best ball) or a Foursome (up to 4 golfers: everyone plays their own ball for the pot, or all play one team scramble). Winners split the pot.</p>
+        <p><b>Money</b> buys gear: spend it in <b>Clubs</b> on new models and upgrades. Customize your outfit and golf bag in <b>Golfer</b>.</p>
       </div>`;
   }
 
@@ -4056,7 +4780,7 @@
   }
   $('resetBtn').addEventListener('click', () => {
     if (!confirm('Reset ALL money, upgrades and stats? This cannot be undone.')) return;
-    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, uid: save.uid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic, migSchoolBag: save.migSchoolBag, ballLook: save.ballLook }; save = Object.assign(freshSave(), keep); loadBag(); persist();
+    const keep = { name: save.name, look: save.look, gbag: save.gbag, pid: save.pid, uid: save.uid, tourney: save.tourney, ownedLook: save.ownedLook, ui: save.ui, migClassic: save.migClassic, migSchoolBag: save.migSchoolBag, ballLook: save.ballLook, friends: save.friends, friendCode: save.friendCode, mp: save.mp }; save = Object.assign(freshSave(), keep); loadBag(); persist();
     previewCourse(COURSES[0]); setTab('stats');
   });
 
@@ -4144,7 +4868,7 @@
   }
 
   function showHome() {
-    $('final').classList.add('hidden'); $('ctpEnd').classList.add('hidden'); $('scOv').classList.add('hidden'); closeSheet();
+    $('final').classList.add('hidden'); $('ctpEnd').classList.add('hidden'); $('scOv').classList.add('hidden'); $('mpOv').classList.add('hidden'); closeSheet();
     if (course.ctp) course = courseById(save.course);
     if (!isUnlocked(course)) course = COURSES[0];
     previewCourse(course);
