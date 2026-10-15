@@ -568,8 +568,21 @@
   .gbadge small{font:800 9px Inter;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
   /* Play tab: head to head, daily challenge and today's aces sit in a slim column on the left, courses on the right */
   #tab-play:not(.hidden){display:grid;grid-template-columns:1fr;gap:4px 16px}
-  @media (min-width:760px){#tab-play:not(.hidden){grid-template-columns:280px minmax(0,1fr);align-items:start}
-    .playSide{position:sticky;top:0}.playMain .sect:first-child{margin-top:8px}}
+  @media (min-width:760px){#tab-play:not(.hidden){grid-template-columns:270px minmax(0,1fr) 340px;align-items:start}
+    .playSide{position:sticky;top:0;grid-column:1}.playMain{grid-column:3}.playMain .sect:first-child{margin-top:8px}}
+  .wrap.full{max-width:none}
+  /* compact course cards in the right-hand column */
+  .course.mini-c{display:flex;align-items:center;gap:10px;padding:7px 10px 7px 7px;margin-bottom:7px;border-radius:14px;background:linear-gradient(180deg,rgba(142,15,34,.82),rgba(79,7,18,.88))}
+  .course.mini-c .thumb{width:46px;min-height:52px;height:52px;border-radius:9px}
+  .course.mini-c .cn{font-size:16px}
+  .course.mini-c .cm{font-size:11px;opacity:.9}
+  .course.mini-c .cm.rec{color:#FFE08A;opacity:1;margin-top:1px}
+  .course.mini-c.locked{opacity:.8}
+  .course.mini-c .go{flex:none;font:700 24px Oswald,sans-serif;color:var(--gold-l);padding:0 4px}
+  .course.mini-c.locked .go{font-size:15px}
+  /* hole-in-ones today: title on its own line so it never gets cut off in the narrow column */
+  .playSide .acebar{flex-direction:column;align-items:stretch;gap:4px}
+  .playSide .acebar .ah{white-space:normal;line-height:1.3}
   .playSide .mpc,.playSide .ctp,.playSide .tour{padding:9px 10px;margin:6px 0;border-radius:14px}
   .playSide .ctp .thumb{display:none}
   .playSide .mpc .cn,.playSide .ctp .cn,.playSide .tour .cn{font-size:17px;margin:2px 0}
@@ -815,8 +828,8 @@
 <div id="resetNote" class="overlay hidden">
   <div class="card">
     <h2>Fresh start! ⛳</h2>
-    <div class="sub" style="font-size:14px;line-height:1.45">The game just got a big update, so <b>everyone's progress has been reset</b>: money, clubs, gear, stats and leaderboards all start over.<br><br>
-      Your name, sign-in and friends are kept. Good luck!</div>
+    <div class="sub" style="font-size:14px;line-height:1.45"><b>We're really sorry</b> for the trouble. The game just got a big update, so <b>everyone's progress has been reset</b>: money, clubs, gear, stats and <b>all the leaderboards</b> start over, so everyone is on a level playing field.<br><br>
+      Your name, sign-in and friends are kept. Thanks for playing, and good luck!</div>
     <div class="btns" style="margin-top:14px"><button class="main" id="resetOk">Let's go</button></div>
   </div>
 </div>
@@ -1044,7 +1057,7 @@
   const SAVE_KEY = 'fairwayclub-save';
   // FULL RESET (Oct 14 2026): bumping this wipes every player's progress (money, gear, stats, unlocks, awards) on every
   // device and in the cloud the next time they open the game. Names, sign-ins, friends and settings are kept.
-  const RESET_EPOCH = 1, RESET_KEEP = ['name', 'pid', 'uid', 'friendCode', 'friends', 'ui', 'lefty', 'signinDay', 'badgeAuto', 'migClassic', 'migSchoolBag'];
+  const RESET_EPOCH = 1, RESET_KEEP = ['noteVer', 'name', 'pid', 'uid', 'friendCode', 'friends', 'ui', 'lefty', 'signinDay', 'badgeAuto', 'migClassic', 'migSchoolBag'];
   const resetSave = old => { const k = {}; RESET_KEEP.forEach(x => { if (old && old[x] !== undefined) k[x] = old[x]; }); return Object.assign(freshSave(), k, { epoch: RESET_EPOCH, mtime: 0, resetNote: 1 }); };
   const freshStats = () => ({ rounds: 0, holes: 0, aces: 0, eagles: 0, birdies: 0, pars: 0, shots: 0, perfects: 0,
     longest: 0, earnedTotal: 0, strokesTotal: 0, parTotal: 0, roundsBy: {}, bestBy: {},
@@ -4090,7 +4103,8 @@
     if (t === 'course') renderCourse();
     if (t === 'ctp') renderCtpTab();
     if (t === 'golfer') { pendingBuy = null; tryLook = tryBag = null; renderGolfer(); }
-    document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer' || t === 'clubs' || t === 'play');
+    document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer' || t === 'clubs');
+    document.querySelector('.hbody .wrap').classList.toggle('full', t === 'play');
     $('miniBtn').classList.toggle('hidden', t !== 'play');
     if (t === 'clubs') renderClubs();
     if (t === 'stats') { renderStats(); renderHow(); }
@@ -4174,7 +4188,8 @@
   const prevDay = day => { const d = new Date(day + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); };
   const serverTime = () => firebase.firestore.FieldValue.serverTimestamp();
   // Leaderboard season: the full reset started fresh boards (old scores stay in the database, they just aren't shown).
-  const SEASON = '_s2';
+  const SEASON = '_s3', SEASON_START = 1792022700000;   // every board (courses, daily tournaments, Closest to the Pin, aces) starts over here
+  const inSeason = r => (r.date || 0) >= SEASON_START;
   const scoresRef = (cid, day) => day ? fbDb.collection('courses').doc(cid + SEASON).collection('days').doc(day).collection('scores')
     : fbDb.collection('courses').doc(cid + SEASON).collection('scores');
   const ctpRef = day => fbDb.collection('ctp').doc(day).collection('shots');
@@ -4240,7 +4255,7 @@
   // One row per golfer per board: their best score. Ties go to whoever posted it first.
   async function fetchBoard(cid, day, limit = 10) {
     const snap = await scoresRef(cid, day).orderBy('rel').limit(limit + 15).get();
-    const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, rel: f.rel, strokes: f.strokes, date: f.date, badge: f.badge || '' }; });
+    const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, rel: f.rel, strokes: f.strokes, date: f.date, badge: f.badge || '' }; }).filter(inSeason);
     rows.sort((a, b) => a.rel - b.rel || a.date - b.date);
     return rows.slice(0, limit);
   }
@@ -4263,7 +4278,7 @@
   }
   async function fetchCtp(day, limit = 10) {
     const snap = await ctpRef(day).orderBy('yd').limit(limit + 10).get();
-    const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, yd: f.yd, date: f.date, badge: f.badge || '' }; });
+    const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, yd: f.yd, date: f.date, badge: f.badge || '' }; }).filter(inSeason);
     rows.sort((a, b) => a.yd - b.yd || a.date - b.date);
     return rows.slice(0, limit);
   }
@@ -4509,7 +4524,7 @@
     const day = etDay();
     if (acesCache && acesCache.day === day && Date.now() - acesCache.at < 60000) return acesCache.rows;
     const snap = await acesRef(day).orderBy('date', 'desc').limit(30).get();
-    const rows = snap.docs.map(d => d.data());
+    const rows = snap.docs.map(d => d.data()).filter(inSeason);
     acesCache = { day, at: Date.now(), rows }; return rows;
   }
   async function renderAceBar() {
@@ -5151,7 +5166,6 @@
     const active = MP && !MP.started ? `<div class="mpnote"><span>⏳ You're in match <b>${MP.id}</b></span><button class="main sm" data-mpopen="1">Lobby</button></div>`
       : !MP && save.mpActive && fbUser ? `<div class="mpnote"><span>⛳ Match <b>${esc(save.mpActive)}</b> in progress</span><button class="main sm" data-mprejoin="1">Rejoin</button></div>` : '';
     box.innerHTML = `<div class="mpc"><div class="ctag">⚔️ PLAY FRIENDS</div><div class="cn">Head to head</div>
-      <div class="cm">1v1 for a wager · 2v2 scramble, alt shot or best ball · 4-golfer groups · ${save.friends.length} friend${save.friends.length === 1 ? '' : 's'}</div>
       <div class="mpbtns"><button class="main sm" data-mpmode="1">1v1</button><button class="main sm" data-mpmode="2">2v2</button><button class="main sm" data-mpmode="4">Foursome</button></div>
       ${active}
       ${inv || fr ? `<div class="mpnote"><span>📨 ${inv ? `<b>${inv}</b> match invite${inv > 1 ? 's' : ''}` : ''}${inv && fr ? ' · ' : ''}${fr ? `<b>${fr}</b> friend request${fr > 1 ? 's' : ''}` : ''}</span><button class="main sm" data-mpopen="1">View</button></div>` : ''}
@@ -5642,14 +5656,13 @@
     renderCtpCard();
     $('courseList').innerHTML = COURSES.map(c => {
       const open = isUnlocked(c), best = save.stats.bestBy[c.id], played = save.stats.roundsBy[c.id] || 0;
-      const meta = `${c.holes.length} holes · Par ${c.par} · ${c.yds.toLocaleString()} yds · Wind up to ${c.wind} mph`;
-      const rec = best == null ? 'Not played yet' : `Best ${fmtRel(best)} · Played ${played}`;
-      const act = open ? `<button class="main sm">View course</button>`
-        : `<div class="lock">🔒 Finish a round at ${courseById(c.unlock).name} to unlock · tap to preview</div>`;
-      return `<div class="course${c.id === course.id ? ' sel' : ''}" data-pick="${c.id}">
+      // compact cards (the full description is on the course page), so more of the course behind them shows
+      const meta = `${c.holes.length} holes · Par ${c.par} · ${c.yds.toLocaleString()} yds`;
+      const rec = !open ? `🔒 Beat ${courseById(c.unlock).name}` : best == null ? 'Not played yet' : `Best ${fmtRel(best)} · ${played} played`;
+      return `<div class="course mini-c${c.id === course.id ? ' sel' : ''}${open ? '' : ' locked'}" data-pick="${c.id}">
         <div class="thumb" style="background-image:url('${courseThumb(c)}');${open ? '' : 'filter:grayscale(.8) brightness(.6)'}"></div>
-        <div class="ci"><div class="cn">${c.name}</div><div class="cd">${c.desc}</div><div class="cm">${meta}</div><div class="cm" style="color:#FFE08A;margin-top:3px">${rec}</div>
-        <div class="act">${act}</div></div></div>`;
+        <div class="ci"><div class="cn">${c.name}</div><div class="cm">${meta}</div><div class="cm rec">${rec}</div></div>
+        <div class="go">${open ? '›' : '🔒'}</div></div>`;
     }).join('');
   }
   $('miniBtn').addEventListener('click', () => { ensureAudio(); sfx.click(); openCourse(MINI); });
@@ -6265,8 +6278,8 @@
   $('adminBody').addEventListener('input', e => { if (e.target.id === 'admQ') { admQ = e.target.value; const l = $('admList'); if (l) l.innerHTML = admListHtml(); } });
   $('adminBody').addEventListener('keydown', e => e.stopPropagation());
 
-  if (save.resetNote) { $('resetNote').classList.remove('hidden'); }
-  $('resetOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('resetNote').classList.add('hidden'); delete save.resetNote; persist(); });
+  if (save.resetNote || (save.noteVer | 0) < 2) { $('resetNote').classList.remove('hidden'); }
+  $('resetOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('resetNote').classList.add('hidden'); delete save.resetNote; save.noteVer = 2; persist(); });
   // anything already earned by older saves is granted quietly
   AWARDS.forEach(a => { if (!save.awards[a.id] && awardDone(a)) save.awards[a.id] = Date.now(); });
   if (!BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === String(save.gbag.body).toLowerCase())) {
