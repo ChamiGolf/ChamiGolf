@@ -4698,7 +4698,8 @@
   const PLAYOFF_MAX = 9, INVITE_HOURS = 12;
   const CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const newCode = () => Array.from({ length: 6 }, () => CODE_CH[Math.floor(Math.random() * CODE_CH.length)]).join('');
-  const cleanCode = v => String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  const CREATOR_CODE = 'CREATOR';   // the creator's own friend code (only the creator's account can claim it)
+  const cleanCode = v => { const c = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); return c === CREATOR_CODE ? c : c.slice(0, 6); };
   const FP = (...p) => new firebase.firestore.FieldPath(...p);
   const matchRef = id => fbDb.collection('matches').doc(id);
   const inboxRef = uid => fbDb.collection('inbox').doc(uid).collection('items');
@@ -4733,6 +4734,11 @@
   async function ensureFriendCode() {
     if (!fbUser) return;
     try {
+      // the creator always gets the code CREATOR
+      if (isCreator() && save.friendCode !== CREATOR_CODE) {
+        const ref = fbDb.collection('codes').doc(CREATOR_CODE), s = await ref.get();
+        if (!s.exists || s.data().uid === fbUser.uid) { await ref.set({ uid: fbUser.uid, name: boardName() }); save.friendCode = CREATOR_CODE; persist(); }
+      }
       if (save.friendCode) {
         const ref = fbDb.collection('codes').doc(save.friendCode), s = await ref.get();
         if (s.exists && s.data().uid === fbUser.uid) { if (s.data().name !== boardName()) ref.set({ uid: fbUser.uid, name: boardName() }).catch(() => {}); return; }
@@ -5241,7 +5247,7 @@
       + (inLobby ? '' : `<div class="lh" style="margin-top:14px">YOUR FRIEND CODE</div><div class="bigcode">${save.friendCode || '······'}</div>
         <div class="mprow"><button class="main sm" data-sharecode="1" style="flex:1"${save.friendCode ? '' : ' disabled'}>Share my code</button></div>
         <div class="lh" style="margin-top:14px">ADD A FRIEND</div>
-        <div class="mprow"><input class="mpin" id="mpFriendCode" maxlength="6" placeholder="FRIEND CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="main sm" data-addfriend="1">Add</button></div>`);
+        <div class="mprow"><input class="mpin" id="mpFriendCode" maxlength="7" placeholder="FRIEND CODE" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="main sm" data-addfriend="1">Add</button></div>`);
   }
   function renderLobby(box, back) {
     const m = MP.doc, t = lobbyTeams(m), host = m.host === fbUser.uid, myTeam = m.players[fbUser.uid].team, md = MP_MODES[m.mode];

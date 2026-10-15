@@ -132,8 +132,10 @@ service cloud.firestore {
     // Friend codes: anyone signed in can look one up; only its owner can claim or rename it.
     match /codes/{code} {
       allow read: if request.auth != null;
+      // the code CREATOR is reserved for the creator's account
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['uid', 'name']) && okName(request.resource.data.name);
+        && request.resource.data.keys().hasOnly(['uid', 'name']) && okName(request.resource.data.name)
+        && (code != 'CREATOR' || isAdmin());
       allow update: if request.auth != null && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid
         && request.resource.data.keys().hasOnly(['uid', 'name']) && okName(request.resource.data.name);
     }
