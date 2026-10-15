@@ -53,6 +53,10 @@ Play it at https://chamigolf.github.io/
 - To announce an update to players, edit `NEWS_VER` and the `NEWS` list in index.html. Each golfer sees it once. Only list things players can see (nothing about anti-cheat or creator tools).
 - New players get a welcome pointing them to the 3C Par Three, plus one-time tips the first time they open Clubs and Golfer.
 
+## Firebase free plan
+
+The free Spark plan allows 50,000 reads and 20,000 writes a day. Leaderboards are cached (90 seconds, today's tournament card 10 minutes), only a few rows past what's shown are read, and cloud saves are batched, so the game stays well under it. If it ever runs out, leaderboards come back at midnight Pacific.
+
 ## Google Analytics (optional)
 
 Paste your GA4 Measurement ID (looks like `G-XXXXXXX`, from Google Analytics or Firebase > Project settings > Integrations > Google Analytics) into `GA_ID` in index.html. It's off while `GA_ID` is empty. Rounds started and finished are sent as events.

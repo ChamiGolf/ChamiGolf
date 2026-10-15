@@ -4622,8 +4622,13 @@
   const ensureName = async () => !needsName() ? true : askName();
 
   // One row per golfer per board: their best score. Ties go to whoever posted it first.
-  async function fetchBoard(cid, day, limit = 10) {
-    const snap = await scoresRef(cid, day).orderBy('rel').limit(limit + 15).get();
+  // Firebase's free plan allows 50,000 reads a day (it ran out on Oct 15), so boards are cached for 90 seconds
+  // and only read a few rows past what's shown. Posting your own score clears the cache.
+  const boardCache = new Map(), BOARD_TTL = 90000;
+  const cached = async (key, fn) => { const c = boardCache.get(key); if (c && Date.now() - c.at < BOARD_TTL) return c.v; const v = await fn(); boardCache.set(key, { at: Date.now(), v }); return v; };
+  async function fetchBoard(cid, day, limit = 10) { return cached(`b|${cid}|${day || ''}|${limit}`, () => fetchBoardNow(cid, day, limit)); }
+  async function fetchBoardNow(cid, day, limit) {
+    const snap = await scoresRef(cid, day).orderBy('rel').limit(limit + 3).get();
     const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, rel: f.rel, strokes: f.strokes, date: f.date, badge: f.badge || '' }; }).filter(inSeason);
     rows.sort((a, b) => a.rel - b.rel || a.date - b.date);
     return rows.slice(0, limit);
@@ -4640,13 +4645,14 @@
     const doc = nb => Object.assign({ name: boardName(), uid, rel: entry.rel, strokes: entry.strokes, date: entry.date, day }, b && !nb ? { badge: b } : {});
     const send = nb => Promise.all([postBest(scoresRef(cid).doc(uid), doc(nb), o => entry.rel < o.rel), postBest(scoresRef(cid, day).doc(uid), doc(nb), o => entry.rel < o.rel)]);
     try { await send(false); } catch (e) { if (!b) throw e; await send(true); }   // (older rules didn't know about badges)
-    (save.tourney[day] || (save.tourney[day] = {}))[cid] = true; persist(); tourCache = null;
+    (save.tourney[day] || (save.tourney[day] = {}))[cid] = true; persist(); tourCache = null; boardCache.clear();
     const today = await fetchBoard(cid, day, 50);
     const i = today.findIndex(r => r.pid === uid);
     return i >= 0 ? i + 1 : 0;
   }
-  async function fetchCtp(day, limit = 10) {
-    const snap = await ctpRef(day).orderBy('yd').limit(limit + 10).get();
+  async function fetchCtp(day, limit = 10) { return cached(`c|${day}|${limit}`, () => fetchCtpNow(day, limit)); }
+  async function fetchCtpNow(day, limit) {
+    const snap = await ctpRef(day).orderBy('yd').limit(limit + 3).get();
     const rows = snap.docs.map(d => { const f = d.data(); return { name: f.name, pid: d.id, yd: f.yd, date: f.date, badge: f.badge || '' }; }).filter(inSeason);
     rows.sort((a, b) => a.yd - b.yd || a.date - b.date);
     return rows.slice(0, limit);
@@ -4656,7 +4662,7 @@
     const u = await ensureOnlineUser(), day = ctpCourse().day, uid = u.uid, b = myBadge();
     const send = nb => postBest(ctpRef(day).doc(uid), Object.assign({ name: boardName(), uid, yd: Math.round(yd * 1000) / 1000, date: Date.now(), day }, b && !nb ? { badge: b } : {}), o => yd < o.yd);
     try { await send(false); } catch (e) { if (!b) throw e; await send(true); }
-    (save.tourney[day] || (save.tourney[day] = {})).ctp = true; persist(); tourCache = null;
+    (save.tourney[day] || (save.tourney[day] = {})).ctp = true; persist(); tourCache = null; boardCache.clear();
     const top = await fetchCtp(day, 50), i = top.findIndex(r => r.pid === uid);
     return i >= 0 ? i + 1 : 0;
   }
@@ -4858,13 +4864,13 @@
         <div class="trows${tourOpen ? '' : ' shut'}">${ctpRow}${rows}</div><button class="tmore" data-tmore="1">${tourOpen ? 'Show fewer ▴' : `See all ${list.length + 1} tournaments ▾`}</button></div>`;
     };
     tourDraw = draw;
-    if (tourCache && tourCache.day === day && Date.now() - tourCache.at < 120000) return draw(tourCache.res);
+    if (tourCache && tourCache.day === day && Date.now() - tourCache.at < 600000) return draw(tourCache.res);   // 10 minutes (saves Firebase reads)
     draw(null);
     try {
-      const lead = async c => { const s = await scoresRef(c.id, day).orderBy('rel').limit(5).get();
+      const lead = async c => { const s = await scoresRef(c.id, day).orderBy('rel').limit(2).get();
         const rows = s.docs.map(d => Object.assign({ pid: d.id }, d.data())).sort((a, b) => a.rel - b.rel || a.date - b.date); return rows[0] || null; };
       const res = await Promise.all(list.map(lead));
-      const cs = await ctpRef(day).orderBy('yd').limit(5).get();
+      const cs = await ctpRef(day).orderBy('yd').limit(2).get();
       res.ctp = cs.docs.map(d => d.data()).sort((a, b) => a.yd - b.yd || a.date - b.date)[0] || null;
       tourCache = { day, at: Date.now(), res };
       if ($('tourCard') === el) draw(res);
@@ -4883,8 +4889,8 @@
   let acesCache = null;
   async function fetchAces() {
     const day = etDay();
-    if (acesCache && acesCache.day === day && Date.now() - acesCache.at < 60000) return acesCache.rows;
-    const snap = await acesRef(day).orderBy('date', 'desc').limit(30).get();
+    if (acesCache && acesCache.day === day && Date.now() - acesCache.at < 300000) return acesCache.rows;
+    const snap = await acesRef(day).orderBy('date', 'desc').limit(15).get();
     const rows = snap.docs.map(d => d.data()).filter(r => inSeason(r) && r.cid !== 'mini');   // mini golf aces aren't real aces
     acesCache = { day, at: Date.now(), rows }; return rows;
   }
@@ -6599,7 +6605,7 @@
   const seenMs = p => (p.last && p.last.toMillis ? p.last.toMillis() : 0) || Math.min(p.lastMs || 0, Date.now());
   let admBanned = new Set();
   async function admLoadPresence(force) {
-    if (admPres && !force && Date.now() - admPres.at < 30000) return admPres.rows;
+    if (admPres && !force && Date.now() - admPres.at < 60000) return admPres.rows;
     const [s, b] = await Promise.all([fbDb.collection('presence').orderBy('last', 'desc').limit(500).get(), fbDb.collection('bans').limit(500).get().catch(() => null)]);
     if (b) admBanned = new Set(b.docs.map(d => d.id));
     const rows = s.docs.map(d => Object.assign({ uid: d.id }, d.data()));
@@ -6634,7 +6640,7 @@
     const v = $('admView');
     try {
       if (admView === 'live') {
-        let today = etDay(), [rows, dT, dY] = await Promise.all([admLoadPresence(true), fbDb.collection('daily').doc(today + STATS_TAG).get(), fbDb.collection('daily').doc(prevDay(today) + STATS_TAG).get()]);
+        let today = etDay(), [rows, dT, dY] = await Promise.all([admLoadPresence(), fbDb.collection('daily').doc(today + STATS_TAG).get(), fbDb.collection('daily').doc(prevDay(today) + STATS_TAG).get()]);
         rows = rows.filter(p => String(p.ver || '') >= STATS_VER);   // stats were reset: only notes from after the reset count
         const now = Date.now(), online = rows.filter(p => now - (p.lastMs || 0) < 6 * 60000), active = rows.filter(p => p.day === today);
         const t = dT.exists ? dT.data() : {}, y = dY.exists ? dY.data() : {};
@@ -6719,7 +6725,7 @@
         else if (confirm(`Give ${d.n} the 🎁 Creator's Pick badge?`)) await ref.set({ name: d.n || '', at: Date.now() });
       } else return;
     } catch (err) { alert('That didn\'t work: ' + (err.code || err.message)); }
-    renderAdmin();
+    boardCache.clear(); renderAdmin();
   });
   $('adminBody').addEventListener('input', e => { if (e.target.id === 'admQ') { admQ = e.target.value; const l = $('admList'); if (l) l.innerHTML = admListHtml(); } });
   $('adminBody').addEventListener('keydown', e => e.stopPropagation());
