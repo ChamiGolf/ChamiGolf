@@ -614,11 +614,6 @@
   .trow .tl{flex:none;font:600 13px Inter;white-space:nowrap}
   .trow .tl b{color:var(--gold-l);margin-left:4px}.trow .tl i{opacity:.65;font-size:12px}
   .cardsBack{margin:26px auto 6px;text-align:center;font:700 20px Oswald,sans-serif;letter-spacing:.05em;color:var(--gold-l);opacity:.92}
-  #fbkBtn{flex:none;height:38px;width:38px;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);font-size:17px;cursor:pointer;padding:0}
-  .fbk textarea{display:block;width:100%;min-height:120px;margin:10px 0;padding:10px 12px;border-radius:12px;border:2px solid rgba(242,193,78,.55);background:var(--red-dd);
-                color:#fff;font:500 15px Inter,sans-serif;resize:vertical;-webkit-user-select:text;user-select:text;touch-action:auto}
-  .fbk .opts{margin-top:10px}
-  .fbk .fmsg{font-size:13px;color:#f3d7a8;min-height:18px;margin-bottom:8px}
   #adminBtn{flex:none;height:38px;width:38px;border-radius:50%;border:2px solid var(--gold);background:var(--red-dd);font-size:18px;cursor:pointer;padding:0}
   .wrapseg{flex-wrap:wrap}.wrapseg button{flex:1 1 30%}
   .pill2{display:inline-block;font:800 9px Inter;letter-spacing:.1em;padding:2px 6px;border-radius:999px;background:rgba(66,133,244,.35);color:#dce8ff;vertical-align:2px;text-transform:uppercase}
@@ -689,7 +684,6 @@
       <div style="min-width:0"><div class="bname" id="gameName">Red &amp; Gold Golf</div><div class="tag">CHAMPIONSHIP GOLF</div></div>
     </div>
     <div class="slideCap" id="slideCap"></div>
-    <button id="fbkBtn" title="Send feedback" aria-label="Send feedback">💬</button>
     <button id="adminBtn" class="hidden" title="Creator tools">🛡️</button>
     <button id="acctBtn" class="hidden">Sign in</button>
     <div class="coins" id="homeCoins">$0</div>
@@ -831,18 +825,6 @@
     <div class="sub" style="font-size:14px;line-height:1.45"><b>We're really sorry</b> for the trouble. The game just got a big update, so <b>everyone's progress has been reset</b>: money, clubs, gear, stats and <b>all the leaderboards</b> start over, so everyone is on a level playing field.<br><br>
       Your name, sign-in and friends are kept. Thanks for playing, and good luck!</div>
     <div class="btns" style="margin-top:14px"><button class="main" id="resetOk">Let's go</button></div>
-  </div>
-</div>
-
-<!-- ===== Feedback ===== -->
-<div id="fbk" class="overlay hidden">
-  <div class="card fbk">
-    <h2>Send feedback 💬</h2>
-    <div class="sub">Found a bug or have an idea? Tell the creator.</div>
-    <div class="opts" id="fbkKind"><button data-k="bug" class="on">🐞 Bug</button><button data-k="idea">💡 Idea</button><button data-k="other">💬 Other</button></div>
-    <textarea id="fbkText" maxlength="1000" placeholder="What happened, or what would make the game better?"></textarea>
-    <div class="fmsg" id="fbkMsg"></div>
-    <div class="btns"><button class="main" id="fbkSend">Send</button><button class="ghost" id="fbkClose">Close</button></div>
   </div>
 </div>
 
@@ -4404,23 +4386,6 @@
     else if (t.id === 'acctBtn' && fbUser) setTab('golfer');
     else signIn();
   });
-  // ---- Feedback: goes to the creator's inbox (Creator tools → Feedback) ----
-  let fbkKind = 'bug';
-  $('fbkBtn').addEventListener('click', () => { ensureAudio(); sfx.click(); $('fbkMsg').textContent = ''; $('fbk').classList.remove('hidden'); });
-  $('fbkClose').addEventListener('click', () => { sfx.click(); $('fbk').classList.add('hidden'); });
-  $('fbkKind').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; fbkKind = b.dataset.k; [...$('fbkKind').children].forEach(x => x.classList.toggle('on', x === b)); });
-  $('fbkText').addEventListener('keydown', e => e.stopPropagation());
-  $('fbkSend').addEventListener('click', async () => {
-    const text = $('fbkText').value.trim().slice(0, 1000), u = meUser();
-    if (!text) { $('fbkMsg').textContent = 'Type something first.'; return; }
-    if (!u || !fbDb) { $('fbkMsg').textContent = "Can't reach the internet right now. Try again in a bit."; return; }
-    $('fbkSend').disabled = true; $('fbkMsg').textContent = 'Sending…';
-    try {
-      await fbDb.collection('feedback').add({ uid: u.uid, name: boardName(), text, kind: fbkKind, at: Date.now(), t: serverTime(), ver: navigator.userAgent.slice(0, 120) });
-      $('fbkText').value = ''; $('fbkMsg').textContent = '✅ Thanks! The creator will read it.';
-    } catch (e) { $('fbkMsg').textContent = "That didn't send (" + (e.code || 'error') + '). Try again later.'; }
-    $('fbkSend').disabled = false;
-  });
   // a Google sign-in counts once a day per device for the analytics
   function countSignin() { const d = etDay(); if (save.signinDay !== d) { save.signinDay = d; persist(); bumpDaily({ signins: 1 }); } }
   let checkedOnce = false;
@@ -6152,7 +6117,7 @@
 
   // ================= Creator tools (only for the creator's Google account; the rules enforce this too) =================
   let admView = 'live', admCid = 'pines', admMode = 'daily', admQ = '', admPres = null;
-  const admTabs = [['live', '📈 Analytics'], ['players', '👥 Players'], ['flags', '🚩 Cheat flags'], ['feedback', '💬 Feedback'], ['bans', '⛔ Bans'], ['boards', '🏆 Leaderboards']];
+  const admTabs = [['live', '📈 Analytics'], ['players', '👥 Players'], ['flags', '🚩 Cheat flags'], ['bans', '⛔ Bans'], ['boards', '🏆 Leaderboards']];
   // a few random fun facts from everyone's "last seen" notes
   function admFunStats(rows) {
     if (!rows.length) return [['—', 'No players yet']];
@@ -6216,13 +6181,6 @@
         v.innerHTML = (s.docs.length ? `<button class="ghost sm" data-adm-clearflags="1" style="margin-bottom:10px">🧹 Clear all flags (${s.docs.length}${s.docs.length >= 100 ? '+' : ''})</button>` : '')
           + `<div class="mplist">${s.docs.map(d => { const f = d.data(); return `<div class="mpli"><div class="nm"><b>${esc(f.name || 'Golfer')}</b> ${f.strong ? '<span class="pill2 r">auto-banned</span>' : '<span class="pill2">flagged</span>'}<small>${esc(f.kind || '')}: ${esc(f.detail || '')} · ${f.at ? ago(f.at) : ''}${f.google ? ' · Google' : ' · guest'}</small></div>
           <button class="ghost sm" data-adm-dismiss="${d.id}">Dismiss</button>${f.strong ? '' : `<button class="main sm" data-adm-ban="${f.uid}" data-n="${esc(f.name || '')}">Ban</button>`}</div>`; }).join('') || '<div class="empty">No cheat flags. 🎉</div>'}</div>`;
-      } else if (admView === 'feedback') {
-        const s = await fbDb.collection('feedback').orderBy('at', 'desc').limit(100).get();
-        const ic = { bug: '🐞', idea: '💡', other: '💬' };
-        v.innerHTML = (s.docs.length ? `<button class="ghost sm" data-adm-clearfbk="1" style="margin-bottom:10px">🧹 Clear all feedback</button>` : '')
-          + `<div class="mplist">${s.docs.map(d => { const f = d.data(); return `<div class="mpli" style="align-items:flex-start"><div class="nm"><b>${ic[f.kind] || '💬'} ${esc(f.name || 'Golfer')}</b>
-            <small>${f.at ? ago(f.at) : ''}</small><div style="font-size:14px;color:#fff;margin-top:4px;white-space:pre-wrap">${esc(f.text || '')}</div></div>
-            <button class="ghost sm" data-adm-fbkdel="${d.id}">Done</button></div>`; }).join('') || '<div class="empty">No feedback yet.</div>'}</div>`;
       } else if (admView === 'bans') {
         const s = await fbDb.collection('bans').orderBy('at', 'desc').limit(200).get();
         v.innerHTML = `<div class="mplist">${s.docs.map(d => { const b = d.data(); return `<div class="mpli"><div class="nm"><b>${esc(b.name || 'Golfer')}</b> ${b.auto ? '<span class="pill2 r">auto</span>' : '<span class="pill2">by you</span>'}<small>${esc(b.reason || '')} · ${b.at ? ago(b.at) : ''}</small></div>
@@ -6263,15 +6221,14 @@
       else if (d.admBan) await admBan(d.admBan, d.n);
       else if (d.admUnban) { if (!confirm('Unban this golfer?')) return; await fbDb.collection('bans').doc(d.admUnban).delete(); }
       else if (d.admDismiss) await fbDb.collection('flags').doc(d.admDismiss).delete();
-      else if (d.admClearflags || d.admClearfbk) {
-        const col = d.admClearflags ? 'flags' : 'feedback';
-        if (!confirm(d.admClearflags ? 'Clear ALL cheat flags? (Bans stay.)' : 'Clear ALL feedback?')) return;
+      else if (d.admClearflags) {
+        const col = 'flags';
+        if (!confirm('Clear ALL cheat flags? (Bans stay.)')) return;
         for (let i = 0; i < 20; i++) {
           const snap = await fbDb.collection(col).limit(200).get(); if (snap.empty) break;
           const batch = fbDb.batch(); snap.docs.forEach(x => batch.delete(x.ref)); await batch.commit();
         }
       }
-      else if (d.admFbkdel) await fbDb.collection('feedback').doc(d.admFbkdel).delete();
       else if (d.admDel) { if (!confirm('Remove this score from the board?')) return; await scoresRef(admCid, admMode === 'daily' ? etDay() : null).doc(d.admDel).delete(); tourCache = null; }
       else if (d.admGift) {
         const ref = fbDb.collection('gifts').doc(d.admGift), has = (await ref.get()).exists;
