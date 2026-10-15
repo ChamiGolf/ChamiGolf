@@ -14,7 +14,8 @@ Play it at https://chamigolf.github.io/
 - Water and out of bounds cost a stroke. Cart paths are concrete: the ball kicks up and skips off them.
 - Left-handed? Switch hands in the Golfer tab.
 - Golf ball colours are free: pick a preset or mix any colour with the R/G/B sliders in Golfer > Ball (alignment lines still cost money).
-- Mr. Hasselbaur greets you on the first tee of the 3C Par Three, and Mr. Garner on the first tee of Chami Links Crimson.
+- On the first tee, Mr. Haslbaur (3C Par Three) and Mr. Garner (Chami Links Crimson) pop up in the bottom-left corner with a word of encouragement (tap to dismiss; they leave after your tee shot).
+- Play Friends: adding a friend is two-way, and if your friend code doesn't load there's a Try again button.
 - Hole payouts: hole-in-one $1,500 · albatross $1,000 · eagle $250 · birdie $100 · par $25 · bogey or worse $0.
 
 ## Courses
@@ -46,7 +47,8 @@ Play it at https://chamigolf.github.io/
 
 - The game catches edited saves, money or gear it never paid out, impossible rounds and absurd drives. Strong signs ban the device right away; smaller ones are flagged.
 - Money: every payout goes through the game's ledger. $5,000+ showing up in the bank at once (or in total) that the game didn't pay out is an automatic ban, and so is a bank bigger than everything the golfer has ever earned. The Firebase rules enforce the same limit on cloud saves.
-- The creator's account (🛡️ button on the home screen) has cheat flags, bans/unbans and the leaderboards (remove a score, ban, give or take back Creator's Pick with 🎁). Player counts, players online and rounds played are in Google Analytics.
+- The creator's account (🛡️ button on the home screen) has Find a player (search by name, give or take back Creator's Pick 🎁, ban), cheat flags (with a 💰 money-only filter), bans/unbans and the leaderboards (remove a score, ban, 🎁).
+- Money flags for review (not bans): earning over $25,000 in an hour, a bank above everything ever earned, and friends-match pots of $5,000+ or won by forfeit. Player counts, players online and rounds played are in Google Analytics.
 
 ## Updates and pop-ups
 
@@ -64,6 +66,7 @@ The game is built to stay on the free Spark plan (50,000 reads and 20,000 writes
 - Badge counts load once per visit; the ban check runs every 15 minutes.
 - Play Friends invites are only watched on the home screen (newest 10). Stroke play and best ball send one score per hole; scramble and alt shot send every shot because players take turns.
 - No "last seen" notes or daily counters: those stats come from Google Analytics.
+- The creator's Find a player search uses a tiny player directory: one record per golfer, written only when they first pick a name or change it.
 
 ## Google Analytics
 

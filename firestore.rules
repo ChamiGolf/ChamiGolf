@@ -137,6 +137,15 @@ service cloud.firestore {
     }
 
     // (Analytics moved to Google Analytics: the old "presence" notes and "daily" counters aren't used any more.)
+    // Player directory for the creator's "Find a player" search: one tiny record per golfer (name only).
+    match /players/{uid} {
+      allow read: if isAdmin();
+      allow create, update: if isMe(uid) && notBanned()
+        && request.resource.data.keys().hasOnly(['name', 'n', 'g', 'at'])
+        && okName(request.resource.data.name) && request.resource.data.n == request.resource.data.name.lower()
+        && request.resource.data.g is bool && request.resource.data.at is int;
+      allow delete: if isAdmin();
+    }
 
     // ---- Play Friends ----
     // Friend codes: anyone signed in can look one up; only its owner can claim or rename it.
