@@ -25,9 +25,12 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isMe(uid) || isAdmin();
       allow delete: if isMe(uid);
+      // money check: your bank can never be more than the game has ever paid you (spending only takes money away)
       allow create, update: if isMe(uid)
         && request.resource.data.keys().hasOnly(['data', 'name', 'coins', 'earned', 'updated'])
-        && request.resource.data.data is string && request.resource.data.data.size() < 500000;
+        && request.resource.data.data is string && request.resource.data.data.size() < 500000
+        && request.resource.data.coins is number && request.resource.data.earned is number
+        && request.resource.data.coins >= 0 && request.resource.data.coins <= request.resource.data.earned + 5000;
     }
 
     // Course leaderboards: one row per golfer (their best), all-time and per day.
@@ -92,18 +95,23 @@ service cloud.firestore {
     // Badge counts: each golfer with a Hole in One or Daily Champion badge leaves a tiny note here (anyone can count them).
     match /badgeHolders/{bid}/who/{uid} {
       allow read: if true;
-      allow create, update: if isMe(uid) && notBanned() && bid in ['ace', 'champ']
+      allow create: if isMe(uid) && notBanned() && bid in ['ace', 'champ']
         && request.resource.data.keys().hasOnly(['name', 'at']) && request.resource.data.name is string && request.resource.data.name.size() <= 20;
       allow delete: if isMe(uid) || isAdmin();
     }
 
-    // Feedback from players (the 💬 button). Only the creator can read or clear it.
-    match /feedback/{id} {
-      allow read, delete: if isAdmin();
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 'kind', 'at', 't', 'ver'])
-        && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
-        && request.resource.data.kind in ['bug', 'idea', 'other'];
+    // One small counter doc for the badge tiles: a golfer can only add 1, and only in the same write that creates
+    // their own badge note above (so each golfer counts once). The creator can fix it with "Recount badge holders".
+    function bumpBadge(k) {
+      let before = resource == null ? {} : resource.data;
+      let keys = resource == null ? request.resource.data.keys() : request.resource.data.diff(resource.data).affectedKeys();
+      return keys.hasOnly([k]) && request.resource.data[k] == before.get(k, 0) + 1
+        && !exists(/databases/$(database)/documents/badgeHolders/$(k)/who/$(request.auth.uid))
+        && existsAfter(/databases/$(database)/documents/badgeHolders/$(k)/who/$(request.auth.uid));
+    }
+    match /meta/badgeCounts {
+      allow read: if true;
+      allow write: if isAdmin() || (request.auth != null && notBanned() && (bumpBadge('ace') || bumpBadge('champ')));
     }
 
     // ---- Anti-cheat ----
@@ -123,11 +131,15 @@ service cloud.firestore {
 
     // ---- Analytics for the creator ----
     // One small "last seen" note per golfer.
+    // (coins = bank, total = everything ever earned: the bank can't be more than that; last = the server's clock)
     match /presence/{uid} {
       allow read: if isAdmin();
-      allow write: if isMe(uid)
-        && request.resource.data.keys().hasOnly(['name', 'google', 'day', 'first', 'lastMs', 'last', 'where', 'coins', 'earned', 'rounds', 'aces', 'ver'])
-        && request.resource.data.name is string && request.resource.data.name.size() <= 20;
+      allow write: if isMe(uid) && notBanned()
+        && request.resource.data.keys().hasOnly(['name', 'google', 'day', 'first', 'lastMs', 'last', 'where', 'coins', 'total', 'earned', 'rounds', 'aces', 'ver'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 20
+        && request.resource.data.last == request.time
+        && request.resource.data.coins is number && request.resource.data.total is number
+        && request.resource.data.coins >= 0 && request.resource.data.coins <= request.resource.data.total + 5000;
     }
     // Daily counters (rounds, aces, sign-ins, new players, Closest to the Pin shots).
     match /daily/{day} {

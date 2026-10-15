@@ -23,7 +23,8 @@
   /* ---------- In-game HUD ---------- */
   .top{position:fixed;top:0;left:0;right:0;display:flex;gap:4px;padding:calc(env(safe-area-inset-top) + 8px) 8px 8px;
        background:linear-gradient(180deg,rgba(69,6,15,.96),rgba(122,12,29,.88));border-bottom:2px solid var(--gold);pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.35);flex-wrap:wrap}
-  .brandbar{flex:0 0 100%;text-align:center;font:700 16px/1 Oswald,sans-serif;letter-spacing:.14em;color:var(--gold-l);margin-bottom:5px}
+  .brandbar{flex:0 0 100%;text-align:center;font:700 16px/1 Oswald,sans-serif;letter-spacing:.14em;color:var(--gold-l);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #hHoleName{color:#fff;letter-spacing:.06em}#hHoleName:not(:empty)::before{content:'·';color:var(--gold);margin:0 .45em}
   .disclaim{flex:0 0 100%;text-align:center;font:600 10px/1.2 Inter,sans-serif;color:rgba(246,220,176,.75);letter-spacing:.02em}
   .stat{flex:1;text-align:center;min-width:0}
   .stat .l{font:800 10px/1 Inter,sans-serif;letter-spacing:.14em;color:var(--gold)}
@@ -325,6 +326,15 @@
                font:700 14px Oswald,sans-serif;letter-spacing:.06em;text-transform:uppercase}
   .logoEd .upl input{position:absolute;inset:0;opacity:0;cursor:pointer}
   .ballpv{display:flex;align-items:center;gap:16px}
+  .rgb{display:grid;gap:10px;margin-top:6px}
+  .rgbrow{display:grid;grid-template-columns:18px 1fr 34px;align-items:center;gap:10px;font:800 13px Inter,sans-serif;color:var(--gold-l)}
+  .rgbrow b{font:700 15px Oswald,sans-serif;color:#fff;text-align:right}
+  .rgbrow input{-webkit-appearance:none;appearance:none;width:100%;height:14px;border-radius:7px;border:1px solid rgba(255,255,255,.35);outline:none;margin:0}
+  .rgbrow input::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;border:3px solid var(--gold);box-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .rgbrow input::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--gold)}
+  #rgbR{background:linear-gradient(90deg,rgb(0,var(--g),var(--b)),rgb(255,var(--g),var(--b)))}
+  #rgbG{background:linear-gradient(90deg,rgb(var(--r),0,var(--b)),rgb(var(--r),255,var(--b)))}
+  #rgbB{background:linear-gradient(90deg,rgb(var(--r),var(--g),0),rgb(var(--r),var(--g),255))}
   .ballpv canvas{width:150px;height:150px;flex:none;background:radial-gradient(circle,#4f9d48,#2f6f30);border-radius:16px}
   .ballpv b{display:block;font:700 22px Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase}
   .ballpv span{font:700 13px Inter;color:#fff}
@@ -533,6 +543,14 @@
   .toast .ts{font:700 12px Inter;color:#FFE08A;margin-top:2px}
 
   /* end-of-round card */
+  .tipBig{margin:6px 0 12px;padding:10px 12px;border-radius:12px;background:rgba(242,193,78,.16);border:1px solid rgba(242,193,78,.55);font:700 17px/1.3 Inter,sans-serif;color:#FFE08A;text-align:center}
+  .tipBig b{color:#fff}
+  .card.news{max-height:86vh;overflow:auto}
+  #newsList{margin:10px 0 0;padding:0;list-style:none;text-align:left}
+  #newsList li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid rgba(242,193,78,.18);font:500 14px/1.4 Inter,sans-serif;color:#f3e6d0}
+  #newsList li:first-child{border-top:0}
+  #newsList li .ni{flex:0 0 26px;font-size:19px;line-height:1.1;text-align:center}
+  #newsList li b{color:#FFE08A}
   .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:12;background:radial-gradient(ellipse at top,rgba(122,12,29,.6),rgba(30,3,8,.88))}
   .card{background:linear-gradient(180deg,#8E0F22,#4F0712);border:2px solid var(--gold);border-radius:20px;padding:24px 22px;
         width:calc(100% - 40px);max-width:380px;max-height:calc(100vh - 40px);overflow:auto;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
@@ -571,6 +589,24 @@
   .bchip.locked{opacity:.6}
   .bchip .bcnt{font:700 10px Inter;font-style:normal;color:#fff;background:rgba(0,0,0,.28);border-radius:999px;padding:2px 7px;margin-top:2px}
   .linkbtn{background:none;border:0;color:var(--gold-l);text-decoration:underline;font:700 12px Inter;cursor:pointer;padding:0}
+  .gbadges{position:absolute;left:10px;top:10px;bottom:10px;display:flex;flex-direction:column;gap:8px;z-index:2}
+  .bmed{width:46px;height:46px;flex:none;border-radius:50%;border:2px solid var(--gold);background:radial-gradient(circle at 35% 30%,#a3162e,#45060f 75%);
+    font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25)}
+  .bmed.on{border-color:#FFE08A;box-shadow:0 0 0 3px rgba(255,224,138,.35),0 3px 10px rgba(0,0,0,.45)}
+  .hbadges{display:flex;gap:6px;flex:none}
+  .hbadges .bmed{width:38px;height:38px;font-size:19px}
+  @media (max-width:560px){.hbadges .bmed:not(.on){display:none}}
+  .bpop{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(20,2,6,.55)}
+  .bpop.hidden{display:none}
+  .bpop .bpc{width:min(320px,calc(100% - 32px));text-align:center;padding:20px 18px 16px;border-radius:20px;background:linear-gradient(180deg,#8E0F22,#4F0712);border:2px solid var(--gold);box-shadow:0 20px 50px rgba(0,0,0,.6)}
+  .bpop .bpi{width:84px;height:84px;margin:0 auto 10px;border-radius:50%;border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:44px;
+    background:radial-gradient(circle at 35% 30%,#a3162e,#45060f 75%);box-shadow:0 0 0 6px rgba(242,193,78,.18)}
+  .bpop .bpi.lk{filter:grayscale(1);opacity:.6}
+  .bpop .bpk{font:800 10px Inter;letter-spacing:.16em;color:var(--gold)}
+  .bpop h3{margin:4px 0 6px;font:700 24px Oswald,sans-serif;color:var(--gold-l);text-transform:uppercase;letter-spacing:.03em}
+  .bpop p{margin:0 0 8px;font-size:14px;line-height:1.45;color:#f6e7cc}
+  .bpop .bps{font:700 12px Inter;color:#fff;opacity:.85;margin-bottom:12px}
+  .bpop .btns{display:flex;gap:8px;justify-content:center}
   .gbadge{position:absolute;left:10px;top:10px;display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border-radius:999px;background:rgba(30,3,8,.78);border:1px solid var(--gold);pointer-events:none}
   .gbadge span{font-size:20px;line-height:1}
   .gbadge b{font:700 14px Oswald,sans-serif;color:#fff;letter-spacing:.03em;text-transform:uppercase}
@@ -636,7 +672,7 @@
 
 <!-- ===== In-game HUD ===== -->
 <div class="top" id="hud">
-  <div class="brandbar">ChamiGolf</div>
+  <div class="brandbar"><span id="hCourse">ChamiGolf</span><span id="hHoleName"></span></div>
   <div class="stat"><div class="l">HOLE</div><div class="v" id="hHole">1/6</div></div>
   <div class="stat"><div class="l">PAR</div><div class="v" id="hPar">4</div></div>
   <div class="stat"><div class="l">STROKE</div><div class="v" id="hStroke">0</div></div>
@@ -694,6 +730,7 @@
     </div>
     <div class="slideCap" id="slideCap"></div>
     <button id="adminBtn" class="hidden" title="Creator tools">🛡️</button>
+    <div class="hbadges" id="hBadges"></div>
     <button id="acctBtn" class="hidden">Sign in</button>
     <div class="coins" id="homeCoins">$0</div>
   </header>
@@ -710,7 +747,7 @@
       <section id="tab-golfer" class="hidden">
         <div class="gwrap">
           <div class="gleft">
-            <div class="gstage"><canvas id="gPrev"></canvas><div class="gbadge" id="gBadge"></div></div>
+            <div class="gstage"><canvas id="gPrev"></canvas><div class="gbadges" id="gBadge"></div></div>
             <label class="nameRow">Name on the leaderboard<input id="gName" maxlength="14" autocomplete="off" spellcheck="false"></label>
             <div id="gNameWarn" class="nameWarn hidden"></div>
             <div id="handBox"></div>
@@ -842,13 +879,36 @@
   </div>
 </div>
 
-<!-- ===== Fresh start notice (full reset) ===== -->
+<!-- ===== Premium badge details (tap a badge) ===== -->
+<div id="bPop" class="bpop hidden"></div>
+
+<!-- ===== Welcome to Chami Golf (first time only) ===== -->
 <div id="resetNote" class="overlay hidden">
   <div class="card">
-    <h2>Fresh start! ⛳</h2>
-    <div class="sub" style="font-size:14px;line-height:1.45"><b>We're really sorry</b> for the trouble. The game just got a big update, so <b>everyone's progress has been reset</b>: money, clubs, gear, stats and <b>all the leaderboards</b> start over, so everyone is on a level playing field.<br><br>
-      Your name, sign-in and friends are kept. Thanks for playing, and good luck!</div>
-    <div class="btns" style="margin-top:14px"><button class="main" id="resetOk">Let's go</button></div>
+    <h2>Welcome to Chami Golf! ⛳</h2>
+    <div class="tipBig">To get started, enter the <b>3C Par Three</b></div>
+    <div class="sub" style="font-size:14px;line-height:1.5">It's where everyone starts. Beat it to unlock Chami Links, TPC Saragosa, Meribah, Deans Valley and more.<br><br>
+      Every birdie, eagle and ace pays out: spend it on <b>clubs, outfits and bags</b>, earn <b>premium badges</b>, take on the <b>Daily Closest to the Pin</b> and challenge your friends head to head.<br><br>
+      Swipe to aim, press the ball and pull back, and let go in the gold zone. Good luck!</div>
+    <div class="btns" style="margin-top:14px"><button class="main" id="resetOk">Go to 3C Par Three</button></div>
+  </div>
+</div>
+
+<!-- ===== What's new (shown once per update; only things players can see) ===== -->
+<div id="newsPop" class="overlay hidden" style="z-index:31">
+  <div class="card news">
+    <h2>What's new ⛳</h2>
+    <ul id="newsList"></ul>
+    <div class="btns" style="margin-top:14px"><button class="main" id="newsOk">Let's play</button></div>
+  </div>
+</div>
+
+<!-- ===== One-time tips (Clubs, Golfer) ===== -->
+<div id="tipPop" class="overlay hidden" style="z-index:31">
+  <div class="card">
+    <h2 id="tipTitle"></h2>
+    <div class="sub" id="tipBody" style="font-size:15px;line-height:1.5"></div>
+    <div class="btns" style="margin-top:14px"><button class="main" id="tipOk">Got it</button></div>
   </div>
 </div>
 
@@ -1084,11 +1144,13 @@
   }
   let tamperedSave = false;
   let save = freshSave();
+  let hadSave = false; try { hadSave = !!localStorage.getItem(SAVE_KEY); } catch (e) {}
   try {
     let s = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (s && (s.epoch | 0) < RESET_EPOCH) s = resetSave(s);   // the full reset: start over, keep who you are
     else if (s) {
-      if (s.sig && s.sig !== sigOf(s)) tamperedSave = true;   // the save was edited outside the game
+      // the save was edited outside the game (a save with progress but no fingerprint was edited too: the game always writes one)
+      if (s.sig ? s.sig !== sigOf(s) : ((s.coins | 0) > 0 || (s.stats && s.stats.earnedTotal > 0))) tamperedSave = true;
     }
     if (s) {
       save = Object.assign(save, s);
@@ -1200,7 +1262,21 @@
   loadBag();
   // Online state (filled in by the Online section below). var so persist() can run before that section does.
   var fbAuth = null, fbDb = null, fbUser = null, cloudReady = false, cloudTimer = null, lastSavedJson = null;
+  // ---- Money watchdog: every payout in the game goes through paid(). If the bank grows by more than the game paid out,
+  // the money was added some other way: 5,000 or more at once (or 5,000 in total) bans; smaller amounts are flagged for review.
+  let coinBase = save.coins || 0, coinPaid = 0, coinOdd = 0;
+  function paid(n) { coinPaid += Math.max(0, +n || 0); }
+  function moneyWatch() {
+    const c = save.coins || 0, extra = c - coinBase - coinPaid;
+    coinBase = c; coinPaid = 0;
+    if (!(extra > 0.5) || typeof cheatFlag !== 'function') return;
+    coinOdd += extra;
+    if (extra >= 5000) cheatFlag('money', `${money(Math.round(extra))} appeared in the bank at once (not paid out by the game)`, true);
+    else if (coinOdd >= 5000) cheatFlag('money', `${money(Math.round(coinOdd))} in total appeared in the bank that the game never paid out`, true);
+    else cheatFlag('money', `${money(Math.round(extra))} appeared in the bank that the game didn't pay out`, false);
+  }
   function persist() {
+    try { moneyWatch(); } catch (e) {}
     save.sig = sigOf(save);
     const j = JSON.stringify(Object.assign({}, save, { mtime: 0 }));
     if (j !== lastSavedJson) { if (lastSavedJson !== null) save.mtime = Date.now(); lastSavedJson = j; pushCloud(); }
@@ -1399,7 +1475,7 @@
         FL(8, 'Sunset Cove', 3, 192, { p: [[0, 0], [20, 192]], wt: [[0.45, 32, 56, 20]], bk: [['g-6', -16, 6, 8], ['g+8', 12, 5, 6]] }),
         FL(9, 'Clubhouse', 4, 440, { p: [[0, 0], [0, 270], [-40, 440]], wt: [['g-30', 0, 9, 40]], bk: [['v1', 28, 10, 7], ['g+8', -14, 5, 7]], wd: [['v1-30', -58, 22, 5]] }),
       ] },
-    { id: 'clyellow', name: 'Chami Links Yellow', unlock: 'farbor', teeCol: '#F2C14E', desc: 'Chami Links from the yellow tees: six new Bethpage Black holes, longer and tighter than the crimson tees.', wind: 11,
+    { id: 'clyellow', name: 'Chami Links Gold', unlock: 'farbor', teeCol: '#F2C14E', desc: 'Chami Links from the gold tees: six new Bethpage Black holes, longer and tighter than the crimson tees.', wind: 11,
       pal: Object.assign({}, CL_PAL, { sky: ['#e0a040', '#f6d79a', '#fdf0d6'], fog: 0xf3dfb8, sun: 0xffe2a8 }),
       holes: [
         CLY(2, 'Hogback', 4, 389, { p: [[0, 0], [0, 240], [-35, 389]], bk: [['v1+5', 26, 10, 7], ['g-12', -15, 7, 8], ['g-6', 16, 6, 7]], wd: [['v1-40', -58, 22, 5]] }),
@@ -1812,8 +1888,20 @@
     return;
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // iPad can drop the 3D context when the app is in the background or memory is tight; when it comes back,
+  // rebuild the hole on screen so it isn't left black or with scrambled colours
+  let glLost = false;
+  glCanvas.addEventListener('webglcontextlost', e => { e.preventDefault(); glLost = true; }, false);
+  glCanvas.addEventListener('webglcontextrestored', () => {
+    glLost = false;
+    try { if (builtFor && hole === builtFor.h) { applyCourseLook(builtFor.course); buildHole(builtFor.h, builtFor.course, builtFor.maxPx); placeTeeBag(); } } catch (e) {}
+    renderer.shadowMap.needsUpdate = true;
+  }, false);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Battery: the sun and the trees never move, so the shadow map is only redrawn when something that casts a shadow
+  // moves (the golfer, the flagstick) instead of on every frame (it means drawing every tree a second time)
+  renderer.shadowMap.autoUpdate = false;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, 1, 0.05, 3000);
@@ -1848,13 +1936,18 @@
   // ball, shadow blob, aim arc, targets, trail
   // ---- golf ball looks (cosmetic; the Pro Ball upgrade in Clubs is separate) ----
   // [name, colour, price, finish] — cheapest first, the most premium cost the most
-  const BALL_COLORS = [['White', '#f7f7f2', 0, 'gloss'], ['Yellow', '#f4e04d', 250, 'gloss'], ['Orange', '#ff8c2a', 300, 'gloss'], ['Pink', '#ff8fb8', 400, 'gloss'],
-    ['Green', '#5fd068', 500, 'gloss'], ['Sky blue', '#7cc7ff', 600, 'gloss'], ['Red', '#d81f3a', 900, 'gloss'], ['Matte black', '#232327', 1500, 'matte'],
-    ['Pearl', '#f6efe2', 2500, 'pearl'], ['Gold', '#e5b740', 5000, 'metal']];
+  // Ball colours are free: pick a preset or mix any colour with the R/G/B sliders (only the alignment lines cost money)
+  const BALL_COLORS = [['White', '#f7f7f2', 0, 'gloss'], ['Yellow', '#f4e04d', 0, 'gloss'], ['Orange', '#ff8c2a', 0, 'gloss'], ['Pink', '#ff8fb8', 0, 'gloss'],
+    ['Green', '#5fd068', 0, 'gloss'], ['Sky blue', '#7cc7ff', 0, 'gloss'], ['Red', '#d81f3a', 0, 'gloss'], ['Matte black', '#232327', 0, 'matte'],
+    ['Pearl', '#f6efe2', 0, 'pearl'], ['Gold', '#e5b740', 0, 'metal']];
+  const okHex = h => /^#[0-9a-f]{6}$/i.test(String(h));
+  const ballColOf = look => BALL_COLORS.find(x => x[1].toLowerCase() === String(look.color).toLowerCase()) || (okHex(look.color) ? ['Custom', look.color, 0, 'gloss'] : BALL_COLORS[0]);
+  const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const rgbHex = (r, g, b) => '#' + [r, g, b].map(v => Math.max(0, Math.min(255, v | 0)).toString(16).padStart(2, '0')).join('');
   const BALL_LINES = [['none', 'No line', 0], ['black', 'Black line', 200], ['red', 'Red line', 400], ['triple', 'Triple track', 1200], ['gold', 'Gold stripe', 1800]];
   save.ballLook = Object.assign({ color: '#f7f7f2', line: 'none' }, save.ballLook || {});
   function paintBall(g, W, H, look) {
-    const c = BALL_COLORS.find(x => x[1] === look.color) || BALL_COLORS[0];
+    const c = ballColOf(look);
     g.fillStyle = c[1]; g.fillRect(0, 0, W, H);
     // dimples
     for (let y = 4; y < H; y += 8) for (let x = (y / 8 % 2) * 4; x < W; x += 8) {
@@ -1867,7 +1960,7 @@
     if (look.line === 'gold') { band(H / 2 - 5, 10, '#d9a520'); band(H / 2 - 1, 2, '#fff3b0'); }
     if (look.line === 'triple') { band(H / 2 - 11, 5, '#d81f3a'); band(H / 2 - 3, 6, '#2747a8'); band(H / 2 + 6, 5, '#d81f3a'); }
     // little brand mark
-    g.save(); g.translate(W * 0.25, H / 2 + (look.line === 'none' ? 0 : 18)); g.fillStyle = c[3] === 'matte' ? '#e8e8e8' : '#1c1c22';
+    g.save(); g.translate(W * 0.25, H / 2 + (look.line === 'none' ? 0 : 18)); const [lr, lg, lb] = hexRgb(c[1]); g.fillStyle = c[3] === 'matte' || lr * 0.3 + lg * 0.59 + lb * 0.11 < 95 ? '#e8e8e8' : '#1c1c22';
     g.font = '800 14px Oswald, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('CHAMI', 0, 0); g.restore();
     return c;
   }
@@ -2260,6 +2353,60 @@
     teeBag.visible = true;
   }
 
+  // ---- Tee hosts: teachers who greet you on the first tee (cartoon headshots on a golfer in their own suit) ----
+  const HOSTS = {
+    par3: { name: 'Mr. Hasselbaur', face: 'data:image/jpeg;base64,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',
+      look: { jacket: '#3e4448', shirt: '#f4f4f0', tie: '#9fd8bb', pants: '#30353a', shoes: '#18181a', skin: '#e2b39a', hair: '#3a2a20', trim: '#3e4448', style: 'suit' } },
+    pines: { name: 'Mr. Garner', face: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUEBAQEAwUEBAQGBQUGCA0ICAcHCBALDAkNExAUExIQEhIUFx0ZFBYcFhISGiMaHB4fISEhFBkkJyQgJh0gISD/2wBDAQUGBggHCA8ICA8gFRIVICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICD/wAARCAEAAQADASIAAhEBAxEB/8QAHQAAAgIDAQEBAAAAAAAAAAAAAAIGBwQFCAMBCf/EAEAQAAEDAwIEBAQDBQYGAwEAAAECAxEABAUGIQcSMUETIlFhCDJxgRSRoRUjQlLBM0NicoKxFjQ1RHPhJNHwU//EABsBAAICAwEAAAAAAAAAAAAAAAACAwUBBAYH/8QAMhEAAgIBAwICCAYDAQEAAAAAAAECEQMEITEFEkFRBhMiYXGBkaEjMjPB0fAUUvFCsf/aAAwDAQACEQMRAD8AteimiiK7086oWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoWimiiKAoaKIpooiksahYoimiiKLChYoimiiKLChYoimiiKLChYoimiiKLChYoimisW/yFljLR27v7pu3YaSVrW4oJCUjqSe1DdcmVFt0jIikW422kqWsJA3NVy1xZ03l7hTWGyLL6Uq5d1+GsntCVQSP961+Q40Y3AKvMfcsXtncpaWWXlWRUl1QHl5STCpJHoPWKo9T1nDi9nEu6X0+/wDB0ml6BmyrvzSUI/X7WWU9lscw0XXLjyj0Qon8gKZvJWjjTDoWUNvkBpTg5PEJ6ABUEk+lVljPiM0/+NsrHK4jK2r7pCLgqCT+HXMdJClD7CKujJWOltYYxNrm8dZZm2aWHAlxKXQhfY7bpO/61Wz6/kjzjr5lrj9GcMt1lv5V/JHm81ZXOTvsXZKVdX9gltVxbo2U3zglAJMCSATE17u3wtgs3dneW6UDmK1MEpj6pmsux01pjTbVwnT2HtMWl0hSwwjlK1AQCfWoHecWMY3xJd0ai1fuVMNqU7dtqlDTqRKkER2H8U9TFQr0gzttqCaNiXoxplFXkab+H8E5Q604kKS4CCJFekVWFlrnAcQMXf22Czb2PvXGlNg8vI/bE9FgHrHqD+VaV7V2tuHS2RqpTee0+paW/wBrMI5HWiegcR36dR1nqTsbPB13FOXbli4v6lPqfRzLjj34Zqa+n8l0xRFRfA670/qJpTmMvmroIIC/CM8hO4BHUfepQ2tDqAttQUk9xV5jz48t+rknRzubTZsFeti1YRRFNFEVLZr0LFEU0URRYULFEU0URRYULFEU0URRYULFEU0URRYUNFEU0URS2MLFEU0URRYCxRFNFEUWAsURTRRFFgLFfCQkEqIAHc18ffZtbdy4uHEtNNpKlLWYCQO5J6VV2Z15a5zEG7w92gYxSFFLxkeJEjeYIEjpsa0dZrcekh3z58F5lloOn5dbk7IbJcvyMLiDxwwul33sThW/2rlGyUO8p5WmCOoUrufYfnVM5C91jxFeZudSXZtcUlfiItkAp5tuoHfbopX2Fedqqysczf5N+4aymZvVKcFvYJ5uUEyQnfYdNz6fnJLF66uLUOXlkbN6SC0XAvbsZFcZreo5c7vhf3w/c7vQdLw6dUt3/fH9jVJ0Vp17IsvLtyykKTKQ4QjbuR/vvvVxYllL142fEZ5VA8srHWqsyq8q3aJcxDLDzyVypt4xzJ9AfWtG5a6sy7NlbX627C28WXxavFK1CO4Bj7D1qrpzVykXClHG2oxOoLrSeE1HiUMZHEWeWWkxzOhJ5TPdQ39dqpjU3CjU2jXl6i4eXuSRdpcJctbdwE8hPyogDmA/lUDI6dKhGPy93iMn42j9c3tje26uVxm8uVltwJPynm2IkRFSdHGXiNiXlN6iwttlLQ781ugonqfnHN+o7VLCM4/lfyYk8mOe81XvW/3RssTxi4h6ccYVr7Ta7jHmG1vIt/AeQZ+Yx5SfYhIPY1KL3VOieIVlfaew+ojb3t8wppslpTbgn0BA5vselafM5a31nw8uczg8arLquUcqrFSjzTIlBg9U9fL1gR1qF4Hhplru4Rf6lbssTj1Pl/8AAMJ5HEq5eVIlO6B7c09+tYqEl3S2a/vBm8kWox9pPz/k1jnBjiRiMmX8RaovCyCUXNjdJQoDp0UUqBI7b1YmjclrWw0s9g9a6Eyt7Y2zZSXVtpUtTMEkFtZl2P8ADJj3p08WdE2N1b423yF2nw4YU74Sy2kg8vmUTuNvmg1sNT6+1JjMKjLaQXZ5C3b/AHjyly4CgEboSnY957gb9qzKc51Gcf2MQx4sdyxy45XJANU4u20O/j9dcPnn02FyoFbe62S2rzAGdwgnaD0MbgiprjOOOKOpWrcIcOHNv4j96Glw05P8SQNk9ir1isnSnE3A61xqrHIIYx2XUFc1or+zek/3ZPUGflO/161ENW47U+I1PbuY1NuvS74Dbtr4SUtNI/jDg99yCPYdqn0+oyYMilxJe/leT8zX1Omx6jE4reL8K4fmvI6Rx2Rs8rYs3lk+h5l5AcQtBkKSehB9KzIrnnA8SdM6HTisBaLJx7i1AOhwLFsCqSVmSYJJ6dN66As7ti+tUXDDiVoWkKCkqBBB7gjqK7rRayOqx9y58TznqHT5aPJXKPaKIpooit+yrFiiKaKIosBYoimiiKLAWKIpooiiwHiiKailsehYoimoosKFiiKaiiwoWKIpqwsteIx2Iur1aglLLZVJMAbetLKSinJ+A0IOclFcsp3jhe5DL4VOm8LfoZlYVctkwH0/ylXYA7x3qk7PQNq2yHMnfuLIErQ1CEp238x329dq22qNavZHNXVnp23Xe3IcDRuQnnbneSPXedztWHn7/IxZ6YxClXuUukhtwpHM5ER06CdyT2H5159qdTm1GVye1/ZHpul0un02JQirr7syb+/xOlscwvH41CjckBpLKYCxsZKoPt9a+DO51KBcv6XeatUH97DnM4BtuEwCfy3qa2uhbexbxLWQJuBjwC03sUKWBEn1idh6+tfM5w9y2SvG8lic8rGvN/JbrRLQ23mN9/ea0FKD2f1dlk4ZOV9FRrwQUg7iRO4g19rfWeF1XY4t9D2mWMjdNIBbetX0pRdHmjouCgxv3ED1MVmYrA5PIMrdzmnU4d0LIS2l4OlQj5jyQBv2qJxrcnW+1fYgN7p/DX6nV3WOZU678zgHKsn1kd6yLLAX+LwpZwGPevlKVLbT1wEzPWCY27wKn+Z0/krXT9+9p+0DuRbaUtltNvzKUrtA7n0rI0no/Ui7eyy+fu70XxaBXacqW2WiR0KACVKHWZ6+g2plJ9u728hPVrvpLfzK0xQ4r6ZRdXTekmX7NQ3t2AlSWzuSrlbVPTqfYVJ8RxM09lcUbPUikYS/UFMvsPhYbO3XmI2BG0Kg9t6uu3xb/IlCG+RA+5rbJ01YXCB+NsmbjzBf75tKzzDodxsffrWXkjL80foPHDOP5ZX8d/4Oa8dwoxozlxk3vwuQx74DtswEFDbcmRsDCk8sbEd62KdEZXS149l9MWS7yweA/E4ttcGd/O0VGJHoeoJg9BXSYxFqhHK2yEj2Ar6nFsyCUAj0gVh5ZPljLTQXCpnKuoeG1q5inchjcHctZEKNwLe1cSFlZA8nWEhJ83l3kGOtYGkdfXt4TpbVbTrtxcHwULdaIK5HyrHY+hjfv6114vF2i2+QsNgf4RBqP5bSdpdJWtDKVOFMcxHmHuDWfW3HtkrFem7Zd0HXn7zizWWmrTFZ1mxxLTqn7gki3QnmEdiPr6do7VdPAbV6RhlaUvnim+x618jDghXhTO0/ykke0ioqq31NYXuWZ1JaOLFo4fCu0oEXDe8QE7EwB0jcxVaHNXljqxzVumzdNoZeS4XlIgBSh5kK9lbiD6/SrbQ6qeLIn5c+8odfpIZcbVc+Hkd6JKVpCkmQa+xUZ0bqO11BhmLq2WFNuoDiD7EdKlFd1jyRyQU48M87z4ZYcjxz5QsURTUVJZDQsURTUUWFCxRFNRRYUNRTx7UR7Ug9CUU8e1Ee1AUJRTx7UR7UBQlVfx4deRwgyjTKikulAVvEpCgSPyBq049qof4msg5b6HxWOQPJeXvMs+yEkgfmRWrq5Vgl8Dc0Mb1ECn9BJL+m32GgllxTpb52z5iSNifcTt9KuXSmkMTpXHluyZK7t4S/dO+Z1w+hPp7VT3CaxZurpbjSFB8OJQ4VqlCgPMIT+QroSvPNS2sklZ6loop4oya4PhAJBIBjcT2rJtWPHdg/IndXv7Vj1ssYkkOGQASBWqyxJBj8eHwFLTIPRPaPU1IGrBhKQjw0qA7EbflSWKEot/L6x+VbFMcu1D2MpWeYt2wI5U/ZIpksN8w5UCe21elfUkpUCOopbGo9UWsbqhP0616hhsdifqadCudAV601SJI13JnibdB6SKx1oKFQazqVaAtMH7Ghx8hoza5MGkWmRI6ivQgpJB6ivlRk/JX2rcBaLaXcFnyOE80dJJrlrUmPXo7XRb8FDeAySoWhSSWhIAWPYyAfofSu2cjbN3GPuGVp5krQRHvGx/OqE1RprD6rXc6cvLkovWktvkM/2jcyELE+sER/6qfFNRe/BpajE5L2eVwQvhRlLnSHFZOnXnlnFZVCvwqFO8yW1CSOvQmFJ99utdT9RIrmzVGicgb/AEze6eBUvFXSA5KkpcCJTK+YxMcpkddzXRmPdFxj2XRBlPau06LqPWYnB8r9zz/0g0rxZVkrZnvRTx7UR7VfHM0JRTx7UR7UBQlFPHtRHtQFDRRFNFEUtjULFEU0URRYULFEU0URRYULFcx/FJepN/prHBZ5kNvPKT7EpSD+hrp6K454+3Tl/wAbF2d4ki2sbNsISSRzJ5SskfUn9K0NdKsLXmWXToXnT8kevAqxKjmMgpUpQpDQT6KgmfyNXbVV8DlJVo2/hQJF6ZHpKEkValcDqP1Wen6NVgiO22p1xLaOp/St3a24RyMI3KjufU1rbBxpt1XiHlKhAJqR4xvmeUvuAAPvWv4m4b+ySfOr+HpWwbB3PavJloJQEDoOtZIECBQ2MkFFFFKMerT3IOUiR7VkpWlXyqBrBAJMASayGmI8y/ypotkU4rkyKVSghJUegpq+KSFJIIkVIQmColSio96+V6OtFsz1T6151CzaTTWwrm6CK5y1SG9H8SndWPM3b9hlWE2b62h4htHEqHIeUb8qoiB0M+sV0cRIIrmTUGqL/A/ERmsBkLx5eIughTCXjCWCWkrBR02nmT3k+4qbEm7ryNbUNLtvz2+JOjM+9T7AtrbxKArpJj6VXNlkLG/LirO6auQy54bgQqeVUA8p9DBFWljkxjWAP5a6ToC9vI/cv3OT9J5fhY0uLZkRRFNFEV1tnCULFEU0URRYULFEU0URRYUNFEU8URSjUJFEU8URQFCRRFPFEUBQkVx/8QT7CuNrCWocW1YNocSOswoxv7EfnXYcVx58TeGTZcRrPLtxy5G1HNvvztkJP6FNV+v/AEvmWfTV+N8jacC0JTou/WCedy9JUPSEACrWqruB7Cm9BXDykEB29WUkjqAlI2+9WjXB5/1JHpuk/RiFRi94sN6Q1c/isjaKesWmGXPHZhTiFKJ2KCRzDYdOk71MrVyzZbcdunWmoITzOqCRvsOu0k7Vj6h0npnV+JFrl7Rbiml8zb7Cw2po94VHfuKjg4p+2tibIpuP4b3MzSXFtnUlyttWm8nYs+El5q5uEpS28hRPKQQe8dN/tVmW+TYvmUlpY8vVMbiuW8hoHVumnG/+E9bPnHsEuos7ySlI28u0hQPfYbVscLxE1ppO5Rc6yxdtdYlww7c40kqtRt5lJ7pn/wDeryxqTuDIoZpRVZU/j4fY6aplLKokAQI2rUYbNY/MWDd5jrxi7YWJDjCwtJ2nqO+426ia2gIIkVA00bqae5msoCWwR1O816VhtuqRt1HpTrukpQVREetOmqIZQdmTXwkDqQKojVnGvO4vXX7IxOk8ndYuwW6m9fRakruIQY8IxASDuSdzGwr5o3jbc6x1YjFWmj79Fiuea9LgV4JCZ84A5QO3zE7jY1L6udXRrrLj7u1su953n8qfl/3rxrHknck/evoUR0rXas3VS2PVauWDXMXxA4d1nilpfUVs14xuG0W6mgrzFSFKKTvsByk7+1dMKUVGTXN/xF3lni9Q4XKJdeVlUWa2rVuJZR+8la1CevKYH/qp8N91I1dXXq7fhRBuDeSvU6izNg+FK8ZaXnBMoC+cpP3M/kK66xyVDGW4UDPIK4+4I3ge1LkWFrSq6uHGngg7FYClcx+3MK7MaSEsoSBAAFdh0mCXrJVva/8AhwPWsjlHFC9t39z5FEU8URV6c1QkURTxRFAUJFEU8URQFDRRFNFEUlj0LFEU0URRYULFEU0URRYULFcw8e7nEXaLq1yV0BfbO2LaRK5T5TPok7gmunnCENLUdgATXLeUsLPW/G7JW+VYS/Y4S2CQgbpdcWoHzH2Kj5f8NUvV59uOK99/T/p0XQ8fdkm1zVfX/hKNBYJeD0XisQpQU8Ec7hHTmWSo/lMfapy9aNOM8iUhBHykCsHGNIS6EoSEpbRCUgQAOgj7VK7e0ZXZpLiBzKE83euKk3KVnocYqEVFeBQesuGOsNWZxx1eftRj0Km2tnUrCWRAHQAgq/xdfp0rYZvhVkLjSDVrktTZa8ufAIC13B8AugSgchHydtzPfrV1pxiOf51KHYRW2ZtVKILieVA7etSrLOkvIh/x8bbfmc7/AA56QXf4/IX2UyV8yhwlCLMI/chIg+ISraTMCNiAZ9qu1ajUuhdYZvRyL7mt1ulLbSEeI240vdAQFAx5VAQnuI7V3QAEpASAEjoOwqHZm0tbm9YeuLVl51sEoWtsKUiTvyk7j7VIs/tOTXJFLSexGEZVRWfBXSmT0dbJvrzIOti/QDc49TY5W1z5TPUKAJB9Z9q6FZ5SEyfKe9V6lKUJCUpAA6AVNbB7ntUE9YANa8pubcmbeOCxxUYm4WwjkJTsRvUK1/qq00Zo+7z96w9cNslKEtMp3WtRhIJ6JE9VHYe5gGWBagnlCjHpWvzOOZy+EvcXcgFm7YWwvyhUBSSJg7bTO/pWE13KxpRl2tJ7nNOneIPEnWeRvsjjMdj2MVbK8zS0r8yyJS0HJnnPWYAHfavbF8eshy3Za4e3TzVq+21dKZuirwVqVyJSqG45ioEAdyIqw+GuislpHSl3pnJKbfKL5x1h9o/2qFBMKIPynbcb/WvmF4PXi9cv5bL5SwZwovE3ycZirUsfinEKKm1XCjurlUQYEgn077V4u52tvAr+3OoJqTvx4Nbd8f8AHYXMJxOp9GZ3DXaQlTzbqUFTQInmCZBUPp1q3MVksfm8XbZTFXbd3ZXKA4082ZCh/Q9iDuDXnq3QumNatMN6iw7N94BltZUptxHsFpIVG/SYrI05pLC6Uw6MRgrJFjZJWpzw0qUslSjJJKiSSfrUU+xr2VTNnG8ifttNfczC2OXbrXPPxJ4zHO6Zayz7Z/G27jTLKgeyyZB9oSfyFdJXCQG0wAI2rmX4lbPJXWS0nZW906LTIOrtixyw34oWnkUT6wswPQGO9GFfiJWY1LTwydFf/DzppGX4iHMuO8qMSiQgdVqcSpI+wAV+YrsqBVc6R0NgNEuZF/DYwWC08in/AN6tZWEz/MT2JqyEwpIUOhEiu16XmjkwXHz3PPetaeeHOlPxQsURTRRFWtlFQsURTRRFFhQsURTRRFFhQ9FNFEUtjC0U0URRYC0U0URRYHi+kqt3EgbkRXLGlLxGn8XnM9l1LubvJZ1VoVpb5VOK8Twwdz8slR9oIkmurSNq5bbxCtQYDNadvLteLuMNnnlqeQArlh1TqTJMdFnftA96ous7443xZ03o+362dc1sWdYHlu1I23SR+VTLElKm2greCRv61ArC6ZfVb3du8l5l2FIcQQoLSehB7zUtx7/hulo7BZ2Poa47hnf+BLKZJSOok1jWzqnWjzdUmJ9a96yMeFy+ltChI5iOnpUWvX0vOgI3SjafWs/JFSbZYJMlUH3rTVh+RhEc1xmL/B6Ou7zEoS5k3FN29ogp5yt1agkBKe6okge1WHpZjKMaXx7WacbdyQYQLhbIhCnI8xA9JqKv4mzyeSxb13zk2FyLhkBUJ8TlKQVDvEyPQ71ZDSAlAgR2A9Kza7aFUX3tsdMhInrTBJUeUCSayUMJ5Bzbk/pXmwAHiJ6UtD9yp0KLQzvAFZSEJQISKaipEqIXJsKKKKyKY9yflT961t1j7O9dt3bu0afVaueMypxAUWlwRzJJ6GCRPvWfcGXY9BVcan1M9Y8XtEYCza8Zd6LpVykEgpZKICtyEkBSSe58u3WkScpOiVyUIJv3Grv9R5NzO8UMatCH7fE2dom0aSnlVLjKiqVd9zNWbZtqasLZpc8yGkpM+oAqE57TVrZX2VvbVx83uqshYsPKgENobAHKPblQsk9ZV9In+9df0VfhSkvP9kcF6QyfrowfKT+7dC0U0URV9ZzAtFNFEUWAtFNFEUWA0URTxRFKPQkURTxRFAUJFEU8URQFHmqAkk9AKoTVeKa07pPX2atXi+9kVPX4DiBDZKAjl9x1/Or8db8RlaOnMkiufuJuaxqNF6nwzl2hi+bZcYVbvKCHFExylKTupKpBBEg/Y1Q9Ycu2CS2vc6foCgpZZN+0lt+576XtUY/SGGtGlqUlmzaCVK6/KD/WplbveKyh0GFd/Y1GMWy5b4axYeTyuNW7SFiZghABH5it9jifAWJ2Cv6VyUt3Z3UFSSJzjnQ41P8AMAqs6o7iXlJbnshUfapCCCJBkGgZEV1pkWsJpvJ5l9Klt2TBuVIT1VA6fc96qXQOtsvrDFZC9yKGbdTNz4SEW4ISElIVBk7x61euRYbdQUuoS424koWhQkKHoR3FQy30tg9O2Ax+HsG7SzWtbnhpkwomSZO//wBAAU1x7Xa3InGTmmnsV1kOLuktN55/DZC4ulusrCHlNMc6G1HqOaeo7wKuvSuq8bqBu5trW5Dl3jyhL6I3AUgLQr3BSRv07dari30Hp1rUVznF4i1cvLhXOt5aedRPqAdkn1IjpWs1Nw1tNXagD+L1I7hMmm28O6DKysvMT5eZAWkgSSJ6GelNWOTSVoS80bbp+73F5ai1VhtLadus9m7r8LZ2yZUqOYknYJSBuSTsBWv0frPB60wTed0/dl+3UotrQ4nkcaWOqVp7Hv8AQgisPG6PxTGg2NGZZTmcx7duLdw3551OpmRMdI/hj5QBB2ptDaB0/oSzvMfgE3CLe8f/ABC0vPeJCuXlASYmIA6z9aV9te8dKaknXs1v5k0Q4hfyq39Keq+vGdZ4zi9ZXFst+/0nk7UtPtnlKce+2lSkrG0gL6e5PsKsBJJSCRBIrNULad0fa81vIQYO59K9Kw3v7ZVLJ0h4K3uebiyeZR6mqgwlkdZcfspqtNwoY3SiP2UwnnB8W4KFeIRHRI5z9THoQLYurhq1t13L7iW2mUl1a1GAlKRJJ9oFV9wPtkr4VnOEN+NmMhd36ghEBBU6Ryz1UBy7E9jTQ2jKQuWnOMfn9Db5Z5vI8T9O4lCOc45l7JvLB/s5HhNg795WY9hUziofpS0fd1hq/M3yCi4Xeps2kmfKw2gckT2VzFX+o1M4rt+m4/V6aK89/qecdXzeu1k35bfQSKIp4oirEqaEiiKeKIoChIoiniiKAoaKIpooilsahYoimiiKLChYoimiiKLChYqCcS9D4DVWkck7f4tt++t7V1ds+hP75tYSSOVQ369uhqexSOIStpaFdFAg0skpKmPCThJSic/aVyf7Y0hiskpXM49bI8TzcxCwOVQJ9ZBmpTjf737f1qutAE49Od0o8XBcYXJPNciyDDalEogjbsr7mp9ZPBq4hRhKxE+leeZoOE5R8j1fT5PWY4z80S3Ho5LXmJ+YzWiwusmstrXUmBaCW2cKphrxZILjqgorHpAIAHrv7VI8OtC0+CsAxKY+tRfG8Om8JrTUupU5Bx45t1LgbKIDG5KgYMK36GAQBHc0sa7XY0u7uVceP0JM9kGQfM4p0+29eCVtZAltaVIKdwQaptzN8TzrPIovdErVg7Z0tt+EtKXOQHZxCir97IBMADqBT2fHLSlivlyVpl7a4ZUpC212m4AMb+YQY3g9Kb1U3xv8BPX41y6+OxczViy2qYLh7c3atKjQ+n2ddu60TbvpzDjYbUrxlBEcvLPIO5SAN5GwMTvUPsPiH4eG7CXE5RAVADhtQQnfqQFTFWLZa/0Pk8WnKW2qcWq1gnmduEtqTG5BQuFA+0VnsnDwoFkxZPFOiTNgqQgewrJSeUgjtUTx/ETQOQfFvZaxw7zxSVcou0jYfWKkLF7bXjCbizu2bhhfyuMuJWlW8GCDB3qJxa5RsRlF8OzdAhQkbivilpRHMYmoVea801iMw3ichn7CzvHSAlh64SlZnpsen3ipIl0uEE7z3rLbS4I1FN7M2KVpV8qgaxHTLyvrSAkEEGCK+qUVKKj1NI3ZLGNM1eZtHMhhsjYMrShy5tnWEKXMJKkFIJjtJrXYc4rh9w6w+GyuUabbsLVu1Dzh5S8oJAhCeqiTMACazsx+NViLpGNeQxeuIKGHHASlCzsCQPTrWDhOHmmcLeN5L8I5kMqlIBv791T7xPrKjCdyekRNW2i0M9TFu6iij6n1KGjkl23JoyNIW2SGKuMll2yze5O4VdqYI3YSYCGz7hATPvNSOKaKIrsoRUIqK4R57km8k3OXLFiiKaKIp7I6FiiKaKIosKFiiKaKIosKHiiKaikHoWKIpqKAoWKIpqKAoWKIpqKAo504j4v/AIN40Y/VKEpaxOpEfgrtcbIfHykntMJ3+tbuvL4lNT43D6NxWLfAdvLnIM3KG0kcyUNKlR+/QVqbXKNs3q7B1weKhIcU0T520k7Ep6xXI9VxqObuj4nedDzOWn7ZeBOMNf8AI6kLUQpIgn1HY1NUXbKkjmMEjfaQaq5p0pUl1pQPcEb1uGcx4aAApxEfwgSKpjoiR3tu2+F8g3ElB/pUE1ZqXA6YxAutQhS7e4WWQ0GPGLqokp5Tt0k7+lSu0yocjnUFpJjmGxH1FNm9P4bUWMex2ZsG7u2ejmSqQZHQgjcEeo3plTe4ku7tajyRHEZjgtq2yLa2dPOI8qyxd2zdutBHchQSe8bEjrWc3wY4RXwF5b6etnkPedK2b50oIP8ALC4j0jasY8IdACyNonTloWyCOdaVKcE+iyeafea01twD0S1b3jKl5F1T8eCvx4VbQP4YEKk7nmB9NutTqUfCTX9+JquEv/UIv+/AlDPAXheEuFenXbgLWVjxLt4hAP8ACmFDYdpk+9ZDfBDhe0pKm9MCEkEJN2+UmD3HPBHtWm09wVxeO5Bdam1Le27fKG7Y5Bdu2AOo5WyNj7RVi6b0tgtJYxeNwFl+EtluF1SC6tyVkAEysk9hSTm1xNskx4ov82NL+/Ai+quDmgtV2dym4wjVjfPnn/aFoOV4K9STsv6KBH33qRaPwD2mNJY7Av5N7KLsWvD/ABTwhSxJIESYABAAk7AVvyoDqa8iolU9Ki75NdrexsLHCMu5Lc9qVaoHuaTxFe1Y79wlpPMoyrsKwotsdySVno2nxr1pvsj94r+lbWKxMcwpDJedH713cz2HYVm13eiweowxg+eX8TzHqWp/ydTLIuOF8F/bFiiKaitwraFiiKaigKFiiKaigKFiiKaigKGiiKaKIpbGFiiKaKIosBYoimiiKLAWKxMnkrLD4q6ymRfTb2lq2XXXFGAlIrCz2q9N6Yty/n83aY9IEw84Ao/RPU/lXJfGnjMniC63pTSLjzeEQrnubkgpNyR7fyDtPU1DkyxgrfJPhwSySqtisOJWschr/WOQ1PcJ5bQL8C2bnZtsTyj+p9zVycabW4xN1orilhGgn9p49pm56qQVhpKkhR9FIUofVE9apC/tUpwqmWkyGQFJ+3U/711dojEY/ix8KeO06tbdvcW7BtEOHzfh7hhR5FnvuCkkeiyK5zUvdTl8/mdZpI7PHH5fIh+mtSs53Dt5GwWtoElLjSjJbWOoPr7HvW/Tk7gEcwQofSKg2kL68thcaRz1mvH53C/uHrd0BKlJHRQHeBG/Qgg9DUrqnyR7ZNF9im5QTs39nkkF0FtXI5/Krv7e9TjFXovLQ7QpvY1VFbjGahGKUHbq4Qy2ISpxxQSmOwJO3WkJ1LzLgZYbShJKQpREyaykInft7VpMTlm7u0SuZT0kdq3DdwgHyuJMe9DJUZZYUhPNAFeK1xsOtO9ejwoVCfUk1qHrtSyQ2SlPr3NYowm63Mxx1DYlat/Tuax1XqYPKgz2msKimoxZ6m5fP8ZH02rLxlqbm4LznmQg9+5rU3Fzb2rYXc3DTCVKCEl1YQFKPRIJ6k9h3qLYDXl3p3jXnuGer3Q248+m4xD5TypU24gKDZPtuJ9UkVa9MhB5u6fhx8Sj6zknHTOOPx5+HiW/FEU0URXXWcALFEU0URRYCxRFNFEUWAsURTRRFFgLFEU0URRYDxRFNFEUtj0LFEV5Xd3a2Fo5d3ty3bW7SeZbrqglKR6kmud+IHxHMpefwXDi2/aV7EKyCh+6b7EpB6/U7VHPJGCuRJjxSyOooujVmutL6KsFXeocqzbGJQzzS459E9a5X1z8Teps86vHaMtTiLVRKQ9876x9eiftVR39lqvVGXdyOaefcuHVEuP3a9yfYf8A4Vmt4JvENpWFBxa/KV9//QqvyamUto7ItcWkjDeW7MJ+2vsvdqyGoMg/fXbh5lFxwqJ+pP8ASstlhm3RyMtpbT1gDrXpRWsbh8UkLQUq6KEH6Vd3wjajFrq7L6EvFcybgi9t0ESOZHlcH3SUn/SapKvPGagyGh9e4bWeJMXNi+lzlmPEA2Ug+ykEpP1pJRUlTHhNwdo7h478HnNbWLer9LKVa6xxDcslvb8Y2JPhH/F15T7lJ2O1B6d1LZ5+0Ij8LkGSUXFm5s40sbHY7kTP06GCK7bwmXstQaex+cxy/Es8hbouWTIPkWkKEx33iqO4z8CHtR5dGvtABi01WwsOP264S1fxtJ7ByNt9lDYwYNQZ8CyK1ybOm1DxOnwVlX1eOGRtXGHrVFwwscq0OJBSr7GtVpnUdtmL53AZzGPYXUdps/ZPAt85HzcqTuPXlO/cSN6nCUpQgIQISBAFU0ouDpnQQccke5PYqbHWmtuHmsnLrTGJvL3T75Tz2TbniDp5oBMpIIMK6GQCTVhX/EjVzlix+wNBZe4vlkBxN6yG2mfqUnzd+4A61uIkgAST2rd2TKbdDYUBPMFKpnkunJbmI4XG1GVL5fY0uIc4uZZ1h/KIwGm7Uf2jSW1Xby9zuPNypPTues+1WKhlxz5EGPU0qYLifQkVtvasSlfgSwhXjZgCycjdaRQbN0dCk/es+ikskoqPjYpeN0DY5BaEufhszZvck/NyqUqJ7TFQj4wrV/EcWdM6nsSu3uLnHjleSr+8adMR6QFipvx+JuNA4zEW4577JZi2Ztmh1cV5tp6DqOtffjN074+i9NarbkO427VZuEK/hdTzAx7Kb/WrjRfkbOc6l+rRIeG3GrSWsNOWCL/NW1jnQ2lu4trhXhlTgEFSSdiD1q1W3G3mw404lxB6KQZB+4r82/wNlcNh02yQpwBXMNlb79RWwxeV1XgXQvBatyNiEmUpS6SJ+kx+lXUNU0qkjnZ6JN3Fn6LRRFcOWHG/jDji2g5+2v20Df8AEspJV9TE1vrX4luJzT83eExNy3EcqU8k+881TLVQNd6PIjsWKIrl7FfFe62pKdSaKdaSTJctHSYH0UP6irU0vx24bapW0wxnE2F050Yvh4Rn05un61JHNCXDIZafJHlFmxRFDa0OtpcaWlaFCUqSZBHsaaKmshoWKIpooiiwo+OuNMNKefdQ02kSpa1AAD3Jql9c/EVpDTTi8dgAdQ5WeVKLc/ukq91d/tXOmezOt9ZLKtWaruX2pkW1t+7bHrt0/SsWzx9nj2+S0YS3PVXVSvqarZ6p8QRb49EuZsydVak17xEulPalzBs7IqlFgxshA9OUbT7kk1jWVha4+3DFq3yJ7k7qV7k96yqK0nJydssIxUVSCo5qW6WbF1FuuCyOcqB7g7/pW5v3VNWalI2KiEz6TUXyX/Srr/xGhIzJ+B7trLjKFkQVJCjHuKevO3/5Vn/In/YV6UwgV4Xlum6tHGVCSRKT6Hsa96KAOovg/wCIwyGm7zhxk34u8WVXOPCzuthRlaB/kWZj0X7V1XX5e6N1O/w94pYjVdurw2Eucj5SJhCtl/pB94PrX6YYPM2mew7GSs1pU26kEhKublMdJ7/1BFOo+z3IXu3ohXE7g9pbidYIOQQrHZlgg22WtUgPtx/Cr+dPsenUEGudsijVvCu/cxnEy1uL3DlYbsdRWbfiIek7BwTIVE9dxyn5hBrtCsa+sbLJ49/H5G0au7S4QW3WHkBaHEnqCDsRWvlwxyKmbWHPPE7iznDGnH3Vm1kcdcIu7Z4S2+2rmQsexrZNtOOqCUIJ9+wr5n+AOY05c3OW4N6kVh1vq8R7C358S0cPYIJBKPTedjsRUbs+JC8Tm7TS3EbB3Wlc67yoLjyQbV0kkc6FgmEEjruJPWBNVGXSyg9t0XuHXQybPZlhjsOtbisdq0S2oKWSpXUSIFZFaxvoKKOtVxrO9zmtby94X6BbD2VeaCcrkFLKGMWwo7hSgDLihICRvE/Z4Qc5dqI8uWOKLlIzNDYpribxquNYvq8fTejFfhMVBCm7q9UJdeHYhAgAjuEnsRWV8XTDrvANxbbZUlrJ2q1kD5R5xJ+6gPvVzaT0xi9G6QxumMMz4Vjj2Q0gd1HqpZ91KJUfc1A/iLxf7W+HbVzIA52LdF2kkTHhOoWf0BH3q/xwUIqKOTy5Hkk5s4Cs1hyxYWBALaev0r3rBxLocxjQkEtygx2g/wD1WdTEYUUUVkArEfx1ncSXGEhX8yfKf0rLooA2Wn9Z8QdGlI01qi5Tbp/7V9XO39OUyP8Aare078VWUtFIY1ppYOJGyrmxPKfrymR+tUfRUkck48MinhhPlHbml+M3DnVoQjHajYYuFf8Ab3Z8Fc/6tj9jVgIUhxAW2sLSeikmQfvX5rv4yyfPMprkVM8zflNbrT+q9eaOf8XTOqblpH/8H1c7Z/0mR+lbMdV/sjTnov8AVm6orCTk7VUTzpJ9R0r1F7aFM+Okex61X0WtmRXxSkpSVKUEgdSTWEvKWyQeXmWe0CAa1dxcu3K+ZZhPZI6CijDZlZC8Q+Ay1ugGSr1NaXJf9Kuv/Eayqxcl/wBKuv8AxGmFZ7W//Ks/5E/7CvSvO3/5Vn/In/YV6VkwFFFFAGNfWgvLRTPRXVJ9DXUHwpcQC9ibnSl++fHxsJS2TJWwSQlQ/wAivKfYiuaKyNKamuuH/EnF6stuZTCXOW5bT/eNK2cT7ynce4FJNy7X2kmPt705rY/UQEESDIr7Wp05fMZPTlnkLS6Rd2tygOMPNmQts/KZ+lbamjLuimYnHtk4+QVqNQ6Z0/qzELxOo8Ra5SyX1auGwqD6pPVJ9wQa29FMIcx6q4XcTOHNxc5nhVlrnP4dY8+EyCjcuW47FoKUOcJASkAHm9lVk6f4uaRyGDZfz+Ws9PZZMt3eOvHS24w4kwRCgDB6iex33Bro955m3YW/cOoZabHMtbiglKR6knYVQWts18P+rOLeN0vqi0xmQyfL4qsmh4IaS4PkYedQQF8wHyqJGwBiQK082nhPfg38GryY9uV7zH1s9xMyd/itNcOcI423lEJcc1EsA29sgkzCtx0gzuTICRJBFq8OeHOD4baYGJxXPc3T6vFvsg9/bXr3daz6bmE9ge5JJ8NUcVeG+g8NaXOZ1JY21u83/wDEZtD4ynUpEDw0Nz5egnZI9ayND8UNDcRbdbmk8+zevNJCnbVYLT7U/wAzagDHuJHvUuLDHEqXJDn1Es8u5kzrT6pwydRaOzOAXEZGyetZIBAK0FIO/uRW4oqc1j8k7BL+Lzb+Lu0ltxK1MuIPZxJII/MEVv6mfxL6W/4T495C6aRyWmX5Mm1Hqow4Op/jSr061DKUAooorIBRRRQAUUUUAFFFFAH/2Q==',
+      look: { jacket: '#1d1e24', shirt: '#f6f6f6', tie: '#1f3274', pants: '#1d1e24', shoes: '#131315', skin: '#eebfa5', hair: '#b98d55', trim: '#1d1e24', style: 'suit' } },
+  };
+  function faceTexture(src) {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const tex = new THREE.CanvasTexture(c), im = new Image();
+    im.onload = () => {
+      const g = c.getContext('2d');
+      g.save(); g.beginPath(); g.arc(128, 128, 122, 0, Math.PI * 2); g.clip(); g.drawImage(im, 0, 0, 256, 256); g.restore();
+      g.lineWidth = 9; g.strokeStyle = '#F2C14E'; g.beginPath(); g.arc(128, 128, 119, 0, Math.PI * 2); g.stroke();
+      g.lineWidth = 4; g.strokeStyle = '#B3122B'; g.beginPath(); g.arc(128, 128, 125, 0, Math.PI * 2); g.stroke();
+      tex.needsUpdate = true;
+    };
+    im.src = src; return tex;
+  }
+  function nameTagTexture(text) {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 112; const g = c.getContext('2d');
+    g.fillStyle = 'rgba(69,6,15,.9)'; g.strokeStyle = '#F2C14E'; g.lineWidth = 6;
+    g.beginPath(); g.roundRect ? g.roundRect(6, 6, 500, 100, 50) : g.rect(6, 6, 500, 100); g.fill(); g.stroke();
+    g.fillStyle = '#FFE08A'; g.font = '700 58px Oswald, Impact, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 256, 60);
+    return new THREE.CanvasTexture(c);
+  }
+  const hostObjs = {};
+  function makeHost(id) {
+    const H = HOSTS[id], m = lookMats(), g = makeGolfer(m);
+    applyLook(m, H.look); poseGolfer(g, 'putter', 0, 0, 0);
+    g.upper.rotation.x = -0.36;   // standing up tall, resting on a club, instead of bent over a ball
+    const torso = g.upper.children.find(o => o.isGroup && Math.abs(o.rotation.x - TILT) < 1e-6);
+    if (torso) torso.children.forEach(o => { if (o.isMesh && o.position.y > 0.76 && (o.material === m.skin || o.material === m.hair)) o.visible = false; });
+    const face = new THREE.Sprite(new THREE.SpriteMaterial({ map: faceTexture(H.face) }));
+    face.scale.set(0.58, 0.58, 1); face.position.set(0, 0.88, 0.02); (torso || g.upper).add(face);   // a big cartoon head, always facing you
+    const tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTagTexture(H.name), transparent: true, depthWrite: false }));
+    tag.scale.set(1.25, 0.27, 1); tag.position.set(0, 2.42, 0); g.root.add(tag);
+    g.root.visible = false; scene.add(g.root);
+    return hostObjs[id] = g;
+  }
+  let hostOn = null;
+  function hideHosts() { for (const k in hostObjs) hostObjs[k].root.visible = false; hostOn = null; }
+  function placeHost() {
+    hideHosts();
+    if (!hole || hole.mini || course.ctp || holeIdx !== 0 || !HOSTS[course.id]) return;
+    const g = hostObjs[course.id] || makeHost(course.id);
+    const dx = Math.cos(aimAng), dz = Math.sin(aimAng), hs = hand();
+    const x = hole.tee.x - dz * 3.6 * hs + dx * 1.4, z = hole.tee.y + dx * 3.6 * hs + dz * 1.4;
+    g.root.position.set(x, surfY(x, z), z);
+    g.root.rotation.y = Math.atan2(hole.tee.x - x, hole.tee.y - z);
+    g.root.visible = true; hostOn = g;
+    renderer.shadowMap.needsUpdate = true;
+  }
+
   // ================= Course painting =================
   const ell = (g, e, pad = 0) => { g.beginPath(); g.ellipse(e.x, e.y, e.rx + pad, e.ry + pad, 0, 0, Math.PI * 2); };
   function paintHole(h, pal, maxPx = 2600, margin = 70) {
@@ -2267,8 +2414,14 @@
     const M = margin, b = h.bounds, ox = b.x - M, oy = b.y - M, W = b.w + 2 * M, Hh = b.h + 2 * M;
     const ppy = Math.min(5, maxPx / Math.max(W, Hh));
     const cw = Math.max(1, Math.round(W * ppy)), ch = Math.max(1, Math.round(Hh * ppy));
+    // The base picture gets its own canvas; every other layer (fairway, path, fringe, green, each bunker) reuses ONE
+    // scratch canvas. Before, each layer was a fresh full-size canvas, and iPad Safari runs out of canvas memory after a
+    // few holes; then new canvases come back blank, which showed up as all-black or garbage-coloured courses.
+    let first = true;
     const mk = () => {
-      const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+      let c;
+      if (first) { first = false; c = document.createElement('canvas'); c.width = cw; c.height = ch; }
+      else { c = layerCanvas(); if (c.width !== cw || c.height !== ch) { c.width = cw; c.height = ch; } else c.width = cw; }   // setting width clears it and resets its state
       const g = c.getContext('2d'); g.setTransform(ppy, 0, 0, ppy, -ox * ppy, -oy * ppy); return g;
     };
     const blit = (g, L) => { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(L.canvas, 0, 0); g.restore(); };
@@ -2432,8 +2585,13 @@
       S.save(); S.translate(e.x, e.y); S.scale(e.rx, e.ry); S.translate(-e.x, -e.y); S.fillStyle = sg; S.fillRect(e.x - 1, e.y - 1, 2, 2); S.restore();
       blit(g, S);
     }
+    freeLayerCanvas();
     return { canvas: g.canvas, ox, oy, W, H: Hh };
   }
+  let _layerCv = null;
+  const layerCanvas = () => _layerCv || (_layerCv = document.createElement('canvas'));
+  const freeLayerCanvas = () => { if (_layerCv) { _layerCv.width = _layerCv.height = 1; } };
+  const freeCanvas = c => { if (c) { c.width = c.height = 1; } };   // hands the memory back right away (iPad Safari won't until GC)
 
   // mini golf: pavers all round, bright carpet inside the walls, ponds and a rubber tee mat
   function paintMini(h, maxPx, M) {
@@ -2477,6 +2635,7 @@
     if (holeThumbs[key]) return holeThumbs[key];
     const { canvas } = paintHole(course.holes[i], course.pal, 220, 8);
     try { holeThumbs[key] = canvas.toDataURL('image/jpeg', 0.8); } catch (e) { holeThumbs[key] = ''; }
+    freeCanvas(canvas);
     return holeThumbs[key];
   }
   const thumbs = {};
@@ -2485,6 +2644,7 @@
     const h = course.holes[2];
     const { canvas } = paintHole(h, course.pal, 260, 10);
     try { thumbs[course.id] = canvas.toDataURL('image/jpeg', 0.8); } catch (e) { thumbs[course.id] = ''; }
+    freeCanvas(canvas);
     return thumbs[course.id];
   }
 
@@ -2688,7 +2848,7 @@
     return line + (surfY(ball.x, ball.y) - line) * sm01((k - 0.85) / 0.15);
   }
 
-  let holeGroup = null, flagMesh = null, pinGroup = null, pinT = 0, pinPulled = false, disposables = [];
+  let holeGroup = null, flagMesh = null, pinGroup = null, pinT = 0, pinPulled = false, pinDir = { x: 1, y: 0 }, disposables = [];
   // mini golf props: walls (red with a gold cap) that follow the ground, gold bumpers, spinning sweepers and a gold star sign
   function buildMiniProps(h) {
     const wallMat = new THREE.MeshLambertMaterial({ color: 0xB3122B }), capMat = new THREE.MeshLambertMaterial({ color: 0xF2C14E, emissive: 0x3a2400 });
@@ -2762,12 +2922,16 @@
     }
     return swept;
   }
+  let paintedHole = null, builtFor = null;
   function buildHole(h, course, maxPx = 2600) {
     if (holeGroup) { scene.remove(holeGroup); disposables.forEach(d => d.dispose()); disposables = []; }
+    if (typeof hideHosts === 'function') hideHosts();
+    // only the hole on screen keeps its painted canvas (the mini map draws from it); older ones are freed
+    if (paintedHole && paintedHole.paint) { freeCanvas(paintedHole.paint.canvas); paintedHole.paint = null; }
     holeGroup = new THREE.Group(); scene.add(holeGroup);
     const pal = course.pal;
     const { canvas, ox, oy, W, H: Hh } = paintHole(h, pal, maxPx);
-    h.paint = { canvas, ox, oy, W, H: Hh };
+    h.paint = { canvas, ox, oy, W, H: Hh }; paintedHole = h; builtFor = { h, course, maxPx };
     const tex = new THREE.CanvasTexture(canvas);
     tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const gcx = ox + W / 2, gcz = oy + Hh / 2;
@@ -3024,7 +3188,7 @@
     strokes = 0; flight = null; swing = null; ptr = null; splash = null; lastPutt = false; strike = null; swingAnim = null; driveYds = null;
     trailReset(); closeSheet();
     viewMode = 'normal'; introT = 1.5;
-    readyForShot(); placeTeeBag();
+    readyForShot(); placeTeeBag(); placeHost();
     overviewCam(camPos, camLook); placeCamera();
     showBanner(hole.name ? `${i + 1}. ${hole.name}` : `Hole ${i + 1}`, `Par ${hole.par} · ${hole.yds} yards${hole.after ? ' · After ' + hole.after : ''}`, 2.4);
   }
@@ -3154,7 +3318,7 @@
   function endPointer() {
     if (!ptr) return;
     if (ptr.mode === 'swing' && state === 'swinging') {
-      if (swing.power < 0.03) { state = 'ready'; swing = null; }
+      if (Math.round(swing.power * 100) < 1) { state = 'ready'; swing = null; }   // only a pull that shows 0% cancels: 1% and up always hits
       else { strike = { power: swing.power, o: swing.o, lat: CLUBS[clubIdx].putter ? 0 : swing.lat, t: 0, putt: !!CLUBS[clubIdx].putter }; state = 'striking'; }
     }
     ptr = null;
@@ -3202,14 +3366,6 @@
   });
 
   // club picker sheet
-  function openSheet() {
-    if (state !== 'ready') return;
-    sfx.click();
-    $('sheetHint').textContent = `${Math.round(distToPin())} yds to the pin · ${LIE_NAME[terrainAt(ball)] || ''} lie`;
-    $('bag').innerHTML = CLUBS.map((c, i) =>
-      `<button data-i="${i}" class="${i === clubIdx ? 'on' : ''}${i === recIdx ? ' rec' : ''}"><div class="bn">${c.short}</div><div class="by">${Math.round(stockNow(c))}<small>yd</small></div></button>`).join('');
-    $('sheet').classList.remove('hidden');
-  }
   function closeSheet() { $('sheet').classList.add('hidden'); }
   $('bag').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; setClub(+b.dataset.i); closeSheet(); });
   $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
@@ -3623,7 +3779,7 @@
     for (const a of AWARDS) {
       if (save.awards[a.id] || !awardDone(a)) continue;
       save.awards[a.id] = Date.now(); changed = true;
-      if (a.pay) { save.coins += a.pay; save.stats.earnedTotal += a.pay; }
+      if (a.pay) { paid(a.pay); save.coins += a.pay; save.stats.earnedTotal += a.pay; }
       const bag = BAG_PRESETS.find(p => p.award === a.id);
       toastQ.push({ a, bag });
     }
@@ -3764,7 +3920,16 @@
     }
     if (swingAnim) swingAnim.t += dt;
     if (pinPulled && pinT < 1) pinT = Math.min(1, pinT + dt / 1.1);
-    if (!pinPulled && lastPutt && (state === 'rolling' || state === 'sinking') && distToPin() < 6) pinPulled = true;
+    if (!pinPulled && lastPutt && (state === 'rolling' || state === 'sinking') && distToPin() < 6) {
+      pinPulled = true;
+      // lay the flag off to the side of the putt's line (never along it) so it can't land on or near the ball
+      let vx = ball.vx, vy = ball.vy, vl = Math.hypot(vx, vy);
+      if (vl < 1e-3) { vx = hole.pin.x - ball.x; vy = hole.pin.y - ball.y; vl = Math.hypot(vx, vy) || 1; }
+      vx /= vl; vy /= vl;
+      let sx = -vy, sy = vx;   // perpendicular to the putt
+      if ((hole.pin.x + sx - ball.x) ** 2 + (hole.pin.y + sy - ball.y) ** 2 < (hole.pin.x - sx - ball.x) ** 2 + (hole.pin.y - sy - ball.y) ** 2) { sx = -sx; sy = -sy; }
+      pinDir = { x: sx * 0.85 + vx * 0.15, y: sy * 0.85 + vy * 0.15 };   // a touch past the cup too, never back toward the golfer
+    }
     if (state === 'flying') { fly(dt); if (flight) trailPush(ball.x, flight.hgt + 0.1 + ballGround(), ball.y); }
     else if (state === 'rolling') roll(dt);
     else if (state === 'sinking') {
@@ -3803,7 +3968,7 @@
       p[i * 3 + 1] = c.putter ? 0.05 + surfY(p[i * 3], p[i * 3 + 2]) : hMax * 4 * s * (1 - s) + 0.15 + g0 + (g1 - g0) * s;
     }
     aimGeo.attributes.position.needsUpdate = true;
-    aimMat.dashSize = c.putter ? 0.25 : 1.6; aimMat.gapSize = c.putter ? 0.18 : 1.1;
+    aimMat.dashSize = c.putter ? 0.275 : 1.6; aimMat.gapSize = c.putter ? 0.16 : 1.1; aimMat.opacity = c.putter ? 1 : 0.95;
     aimLine.computeLineDistances();
   }
   function syncScene(time, dt) {
@@ -3813,7 +3978,6 @@
 
     const h = flight ? flight.hgt : (ball.z || 0);
     const by = h - (ball.overCup ? ball.dip || 0 : 0);
-    const camD = camera.position.distanceTo(ballV.set(ball.x, h, ball.y));
     const r = BALL_R;   // the ball is always its real size (same as when putting), never blown up with distance
     const sy = ballGround();
     ballMesh.scale.setScalar(r); ballMesh.position.set(ball.x, by + r + sy, ball.y);
@@ -3827,7 +3991,7 @@
     fullTarget.visible = liveTarget.visible = false;   // just the aim line, no landing circles
     if (aiming) {
       const c = CLUBS[clubIdx], full = stockNow(c), dx = Math.cos(aimAng), dy = Math.sin(aimAng);
-      const live = c.putter ? Math.min(full, 1.6) : full;   // putting: just a short start line, like the line on your ball
+      const live = c.putter ? Math.min(full, 1.76) : full;   // putting: just a short start line, like the line on your ball (10% longer/bolder than before)
       const cv = state === 'swinging' ? curveOf(swing.lat, live) : 0;
       setArc(live, c, cv);
       const sz = d => c.putter ? 0.4 : clamp(d * 0.028, 1.4, 7);
@@ -3860,16 +4024,20 @@
 
     // don't let the chase camera pass through the golfer
     if (golfer.root.visible && Math.hypot(camera.position.x - golfer.root.position.x, camera.position.z - golfer.root.position.z) < 1.4) golfer.root.visible = false;
+    if (hostOn) hostOn.root.visible = Math.hypot(camera.position.x - hostOn.root.position.x, camera.position.z - hostOn.root.position.z) > 1.6;
 
     // flagstick: lifted out of the cup and laid on the green when a putt gets close
     if (pinGroup) {
       const k = pinT, ps = pinGroup.scale.x, cy = hole.cupY;
-      if (k < 0.5) { const u = easeOut(k / 0.5); pinGroup.position.y = cy + u * (4.3 + CUP_D) * 0.55 * ps; pinGroup.rotation.z = 0; pinGroup.position.x = hole.pin.x; }
+      pinGroup.rotation.y = Math.atan2(-pinDir.y, pinDir.x);   // local +x points away from the ball's line
+      if (k < 0.5) { const u = easeOut(k / 0.5); pinGroup.position.y = cy + u * (4.3 + CUP_D) * 0.55 * ps; pinGroup.rotation.z = 0; pinGroup.position.x = hole.pin.x; pinGroup.position.z = hole.pin.y; }
       else {
-        const u = easeOut((k - 0.5) / 0.5);
+        const u = easeOut((k - 0.5) / 0.5), off = u * 3.2 * ps;
         pinGroup.rotation.z = -u * Math.PI / 2;
-        pinGroup.position.x = hole.pin.x + u * 2.2 * ps;
-        pinGroup.position.y = cy + (1 - u) * (4.3 + CUP_D) * 0.55 * ps + u * 0.08 * ps;
+        pinGroup.position.x = hole.pin.x + pinDir.x * off;
+        pinGroup.position.z = hole.pin.y + pinDir.y * off;
+        const gy = hole.terr ? terrainH(hole, pinGroup.position.x, pinGroup.position.z) : cy;
+        pinGroup.position.y = cy + (1 - u) * (4.3 + CUP_D) * 0.55 * ps + u * (gy - cy + 0.08 * ps);
       }
     }
 
@@ -4159,6 +4327,8 @@
     $('mpBar').style.display = playing && MP && MP.started && state !== 'mpCard' ? '' : 'none';
     if (!playing) { $('side').style.display = 'none'; $('pinMark').style.display = 'none'; return; }
     setText('hHole', `${holeIdx + 1}/${HOLES.length}`);
+    setText('hCourse', course.name || 'ChamiGolf');
+    setText('hHoleName', hole.name ? `Hole ${holeIdx + 1}: ${hole.name}` : `Hole ${holeIdx + 1}`);
     setText('hPar', String(hole.par));
     setText('hStroke', String(strokes));
     setText('hTotal', fmtRel(relTotal()));
@@ -4213,7 +4383,8 @@
     document.querySelector('.hbody .wrap').classList.toggle('wide', t === 'golfer' || t === 'clubs');
     document.querySelector('.hbody .wrap').classList.toggle('full', t === 'play');
     $('miniBtn').classList.toggle('hidden', t !== 'play');
-    if (t === 'clubs') renderClubs();
+    if (t === 'clubs') { renderClubs(); showTip('clubs'); }
+    if (t === 'golfer') showTip('golfer');
     if (t === 'stats') { renderStats(); renderHow(); }
     if (t === 'awards') renderAwards();
     $('homeCoins').textContent = money(save.coins);
@@ -4283,7 +4454,7 @@
     messagingSenderId: '934222144340',
     appId: '1:934222144340:web:b7f2209350da831f4e5ec1'
   };
-  const GAME_VER = '2026.10.15';
+  const GAME_VER = '2026.10.15b';
   // Creator analytics were reset here: stats count from this moment (older notes and counters are ignored)
   const STATS_VER = '2026.10.15', STATS_TAG = '_r2';
   // The creator: gets the 👑 Creator badge and the admin tools (bans, analytics). The rules check this email too.
@@ -4291,6 +4462,14 @@
   // In-game money paid to the top 3 of each Daily Tournament, collected the next time they open the game.
   const DAILY_PRIZES = [1000, 500, 250];
   const CTP_PRIZES = [1500, 750, 400];   // Daily Closest to the Pin: top 3 closest shots of the day
+  // ---- Google Analytics (optional): paste the Measurement ID (G-XXXXXXX) from Google Analytics / Firebase here to turn it on ----
+  const GA_ID = '';
+  const track = (ev, params) => { try { if (window.gtag && GA_ID) window.gtag('event', ev, params || {}); } catch (e) {} };
+  if (GA_ID) {
+    window.dataLayer = window.dataLayer || []; window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date()); window.gtag('config', GA_ID, { anonymize_ip: true });
+    const gs = document.createElement('script'); gs.async = true; gs.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID; document.head.appendChild(gs);
+  }
   try { if (window.firebase && !fbAuth) { firebase.initializeApp(FIREBASE_CONFIG); fbAuth = firebase.auth(); fbDb = firebase.firestore(); } } catch (e) { fbAuth = fbDb = null; }
   const ONLINE = !!fbDb;
   const etDay = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
@@ -4314,57 +4493,104 @@
   const ago = ms => { const s = Math.max(0, (Date.now() - ms) / 1000); return s < 90 ? 'just now' : s < 3600 ? `${Math.round(s / 60)}m ago` : s < 86400 ? `${Math.round(s / 3600)}h ago` : `${Math.round(s / 86400)}d ago`; };
 
   // ---- Badges: a small icon next to your name on the leaderboards. Earn them, then equip one in the Golfer tab. ----
+  // Premium badges. The Creator badge isn't in the list: only the creator has it, and it just shows up for him.
+  const CREATOR_BADGE = { id: 'creator', icon: '👑', name: 'Creator', how: 'Only the creator of the game has this one.',
+    blurb: 'The one and only. This golfer made Chami Golf.' };
   const BADGES = [
-    { id: 'creator', icon: '👑', name: 'Creator', how: 'Only the creator of the game has this one.', hidden: true },   // only the creator sees it in the list
-    { id: 'gift', icon: '🎁', name: "Creator's Pick", how: 'Given to golfers who helped make the game or had a suggestion added to it.' },
-    { id: 'champ', icon: '🏆', name: 'Daily Champion', how: 'Finish 1st in a Daily Tournament or the Daily Closest to the Pin.' },
-    { id: 'ace', icon: '🎯', name: 'Hole in One', how: 'Make a hole in one.' },
+    { id: 'gift', icon: '🎁', name: "Creator's Pick", how: 'Given to golfers who helped make the game or had a suggestion added to it.',
+      blurb: 'Handed out by the creator to golfers who helped build Chami Golf or had one of their ideas added to the game.' },
+    { id: 'champ', icon: '🏆', name: 'Daily Champion', how: 'Finish 1st in a Daily Tournament or the Daily Closest to the Pin.',
+      blurb: 'Won a day. Finish 1st on any Daily Tournament board or the Daily Closest to the Pin when the day ends.' },
+    { id: 'ace', icon: '🎯', name: 'Hole in One', how: 'Make a hole in one.',
+      blurb: 'Holed a tee shot in one on a real course. Mini golf aces don\'t count.' },
   ];
   let remoteBadges = {};   // Creator's Pick is checked online, so it can't be faked
-  const badgeOf = id => BADGES.find(b => b.id === id);
+  const badgeOf = id => id === 'creator' ? CREATOR_BADGE : BADGES.find(b => b.id === id);
+  const ownedBadges = () => (hasBadge('creator') ? [CREATOR_BADGE] : []).concat(BADGES.filter(b => hasBadge(b.id)));
   const hasBadge = id => id === 'creator' ? isCreator() : id === 'ace' ? !!(save.badges.ace || save.stats.aces > 0) : id === 'champ' ? !!save.badges.champ : !!remoteBadges[id];
   const myBadge = () => (save.badge && hasBadge(save.badge) ? save.badge : '');
   const badgeHtml = id => { const b = id && badgeOf(id); return b ? `<span class="bdg" title="${b.name}">${b.icon}</span>` : ''; };
+  // premium badges at the top of the home screen, next to the Google sign-in
+  function renderHeadBadges() {
+    const el = $('hBadges'); if (!el) return;
+    const own = ownedBadges(), mb = myBadge();
+    el.innerHTML = own.map(b => `<button class="bmed${mb === b.id ? ' on' : ''}" data-bpop="${b.id}" title="${esc(b.name)}">${b.icon}</button>`).join('');
+  }
+  // tap any badge: a little card about it (and equip it if it's yours)
+  function showBadgePop(id) {
+    const b = badgeOf(id); if (!b) return;
+    const have = hasBadge(id), on = myBadge() === id, cnt = badgeCountTxt(id);
+    $('bPop').innerHTML = `<div class="bpc"><div class="bpi${have ? '' : ' lk'}">${b.icon}</div><div class="bpk">PREMIUM BADGE</div><h3>${esc(b.name)}</h3>
+      <p>${esc(b.blurb || b.how)}</p><div class="bps">${have ? (on ? '✅ Equipped: it shows next to your name on the leaderboards' : '✅ You have this badge') : '🔒 ' + esc(b.how)}${cnt && id !== 'creator' ? '<br>' + cnt : ''}</div>
+      <div class="btns">${have ? (on ? '<button class="ghost" data-badge="">Take it off</button>' : `<button class="main" data-badge="${id}">Equip</button>`) : ''}<button class="ghost" data-bclose="1">Close</button></div></div>`;
+    $('bPop').classList.remove('hidden');
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-bpop]');
+    if (t) { ensureAudio(); sfx.click(); showBadgePop(t.dataset.bpop); return; }
+    if ($('bPop').classList.contains('hidden')) return;
+    const eq = e.target.closest('#bPop [data-badge]');
+    if (eq) {
+      const id = eq.dataset.badge;
+      if (!id || hasBadge(id)) { save.badge = id; save.badgeAuto = 1; persist(); }
+      sfx.click(); $('bPop').classList.add('hidden'); renderHeadBadges();
+      if (tab === 'golfer') renderGolfer();
+      return;
+    }
+    if (e.target.id === 'bPop' || e.target.closest('[data-bclose]')) { sfx.click(); $('bPop').classList.add('hidden'); }
+  });
   async function loadRemoteBadges() {
     const u = meUser(); if (!u || !fbDb) return;
     const got = {};
     try { const gf = await fbDb.collection('gifts').doc(u.uid).get(); if (gf.exists) got.gift = true; } catch (e) {}
     remoteBadges = got;
-    regBadges();
+    regBadges(); renderHeadBadges(); autoGifts();
     if (isCreator() && !save.badgeAuto) { save.badgeAuto = 1; save.badge = 'creator'; persist(); }
     if (tab === 'golfer' && !$('home').classList.contains('hidden')) renderGolfer();
   }
 
   // ---- How many golfers have each badge (shown on the badge tiles) ----
-  // Hole in One and Daily Champion: every golfer who has one drops a tiny note in badgeHolders/<badge>/who/<uid>.
-  // Creator's Pick: the gifts list itself.
-  const shownBadges = () => BADGES.filter(b => !b.hidden || hasBadge(b.id));
+  // Hole in One and Daily Champion: each golfer who has one leaves a tiny note in badgeHolders/<badge>/who/<uid>
+  // and, in the same write, adds 1 to a single counter doc (meta/badgeCounts). Reading the counts costs just 1 read.
+  // Creator's Pick: the gifts list itself (only a handful of docs).
+  const shownBadges = () => BADGES;
   let badgeCounts = null, badgeCountAt = 0;
   const holdersRef = id => fbDb.collection('badgeHolders').doc(id).collection('who');
+  const badgeCountsRef = () => fbDb.collection('meta').doc('badgeCounts');
   function regBadges() {
     const u = meUser(); if (!u || !fbDb || banned()) return;
     save.badgeReg = save.badgeReg || {};
-    ['ace', 'champ'].forEach(id => {
+    ['ace', 'champ'].forEach(async id => {
       if (!hasBadge(id) || save.badgeReg[id] === u.uid) return;
-      holdersRef(id).doc(u.uid).set({ name: boardName(), at: Date.now() }).then(() => { save.badgeReg[id] = u.uid; persist(); badgeCounts = null; }).catch(() => {});
+      const mark = () => { save.badgeReg[id] = u.uid; persist(); badgeCounts = null; };
+      try {
+        const b = fbDb.batch();
+        b.set(holdersRef(id).doc(u.uid), { name: boardName(), at: Date.now() });
+        b.set(badgeCountsRef(), { [id]: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+        await b.commit(); mark();
+      } catch (e) {
+        try { if ((await holdersRef(id).doc(u.uid).get()).exists) mark(); } catch (e2) {}   // already counted before
+      }
     });
   }
-  async function countOf(q) {
-    try { if (q.count) { const a = await q.count().get(); return a.data().count; } } catch (e) {}
-    return (await q.limit(2000).get()).size;
-  }
   async function loadBadgeCounts() {
-    if (!ONLINE || !fbDb || (badgeCounts && Date.now() - badgeCountAt < 120000)) return;
+    if (!ONLINE || !fbDb || (badgeCounts && Date.now() - badgeCountAt < 600000)) return;
     badgeCountAt = Date.now(); const got = {};
     try { await ensureOnlineUser(); } catch (e) {}
     await Promise.all([
-      countOf(fbDb.collection('gifts')).then(n => { got.gift = n; }).catch(() => {}),
-      countOf(holdersRef('ace')).then(n => { got.ace = n; }).catch(() => {}),
-      countOf(holdersRef('champ')).then(n => { got.champ = n; }).catch(() => {}),
+      fbDb.collection('gifts').get().then(s => { got.gift = s.size; }).catch(() => {}),
+      badgeCountsRef().get().then(d => { const c = d.exists ? d.data() : {}; got.ace = c.ace || 0; got.champ = c.champ || 0; }).catch(() => {}),
     ]);
     got.creator = 1;
     badgeCounts = got;
     if (tab === 'golfer' && !$('home').classList.contains('hidden') && $('badgeBox')) $('badgeBox').innerHTML = badgesHtml();
+  }
+  // creator only: count the badge notes once and fix the counter (for anyone who earned a badge before the counter existed)
+  async function recountBadges() {
+    const got = {};
+    for (const id of ['ace', 'champ']) got[id] = (await holdersRef(id).get()).size;
+    await badgeCountsRef().set(got); badgeCounts = null;
+    return got;
   }
   const badgeCountTxt = id => { const n = badgeCounts && badgeCounts[id]; return n == null ? '' : `👥 ${n.toLocaleString()} golfer${n === 1 ? ' has' : 's have'} it`; };
 
@@ -4460,7 +4686,7 @@
     } catch (e) {}
     if (wins.length) {
       const total = wins.reduce((a, w) => a + w.prize, 0), firsts = wins.some(w => w.place === 0);
-      save.coins += total; save.stats.earnedTotal += total;
+      paid(total); save.coins += total; save.stats.earnedTotal += total;
       if (firsts && !save.badges.champ) { save.badges.champ = 1; regBadges(); }
       const medal = ['🥇 1st', '🥈 2nd', '🥉 3rd'];
       $('prizeBody').innerHTML = wins.map(w => `${medal[w.place]} at ${esc(w.label)} (${w.score}) · ${w.day.slice(5).replace('-', '/')} · <b>+${money(w.prize)}</b>`).join('<br>')
@@ -4495,14 +4721,22 @@
   }
   function signOut() { if (fbAuth) fbAuth.signOut(); }
   const userDoc = () => fbDb.collection('users').doc(fbUser.uid);
+  // Cloud save: batched (one write at most every 6 seconds instead of after every change, to stay well inside
+  // Firebase's free daily write limit), and written right away when the game is closed or put in the background.
+  let cloudDirty = false;
   function pushCloud() {
     if (!fbUser || !cloudReady) return;
-    clearTimeout(cloudTimer);
-    cloudTimer = setTimeout(() => {
-      if (!fbUser) return;
-      userDoc().set({ data: JSON.stringify(save), name: boardName(), coins: save.coins, earned: save.stats.earnedTotal, updated: serverTime() }).catch(() => {});
-    }, 1200);
+    cloudDirty = true;
+    if (!cloudTimer) cloudTimer = setTimeout(flushCloud, 6000);
   }
+  function flushCloud() {
+    clearTimeout(cloudTimer); cloudTimer = null;
+    if (!fbUser || !cloudReady || !cloudDirty) return;
+    cloudDirty = false;
+    userDoc().set({ data: JSON.stringify(save), name: boardName(), coins: save.coins, earned: save.stats.earnedTotal, updated: serverTime() }).catch(() => {});
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) flushCloud(); });
+  addEventListener('pagehide', flushCloud);
   async function syncFromCloud() {
     cloudReady = false;
     let snap; try { snap = await userDoc().get(); } catch (e) { return; }
@@ -4537,6 +4771,7 @@
       b.classList.toggle('in', !!fbUser);
     }
     if ($('adminBtn')) $('adminBtn').classList.toggle('hidden', !isCreator());
+    renderHeadBadges();
     if ($('acctBox')) $('acctBox').innerHTML = acctHtml();
   }
   document.addEventListener('click', e => {
@@ -4689,9 +4924,11 @@
     const day = etDay();
     if (!save.firstDay) { save.firstDay = day; persist(); bumpDaily({ newPlayers: 1 }); }
     fbDb.collection('presence').doc(u.uid).set({ name: boardName(), google: !!fbUser, day, first: save.firstDay, lastMs: now, last: serverTime(), where: String(presWhere).slice(0, 20),
-      coins: Math.round(save.coins) || 0, earned: Math.max(0, (Math.round(save.stats.earnedTotal) || 0) - (sb.earned | 0)), rounds: Math.max(0, (save.stats.rounds | 0) - (sb.rounds | 0)), aces: Math.max(0, (save.stats.aces | 0) - (sb.aces | 0)), ver: GAME_VER }).catch(() => {});
+      coins: Math.round(save.coins) || 0, total: Math.round(save.stats.earnedTotal) || 0, earned: Math.max(0, (Math.round(save.stats.earnedTotal) || 0) - (sb.earned | 0)), rounds: Math.max(0, (save.stats.rounds | 0) - (sb.rounds | 0)), aces: Math.max(0, (save.stats.aces | 0) - (sb.aces | 0)), ver: GAME_VER }).catch(() => {});
   }
-  setInterval(() => { if (!document.hidden) presence(); }, 180000);
+  let lastUse = Date.now();
+  ['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { lastUse = Date.now(); }, { passive: true, capture: true }));
+  setInterval(() => { if (!document.hidden && Date.now() - lastUse < 5 * 60000) presence(); }, 180000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) presence(); });
   function bumpDaily(inc) {
     if (!fbDb || !meUser() || banned()) return;
@@ -4770,6 +5007,8 @@
     const worth = (save.coins || 0) + spent;
     if (save.coins > 3000000 || worth > earned + 60000) cheatFlag('money', `${money(Math.round(worth))} in money and gear but only ${money(Math.round(earned))} ever earned`, true);
     if (save.coins < 0 || !isFinite(save.coins)) cheatFlag('money', 'impossible bank balance', true);
+    // your bank can never hold more than the game has ever paid you (spending and buy-ins only take money away)
+    if (save.coins > earned + 5000) cheatFlag('money', `${money(Math.round(save.coins))} in the bank but only ${money(Math.round(earned))} ever earned`, true);
   }
   function startupChecks() {
     if (isCreator()) { syncBan(); return; }
@@ -4818,7 +5057,7 @@
   }
   function refundBuyIn(id) {
     const rec = save.mp[id]; if (!rec || !rec.paid || rec.started || rec.settled) return;
-    if (rec.wager) save.coins += rec.wager;
+    if (rec.wager) { paid(rec.wager); save.coins += rec.wager; }
     delete save.mp[id]; persist(); $('homeCoins').textContent = money(save.coins);
   }
   const teamsOf = m => [m.t0, m.t1, m.t2, m.t3].slice(0, m.nt || 2).map(t => t || []);
@@ -5267,7 +5506,7 @@
     const tie = res.win === -1, won = !res.coop && res.win === MP.team, split = tie && winners.includes(MP.team);
     const prize = winners.includes(MP.team) ? Math.floor(pot / winners.reduce((a, t) => a + MP.teams[t].length, 0)) : 0;
     if (!rec.settled) {
-      rec.settled = 1; save.coins += prize + holeMoney;
+      rec.settled = 1; paid(prize + holeMoney); save.coins += prize + holeMoney;
       save.stats.earnedTotal += holeMoney + Math.max(0, prize - m.wager);
       save.stats.mpWins = (save.stats.mpWins || 0) + (won ? 1 : 0); save.stats.mpPlayed = (save.stats.mpPlayed || 0) + 1;
       persist(); checkAwards();
@@ -5577,21 +5816,24 @@
   function ballPanel() {
     const L = save.ballLook;
     const cols = BALL_COLORS.map(([n, c, pr, fin]) => {
-      const own = ownsBall('color', c, pr);
-      return `<button data-ballc="${c}" title="${n}" class="${c === L.color ? 'on' : ''}${own ? '' : ' buy'}" style="background:${fin === 'metal' ? `radial-gradient(circle at 35% 30%,#fff3b0,${c} 55%,#8a6416)` : fin === 'pearl' ? `radial-gradient(circle at 35% 30%,#fff,${c} 60%,#d9cdb8)` : c}">${own ? '' : `<em>${pr >= 1000 ? '$' + pr / 1000 + 'k' : '$' + pr}</em>`}</button>`;
+      const own = true;
+      return `<button data-ballc="${c}" title="${n}" class="${c.toLowerCase() === String(L.color).toLowerCase() ? 'on' : ''}" style="background:${fin === 'metal' ? `radial-gradient(circle at 35% 30%,#fff3b0,${c} 55%,#8a6416)` : fin === 'pearl' ? `radial-gradient(circle at 35% 30%,#fff,${c} 60%,#d9cdb8)` : c}">${own ? '' : `<em>${pr >= 1000 ? '$' + pr / 1000 + 'k' : '$' + pr}</em>`}</button>`;
     }).join('');
     const lines = BALL_LINES.map(([id, n, pr]) => `<button data-balll="${id}" class="${L.line === id ? 'on' : ''}">${n}${ownsBall('line', id, pr) ? '' : `<br><small style="font:800 10px Inter;color:var(--gold)">${money(pr)}</small>`}</button>`).join('');
-    const cn = (BALL_COLORS.find(x => x[1] === L.color) || BALL_COLORS[0])[0], ln = (BALL_LINES.find(x => x[0] === L.line) || BALL_LINES[0])[1];
+    const cn = ballColOf(L)[0], ln = (BALL_LINES.find(x => x[0] === L.line) || BALL_LINES[0])[1];
+    const rgb = hexRgb(ballColOf(L)[1]);
+    const slider = (k, i, lab) => `<label class="rgbrow"><span>${lab}</span><input type="range" min="0" max="255" step="1" data-rgb="${i}" id="rgb${k}" value="${rgb[i]}"><b id="rgbv${k}">${rgb[i]}</b></label>`;
     return `<div class="gcard"><div class="sect" style="display:flex;justify-content:space-between">GOLF BALL<span>${money(save.coins)}</span></div>
       <div class="ballpv"><canvas id="ballPv" width="320" height="320"></canvas><div><b>${cn}</b><span>${ln}</span>
         <p>Looks only. The Pro Ball upgrade in the Clubs tab is what cuts the wind.</p></div></div></div>
-      <div class="gcard"><div class="sect">COLOUR</div><div class="sw">${cols}</div>${pendingBuy && pendingBuy.kind === 'ballc' ? buyBar() : ''}
+      <div class="gcard"><div class="sect">COLOUR · FREE</div><div class="sw">${cols}</div>
+      <div class="sect" style="margin-top:16px">MIX YOUR OWN</div><div class="rgb" id="rgbBox" style="--r:${rgb[0]};--g:${rgb[1]};--b:${rgb[2]}">${slider('R', 0, 'R')}${slider('G', 1, 'G')}${slider('B', 2, 'B')}</div>
       <div class="sect" style="margin-top:16px">ALIGNMENT LINE</div><div class="opts" style="flex-wrap:wrap">${lines}</div>${pendingBuy && pendingBuy.kind === 'balll' ? buyBar() : ''}</div>`;
   }
   function drawBallPreview() {
     const cv = $('ballPv'); if (!cv) return;
     const g = cv.getContext('2d'), S = cv.width, R = S * 0.4, cx = S / 2, cy = S / 2;
-    const c = BALL_COLORS.find(x => x[1] === save.ballLook.color) || BALL_COLORS[0];
+    const c = ballColOf(save.ballLook);
     g.clearRect(0, 0, S, S);
     g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(cx, cy + R + 14, R * 0.8, 12, 0, 0, Math.PI * 2); g.fill();
     // the ball's skin wrapped onto a circle (front half of the texture)
@@ -5607,19 +5849,20 @@
     const list = shownBadges();
     const chips = list.map(b => {
       const have = hasBadge(b.id), cnt = badgeCountTxt(b.id);
-      return `<button class="bchip${cur === b.id ? ' on' : ''}${have ? '' : ' locked'}" data-badge="${b.id}" title="${esc(b.how)}"><span>${have ? b.icon : '🔒'}</span><b>${b.name}</b><small>${have ? (cur === b.id ? 'EQUIPPED' : 'Tap to equip') : esc(b.how)}</small>${cnt ? `<em class="bcnt">${cnt}</em>` : ''}</button>`;
+      return `<button class="bchip${cur === b.id ? ' on' : ''}${have ? '' : ' locked'}" data-bpop="${b.id}" title="${esc(b.how)}"><span>${have ? b.icon : '🔒'}</span><b>${b.name}</b><small>${have ? (cur === b.id ? 'EQUIPPED' : 'Tap for details') : esc(b.how)}</small>${cnt ? `<em class="bcnt">${cnt}</em>` : ''}</button>`;
     }).join('');
     loadBadgeCounts();
-    return `<div class="gcard" style="margin-top:12px"><div class="sect" style="display:flex;justify-content:space-between">BADGES<span>${list.filter(b => hasBadge(b.id)).length} / ${list.length}</span></div>
-      <div class="bgrid">${chips}</div><div class="gnote">Your equipped badge sits next to your name on the leaderboards.${cur ? ' <button class="linkbtn" data-badge="">Take it off</button>' : ''}</div></div>`;
+    return `<div class="gcard" style="margin-top:12px"><div class="sect" style="display:flex;justify-content:space-between">PREMIUM BADGES<span>${list.filter(b => hasBadge(b.id)).length} / ${list.length}</span></div>
+      <div class="bgrid">${chips}</div><div class="gnote">Tap a premium badge to see what it's for. Your equipped one sits next to your name on the leaderboards.${cur ? ' <button class="linkbtn" data-badge="">Take it off</button>' : ''}</div></div>`;
   }
   function renderGolfer() {
     $('gName').value = save.name || '';
     $('handBox').innerHTML = `<div class="nameRow" style="margin-top:12px">I swing</div><div class="opts" style="margin-top:6px"><button data-hand="r" class="${save.lefty ? '' : 'on'}">🏌️ Right-handed</button><button data-hand="l" class="${save.lefty ? 'on' : ''}">🏌️ Left-handed</button></div>`;
     $('badgeBox').innerHTML = badgesHtml();
-    const mb = myBadge(), bo = mb && badgeOf(mb);
-    $('gBadge').innerHTML = bo ? `<span>${bo.icon}</span><b>${esc(boardName())}</b><small>${bo.name}</small>` : '';
-    $('gBadge').style.display = bo ? '' : 'none';
+    const own = ownedBadges(), mb = myBadge();
+    $('gBadge').innerHTML = own.map(b => `<button class="bmed${mb === b.id ? ' on' : ''}" data-bpop="${b.id}" title="${esc(b.name)}">${b.icon}</button>`).join('');
+    $('gBadge').style.display = own.length ? '' : 'none';
+    renderHeadBadges();
     document.querySelectorAll('#gTabs button').forEach(b => b.classList.toggle('on', b.dataset.gtab === gTab));
     $('gPanel').innerHTML = gTab === 'bag' ? bagPanel() : gTab === 'ball' ? ballPanel() : outfitPanel();
     if (gTab === 'ball') drawBallPreview();
@@ -5667,12 +5910,7 @@
       if (bagOpen(bp)) { grantC('bag-trim', bp.bag.trim); grantC('bag-covers', bp.bag.covers); persist(); setBag(Object.assign({ panel: '' }, bp.bag)); } else { bLockMsg = bp; tryBag = Object.assign({ panel: '' }, bp.bag); }
     }
     else if (d.bpart) bPart = d.bpart;
-    else if (d.ballc) {
-      const bc = BALL_COLORS.find(x => x[1] === d.ballc);
-      if (bc && !ownsBall('color', bc[1], bc[2])) pendingBuy = { kind: 'ballc', title: `${bc[0]} golf ball`, price: bc[2], swatch: bc[1],
-        grant: () => { save.ownedLook[`ball-color:${bc[1]}`] = 1; }, apply: () => { save.ballLook.color = bc[1]; persist(); applyBallLook(); } };
-      else { save.ballLook.color = d.ballc; persist(); applyBallLook(); }
-    }
+    else if (d.ballc) { save.ballLook.color = d.ballc; persist(); applyBallLook(); }
     else if (d.balll) {
       const bl = BALL_LINES.find(x => x[0] === d.balll);
       if (bl && !ownsBall('line', bl[0], bl[2])) pendingBuy = { kind: 'balll', title: `${bl[1]} ball marking`, price: bl[2], swatch: save.ballLook.color,
@@ -5694,11 +5932,21 @@
     renderGolfer();
   });
   $('gPanel').addEventListener('input', e => {
+    if (e.target.dataset.rgb != null) {   // R/G/B sliders: recolour the ball live (saved when you let go)
+      const v = ['R', 'G', 'B'].map(k => +$('rgb' + k).value);
+      ['R', 'G', 'B'].forEach((k, i) => { $('rgbv' + k).textContent = v[i]; });
+      const box = $('rgbBox'); box.style.setProperty('--r', v[0]); box.style.setProperty('--g', v[1]); box.style.setProperty('--b', v[2]);
+      save.ballLook.color = rgbHex(v[0], v[1], v[2]); applyBallLook(); drawBallPreview();
+      document.querySelectorAll('#gPanel [data-ballc]').forEach(b => b.classList.toggle('on', b.dataset.ballc.toLowerCase() === save.ballLook.color));
+      const nm = document.querySelector('#gPanel .ballpv b'); if (nm) nm.textContent = ballColOf(save.ballLook)[0];
+      return;
+    }
     if (e.target.id !== 'logoText') return;
     customLogo().text = e.target.value.replace(/[<>]/g, '').slice(0, 12); persist(); setBag({});
   });
   $('gPanel').addEventListener('keydown', e => { if (e.target.id === 'logoText') { e.stopPropagation(); if (e.key === 'Enter') e.target.blur(); } });
   $('gPanel').addEventListener('change', e => {
+    if (e.target.dataset.rgb != null) { persist(); return; }
     if (e.target.id !== 'logoFile' || !e.target.files || !e.target.files[0]) return;
     const fr = new FileReader();
     fr.onload = () => {
@@ -5850,7 +6098,6 @@
   function renderClubs() {
     const back = clubsReturn ? `<button class="back" data-back="1">← Back to ${courseById(clubsReturn).name}</button>` : '';
     const ringOf = (n, of = MAX_LV) => `<div class="lvring" style="--p:${n / of}"><b>${n}</b><small>/${of}</small></div>`;
-    const sumUp = c => { const u = upOf(c); return tracksOf(c).reduce((a, [k]) => a + u[k], 0); };
     // the bag rack: every club as a chip, plus the ball
     const chips = SLOTS.map((slotName, si) => {
       const eq = CLUBS[si], lv = lvOf(eq);
@@ -6080,7 +6327,7 @@
     applyCourseLook(c);
     scores = []; earned = []; firstShot = save.stats.rounds === 0; roundAces = 0; roundStart = Date.now(); roundCut = false;
     if (save.live) delete save.live;
-    presence(c.id);
+    presence(c.id); track('round_start', { course: c.id });
     $('home').classList.add('hidden'); $('final').classList.add('hidden'); slidesOn(false);
     loadHole(0);
   }
@@ -6088,6 +6335,7 @@
   function showFinal() {
     state = 'finished';
     const rel = relTotal(), s = save.stats;
+    track('round_finish', { course: course.id, score: rel, holes: HOLES.length });
     let tp = 0, ts = 0;
     let rows = '';
     HOLES.forEach((h, i) => { tp += h.par; ts += scores[i]; });
@@ -6123,7 +6371,7 @@
     $('earnBox').innerHTML = lines;
 
     const wasLocked = COURSES.filter(c => !isUnlocked(c)).map(c => c.id);
-    save.coins += total; s.earnedTotal += total;
+    paid(total); save.coins += total; s.earnedTotal += total;
     if (!course.mini && !roundCut) { s.rounds++; s.strokesTotal += ts; s.parTotal += tp; if (rel < 0) s.underPar++; }
     if (!roundCut) s.roundsBy[course.id] = (s.roundsBy[course.id] || 0) + 1;
     let mastersLine = '';
@@ -6185,7 +6433,7 @@
       pay = Math.max(0, ctpPay(ft) - ctpPay(old == null ? null : old * 3));
       st.best = yd; line = old == null ? "Today's best!" : 'New best today!';
     }
-    if (pay) { save.coins += pay; save.stats.earnedTotal += pay; }
+    if (pay) { paid(pay); save.coins += pay; save.stats.earnedTotal += pay; }
     let unlockLine = '';
     if (ft != null && ft <= CTP_UNLOCK_FT && !unlocked('senior')) { save.unlocks.senior = true; unlockLine = '🔓 You unlocked the Senior Sweater! Wear it from the Golfer tab.'; }
     if (yd === 0) { save.badges.ace = 1; postAce(course, 0, hole); }
@@ -6296,13 +6544,38 @@
 
   // ================= Creator tools (only for the creator's Google account; the rules enforce this too) =================
   let admView = 'live', admCid = 'pines', admMode = 'daily', admQ = '', admPres = null;
-  const GIFT_TODO = ['Frank', 'Freddy', 'Gilroy', 'Aiden'];   // the creator's note: helped with the game / had a suggestion used
+  // Creator's Pick for the golfers who helped with the game. The creator's device hands these out on its own:
+  // a golfer whose first name matches gets the badge. If two golfers share a name it waits for the creator to pick (🎁).
+  const GIFT_TODO = ['Frank', 'Freddy', 'Gilroy', 'Aiden'];
+  let giftNote = '', giftBusy = false;
+  async function autoGifts() {
+    if (!isCreator() || !fbDb || giftBusy) return;
+    save.giftsGiven = save.giftsGiven || {};
+    const left = GIFT_TODO.filter(n => !save.giftsGiven[n]); if (!left.length) { giftNote = ''; return; }
+    giftBusy = true;
+    try {
+      const rows = await admLoadPresence(true), wait = [];
+      for (const n of left) {
+        const hits = rows.filter(p => String(p.name || '').trim().split(/\s+/)[0].toLowerCase() === n.toLowerCase());
+        const pick = hits.length === 1 ? hits : hits.filter(p => p.google).length === 1 ? hits.filter(p => p.google) : null;
+        if (!pick) { wait.push(hits.length ? `${n} (${hits.length} golfers with that name: tap 🎁 on the right one)` : `${n} (hasn't played yet)`); continue; }
+        const ref = fbDb.collection('gifts').doc(pick[0].uid);
+        if (!(await ref.get()).exists) await ref.set({ name: pick[0].name || n, at: Date.now() });
+        save.giftsGiven[n] = pick[0].uid;
+      }
+      persist();
+      giftNote = wait.length ? `🎁 Creator's Pick still waiting for: ${wait.join(' · ')}` : '';
+    } catch (e) {}
+    giftBusy = false;
+  }
   const admTabs = [['live', '📈 Analytics'], ['players', '👥 Players'], ['flags', '🚩 Cheat flags'], ['bans', '⛔ Bans'], ['boards', '🏆 Leaderboards']];
   // a few random fun facts from everyone's "last seen" notes
   function admFunStats(rows) {
     if (!rows.length) return [['—', 'No players yet']];
     const top = k => rows.reduce((a, p) => ((p[k] || 0) > (a[k] || 0) ? p : a), rows[0]), sum = k => rows.reduce((a, p) => a + (p[k] || 0), 0);
     const nm = p => esc((p.name || 'Golfer').slice(0, 14));
+    rows = rows.filter(p => !admBanned.has(p.uid));   // banned golfers don't show up in the money stats
+    if (!rows.length) return [['—', 'No players yet']];
     const rich = top('coins'), earner = top('earned'), grinder = top('rounds'), acer = top('aces');
     const hourET = ms => +new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }).format(new Date(ms)) % 24;
     const owls = rows.filter(p => p.lastMs && (hourET(p.lastMs) >= 23 || hourET(p.lastMs) < 5));
@@ -6322,11 +6595,30 @@
     ];
     return out;
   }
+  // "last seen" uses the server's clock (a device with its clock set wrong used to look online forever)
+  const seenMs = p => (p.last && p.last.toMillis ? p.last.toMillis() : 0) || Math.min(p.lastMs || 0, Date.now());
+  let admBanned = new Set();
   async function admLoadPresence(force) {
     if (admPres && !force && Date.now() - admPres.at < 30000) return admPres.rows;
-    const s = await fbDb.collection('presence').orderBy('lastMs', 'desc').limit(500).get();
-    admPres = { at: Date.now(), rows: s.docs.map(d => Object.assign({ uid: d.id }, d.data())) };
+    const [s, b] = await Promise.all([fbDb.collection('presence').orderBy('last', 'desc').limit(500).get(), fbDb.collection('bans').limit(500).get().catch(() => null)]);
+    if (b) admBanned = new Set(b.docs.map(d => d.id));
+    const rows = s.docs.map(d => Object.assign({ uid: d.id }, d.data()));
+    rows.forEach(p => { p.lastMs = seenMs(p); });
+    admPres = { at: Date.now(), rows };
+    admMoneySweep(rows);
     return admPres.rows;
+  }
+  // Money sweep (runs whenever the creator opens the tools): a bank bigger than everything the golfer has ever been paid
+  // (by 5,000+) can only come from adding money outside the game, so they're banned automatically and their scores removed.
+  async function admMoneySweep(rows) {
+    for (const p of rows) {
+      if (admBanned.has(p.uid) || p.total == null) continue;
+      const extra = (p.coins || 0) - (p.total || 0);
+      if (extra >= 5000 || (p.coins || 0) > 3000000) {
+        admBanned.add(p.uid);
+        try { await admBanNow(p.uid, p.name, `Auto-ban: ${money(Math.round(p.coins || 0))} in the bank but only ${money(Math.round(p.total || 0))} ever earned`, true); } catch (e) {}
+      }
+    }
   }
   const admPlayerRow = (p, extra = '') => `<div class="mpli"><div class="nm"><b>${esc(p.name || 'Golfer')}</b> ${p.google ? '<span class="pill2">Google</span>' : '<span class="pill2 g">Guest</span>'}
     <small>${p.lastMs ? 'seen ' + ago(p.lastMs) : ''}${p.where ? ' · ' + esc(courseById(p.where) && p.where !== 'home' ? courseById(p.where).name : p.where) : ''} · ${money(p.coins || 0)} · ${p.rounds || 0} rounds · ${p.aces || 0} aces${p.ver ? ' · v' + esc(p.ver) : ''}</small></div>${extra}</div>`;
@@ -6352,13 +6644,15 @@
         v.innerHTML = `<div class="tiles">${tiles.map(([n, l]) => `<div class="tile"><div class="v">${n}</div><div class="l">${l}</div></div>`).join('')}</div>
           <div class="sect">FUN STATS</div><div class="tiles">${admFunStats(rows).map(([n, l]) => `<div class="tile"><div class="v" style="font-size:20px">${n}</div><div class="l">${l}</div></div>`).join('')}</div>
           <div class="sect">ONLINE NOW (LAST 6 MIN)</div><div class="mplist">${online.length ? online.map(p => admPlayerRow(p)).join('') : '<div class="empty">Nobody online right now.</div>'}</div>
+          <div class="tnote"><button class="linkbtn" data-adm-recount="1">🔢 Recount badge holders</button> (use once after publishing the new Firebase rules)</div>
           <div class="tnote">🥚 Rare home screen messages (0.01% each): ${EGGS.map((m, i) => `<button class="linkbtn" data-adm-egg="${i}">${esc(m)}</button>`).join(' · ')} (tap to preview)</div>
-          <div class="tnote">"Online" = the game was open in the last 6 minutes. All stats were reset on Oct 15, 2026 and count from then.</div>`;
+          <div class="tnote">"Online" = someone was playing in the last 6 minutes (by the server's clock). Anyone whose bank is $5,000+ more than they've ever earned is banned automatically when you open these tools. All stats were reset on Oct 15, 2026 and count from then.</div>`;
       } else if (admView === 'players') {
+        await autoGifts();
         await admLoadPresence();
         v.innerHTML = `<input class="mpin" id="admQ" placeholder="Search players by name" value="${esc(admQ)}" style="margin-bottom:10px"><div class="mplist" id="admList">${admListHtml()}</div>
           <div class="tnote">🎁 gives (or takes back) the Creator's Pick badge: it's for golfers who helped make the game or had a suggestion added.</div>
-          <div class="tnote">To give it to: ${GIFT_TODO.map(n => `<button class="linkbtn" data-adm-q="${n}">${n}</button>`).join(' · ')} (tap a name to search for them)</div>`;
+          ${giftNote ? `<div class="tnote">${giftNote}</div>` : ''}`;
       } else if (admView === 'flags') {
         const s = await fbDb.collection('flags').orderBy('at', 'desc').limit(100).get();
         v.innerHTML = (s.docs.length ? `<button class="ghost sm" data-adm-clearflags="1" style="margin-bottom:10px">🧹 Clear all flags (${s.docs.length}${s.docs.length >= 100 ? '+' : ''})</button>` : '')
@@ -6385,7 +6679,10 @@
   async function admBan(uid, name) {
     const reason = prompt(`Ban ${name || 'this golfer'}? Type a reason (they'll see it):`, 'Cheating');
     if (reason == null) return;
-    await fbDb.collection('bans').doc(uid).set({ auto: false, reason: reason.slice(0, 140) || 'Banned by the creator', name: name || '', at: Date.now(), t: serverTime() });
+    await admBanNow(uid, name, reason);
+  }
+  async function admBanNow(uid, name, reason, auto = false) {
+    await fbDb.collection('bans').doc(uid).set({ auto: !!auto, reason: String(reason).slice(0, 140) || 'Banned by the creator', name: name || '', at: Date.now(), t: serverTime() });
     const day = etDay(), dels = [];
     COURSES.concat([MINI]).forEach(c => { dels.push(scoresRef(c.id).doc(uid).delete(), scoresRef(c.id, day).doc(uid).delete()); });
     dels.push(ctpRef(day).doc(uid).delete());
@@ -6402,6 +6699,7 @@
       else if (d.admCid) admCid = d.admCid;
       else if (d.admQ != null) { admQ = d.admQ; admView = 'players'; }
       else if (d.admEgg != null) { setTab('play'); rollEgg(+d.admEgg); return; }
+      else if (d.admRecount) { const g = await recountBadges(); alert(`Badge counts fixed: 🎯 ${g.ace} Hole in One · 🏆 ${g.champ} Daily Champion`); }
       else if (d.admMode) admMode = d.admMode;
       else if (d.admBan) await admBan(d.admBan, d.n);
       else if (d.admUnban) { if (!confirm('Unban this golfer?')) return; await fbDb.collection('bans').doc(d.admUnban).delete(); }
@@ -6426,8 +6724,51 @@
   $('adminBody').addEventListener('input', e => { if (e.target.id === 'admQ') { admQ = e.target.value; const l = $('admList'); if (l) l.innerHTML = admListHtml(); } });
   $('adminBody').addEventListener('keydown', e => e.stopPropagation());
 
-  if (save.resetNote || (save.noteVer | 0) < 2) { $('resetNote').classList.remove('hidden'); }
-  $('resetOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('resetNote').classList.add('hidden'); delete save.resetNote; save.noteVer = 2; persist(); });
+  // ---- Pop-ups: the first-time welcome, "What's new" after an update, and one-time tips ----
+  // What's new only lists things players can see in the game (nothing about anti-cheat, analytics or creator tools).
+  // To announce a new update: change NEWS_VER and replace NEWS.
+  const NEWS_VER = '2026.10.15b';
+  const NEWS = [
+    ['⛳', '<b>Putting fixed.</b> No more dead zone: any pull that shows 1% or more now hits the ball.'],
+    ['🚩', '<b>The flagstick</b> is now laid down off to the side, well out of your ball\'s way.'],
+    ['📏', '<b>Easier to see putting line.</b>'],
+    ['📍', '<b>Course and hole names</b> now show at the top of the screen while you play.'],
+    ['🏅', '<b>Premium Badges.</b> Your badges show as gold medallions on the home screen and next to your golfer. Tap one to see what it\'s for and how many golfers have it.'],
+    ['🎨', '<b>Free ball colors.</b> Mix any color you want with the new color sliders in the Golfer tab.'],
+    ['👋', '<b>Say hi</b> to Mr. Hasselbaur on the first tee at the 3C Par Three and Mr. Garner on the first tee at Chami Links Crimson.'],
+    ['🟡', 'Chami Links Yellow is now <b>Chami Links Gold</b>.'],
+    ['🔋', 'Fixes for holes that showed up black or with scrambled colors, and <b>better battery life</b>.'],
+  ];
+  const TIPS = {
+    clubs: ['Upgrade your clubs 🏌️', 'Spend your winnings here to <b>upgrade your clubs</b>: more <b>Power</b> to hit it farther, more <b>Accuracy</b> for a bigger gold zone, and more <b>Control</b> for a steadier swing. You can buy brand new clubs too.'],
+    golfer: ['Make it yours 🎨', 'You can customize <b>everything</b> here, from your <b>outfit</b> and <b>golf bag</b> to your <b>ball</b>. Tap anything to try it on before you buy.'],
+  };
+  save.tips = save.tips || {};
+  const isNewGolfer = !hadSave && !(save.stats.rounds > 0);
+  const popOpen = () => ['resetNote', 'newsPop', 'tipPop'].some(id => !$(id).classList.contains('hidden'));
+  function showTip(k) {
+    try { if (!save.tips || save.tips[k] || popOpen() || !TIPS[k]) return; } catch (e) { return; }   // (setTab can run before the tips are set up)
+    save.tips[k] = 1; persist();
+    $('tipTitle').textContent = TIPS[k][0]; $('tipBody').innerHTML = TIPS[k][1];
+    $('tipPop').classList.remove('hidden');
+  }
+  $('tipOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('tipPop').classList.add('hidden'); });
+  function showNews() {
+    $('newsList').innerHTML = NEWS.map(([i, t]) => `<li><span class="ni">${i}</span><span>${t}</span></li>`).join('');
+    $('newsPop').classList.remove('hidden');
+  }
+  $('newsOk').addEventListener('click', () => { ensureAudio(); sfx.click(); $('newsPop').classList.add('hidden'); save.newsVer = NEWS_VER; persist(); });
+  if (isNewGolfer && (save.noteVer | 0) < 3) {
+    $('resetNote').classList.remove('hidden');   // brand new: the welcome, which points them at the 3C Par Three
+    save.newsVer = NEWS_VER;                       // (they don't need a list of changes)
+  } else {
+    save.noteVer = Math.max(3, save.noteVer | 0);
+    if (save.newsVer !== NEWS_VER) showNews();
+  }
+  $('resetOk').addEventListener('click', () => {
+    ensureAudio(); sfx.click(); $('resetNote').classList.add('hidden'); delete save.resetNote; save.noteVer = 3; persist();
+    const p3 = courseById('par3'); if (p3) openCourse(p3);
+  });
   // anything already earned by older saves is granted quietly
   AWARDS.forEach(a => { if (!save.awards[a.id] && awardDone(a)) save.awards[a.id] = Date.now(); });
   if (!BAG_PRESETS.some(p => bagOpen(p) && p.bag.body.toLowerCase() === String(save.gbag.body).toLowerCase())) {
@@ -6447,7 +6788,7 @@
   document.addEventListener('visibilitychange', () => { last = performance.now(); });
   // Battery: cap the game at 60 fps (iPads with 120 Hz screens would otherwise draw twice as often),
   // and drop to 30 fps while you're just standing over the ball not touching anything.
-  let lastInput = 0, lastFrame = 0;
+  let lastInput = 0, lastFrame = 0, shadowKey = 0, shadowAt = 0;
   ['pointerdown', 'pointermove', 'keydown'].forEach(ev => addEventListener(ev, () => { lastInput = performance.now(); }, { passive: true, capture: true }));
   function loop(now) {
     requestAnimationFrame(loop);
@@ -6465,7 +6806,10 @@
     if (bannerT > 0) { bannerT -= dt; if (bannerT <= 0) $('banner').classList.remove('show'); }
     if (ratingT > 0) { ratingT -= dt; if (ratingT <= 0) $('rating').classList.remove('show'); }
     syncScene(now / 1000, dt);
-    renderer.render(scene, camera);
+    { const r = golfer.root, q = golfer.pivot.quaternion, pr = pinGroup ? pinGroup.position.y + pinGroup.rotation.z : 0;
+      const k = r.position.x + r.position.y * 7 + r.position.z * 13 + r.rotation.y * 17 + (r.visible ? 1 : 0) + q.x * 31 + q.y * 37 + golfer.hinge.quaternion.z * 41 + golfer.upper.rotation.y * 43 + pr * 47;
+      if (k !== shadowKey || now - shadowAt > 1000) { renderer.shadowMap.needsUpdate = true; shadowKey = k; shadowAt = now; } }
+    if (!glLost) renderer.render(scene, camera);
     drawFx(now / 1000);
     updateHud();
   }
