@@ -65,9 +65,9 @@ The game is built to stay on the free Spark plan (50,000 reads and 20,000 writes
 - Play Friends invites are only watched on the home screen (newest 10). Stroke play and best ball send one score per hole; scramble and alt shot send every shot because players take turns.
 - No "last seen" notes or daily counters: those stats come from Google Analytics.
 
-## Google Analytics (optional)
+## Google Analytics
 
-Paste your GA4 Measurement ID (looks like `G-XXXXXXX`, from Google Analytics or Firebase > Project settings > Integrations > Google Analytics) into `GA_ID` in index.html. It's off while `GA_ID` is empty. Rounds started and finished are sent as events.
+On, with Measurement ID `G-4D02FQ9XMJ` (`GA_ID` in index.html). Players online, players per day, new players, rounds started and finished, aces and Closest to the Pin shots show up in Google Analytics (Firebase console > Analytics, or analytics.google.com). It's free and doesn't count against Firebase's database limits.
 
 ## Firebase setup
 

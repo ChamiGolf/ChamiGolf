@@ -4452,7 +4452,8 @@
     projectId: 'chamigolf1',
     storageBucket: 'chamigolf1.firebasestorage.app',
     messagingSenderId: '934222144340',
-    appId: '1:934222144340:web:b7f2209350da831f4e5ec1'
+    appId: '1:934222144340:web:b7f2209350da831f4e5ec1',
+    measurementId: 'G-4D02FQ9XMJ'
   };
   const GAME_VER = '2026.10.15b';
   // The creator: gets the 👑 Creator badge and the admin tools (bans, analytics). The rules check this email too.
@@ -4461,7 +4462,7 @@
   const DAILY_PRIZES = [1000, 500, 250];
   const CTP_PRIZES = [1500, 750, 400];   // Daily Closest to the Pin: top 3 closest shots of the day
   // ---- Google Analytics (optional): paste the Measurement ID (G-XXXXXXX) from Google Analytics / Firebase here to turn it on ----
-  const GA_ID = '';
+  const GA_ID = 'G-4D02FQ9XMJ';   // Firebase > Project settings > Integrations > Google Analytics (property chamigolf1)
   const track = (ev, params) => { try { if (window.gtag && GA_ID) window.gtag('event', ev, params || {}); } catch (e) {} };
   if (GA_ID) {
     window.dataLayer = window.dataLayer || []; window.gtag = function () { window.dataLayer.push(arguments); };
