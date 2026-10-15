@@ -70,14 +70,21 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Hole-in-ones today (the banner on the Play tab).
-    match /aces/{day}/list/{id} {
+    // Hole-in-ones today (the banner on the Play tab): ONE record per day holding a list, so the banner costs 1 read.
+    // Each write can only add one ace to the end of the list, and only an ace by the golfer writing it.
+    function okAce(a) {
+      return a is map && a.keys().hasOnly(['name', 'uid', 'cid', 'course', 'hole', 'yds', 'date', 'badge'])
+        && a.uid == request.auth.uid && okName(a.name) && okBadge(a, request.auth.uid)
+        && a.course is string && a.course.size() < 40 && a.hole is int && a.yds is int && recent(a.date);
+    }
+    match /acesToday/{day} {
       allow read: if true;
-      allow create: if notBanned() && request.resource.data.uid == request.auth.uid
-        && request.resource.data.keys().hasOnly(['name', 'uid', 'cid', 'course', 'hole', 'yds', 'date', 't', 'badge'])
-        && okName(request.resource.data.name) && okBadge(request.resource.data, request.auth.uid)
-        && request.resource.data.course is string && request.resource.data.course.size() < 40
-        && recent(request.resource.data.date) && request.resource.data.t == request.time;
+      allow create: if notBanned() && request.resource.data.keys().hasOnly(['list'])
+        && request.resource.data.list.size() == 1 && okAce(request.resource.data.list[0]);
+      allow update: if notBanned() && request.resource.data.keys().hasOnly(['list'])
+        && request.resource.data.list.size() == resource.data.list.size() + 1 && request.resource.data.list.size() <= 300
+        && request.resource.data.list[0:resource.data.list.size()] == resource.data.list
+        && okAce(request.resource.data.list[resource.data.list.size()]);
       allow delete: if isAdmin();
     }
     // The very first hole in one in the game's history (First Ace Ever badge). Can only be claimed once.
@@ -129,24 +136,7 @@ service cloud.firestore {
         && request.resource.data.detail is string && request.resource.data.detail.size() <= 140;
     }
 
-    // ---- Analytics for the creator ----
-    // One small "last seen" note per golfer.
-    // (coins = bank, total = everything ever earned: the bank can't be more than that; last = the server's clock)
-    match /presence/{uid} {
-      allow read: if isAdmin();
-      allow write: if isMe(uid) && notBanned()
-        && request.resource.data.keys().hasOnly(['name', 'google', 'day', 'first', 'lastMs', 'last', 'where', 'coins', 'total', 'earned', 'rounds', 'aces', 'ver'])
-        && request.resource.data.name is string && request.resource.data.name.size() <= 20
-        && request.resource.data.last == request.time
-        && request.resource.data.coins is number && request.resource.data.total is number
-        && request.resource.data.coins >= 0 && request.resource.data.coins <= request.resource.data.total + 5000;
-    }
-    // Daily counters (rounds, aces, sign-ins, new players, Closest to the Pin shots).
-    match /daily/{day} {
-      allow read: if isAdmin();
-      allow create, update: if request.auth != null
-        && request.resource.data.keys().hasOnly(['rounds', 'aces', 'signins', 'newPlayers', 'ctp']);
-    }
+    // (Analytics moved to Google Analytics: the old "presence" notes and "daily" counters aren't used any more.)
 
     // ---- Play Friends ----
     // Friend codes: anyone signed in can look one up; only its owner can claim or rename it.

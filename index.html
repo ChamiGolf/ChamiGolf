@@ -4455,8 +4455,6 @@
     appId: '1:934222144340:web:b7f2209350da831f4e5ec1'
   };
   const GAME_VER = '2026.10.15b';
-  // Creator analytics were reset here: stats count from this moment (older notes and counters are ignored)
-  const STATS_VER = '2026.10.15', STATS_TAG = '_r2';
   // The creator: gets the 👑 Creator badge and the admin tools (bans, analytics). The rules check this email too.
   const CREATOR_EMAIL = 'jamesondoyle11@gmail.com';
   // In-game money paid to the top 3 of each Daily Tournament, collected the next time they open the game.
@@ -4481,7 +4479,8 @@
   const scoresRef = (cid, day) => day ? fbDb.collection('courses').doc(cid + SEASON).collection('days').doc(day).collection('scores')
     : fbDb.collection('courses').doc(cid + SEASON).collection('scores');
   const ctpRef = day => fbDb.collection('ctp').doc(day).collection('shots');
-  const acesRef = day => fbDb.collection('aces').doc(day).collection('list');
+  // today's holes-in-one all live in ONE small record per day (1 read for the whole banner instead of one per ace)
+  const acesDayRef = day => fbDb.collection('acesToday').doc(day);
   // fbUser = signed in with Google (cloud saves, Play Friends). fbGuest = a quiet guest account so anyone can post to the
   // leaderboards with just a name, no sign-in needed. meUser() is whichever one is active.
   var fbGuest = null;
@@ -4562,7 +4561,7 @@
     save.badgeReg = save.badgeReg || {};
     ['ace', 'champ'].forEach(async id => {
       if (!hasBadge(id) || save.badgeReg[id] === u.uid) return;
-      const mark = () => { save.badgeReg[id] = u.uid; persist(); badgeCounts = null; };
+      const mark = () => { save.badgeReg[id] = u.uid; persist(); badgeCounts = null; badgeCountAt = 0; };
       try {
         const b = fbDb.batch();
         b.set(holdersRef(id).doc(u.uid), { name: boardName(), at: Date.now() });
@@ -4574,7 +4573,7 @@
     });
   }
   async function loadBadgeCounts() {
-    if (!ONLINE || !fbDb || (badgeCounts && Date.now() - badgeCountAt < 600000)) return;
+    if (!ONLINE || !fbDb || badgeCounts || badgeCountAt) return;   // once per visit (saves Firebase reads)
     badgeCountAt = Date.now(); const got = {};
     try { await ensureOnlineUser(); } catch (e) {}
     await Promise.all([
@@ -4589,7 +4588,7 @@
   async function recountBadges() {
     const got = {};
     for (const id of ['ace', 'champ']) got[id] = (await holdersRef(id).get()).size;
-    await badgeCountsRef().set(got); badgeCounts = null;
+    await badgeCountsRef().set(got); badgeCounts = null; badgeCountAt = 0;
     return got;
   }
   const badgeCountTxt = id => { const n = badgeCounts && badgeCounts[id]; return n == null ? '' : `👥 ${n.toLocaleString()} golfer${n === 1 ? ' has' : 's have'} it`; };
@@ -4622,10 +4621,23 @@
   const ensureName = async () => !needsName() ? true : askName();
 
   // One row per golfer per board: their best score. Ties go to whoever posted it first.
-  // Firebase's free plan allows 50,000 reads a day (it ran out on Oct 15), so boards are cached for 90 seconds
-  // and only read a few rows past what's shown. Posting your own score clears the cache.
-  const boardCache = new Map(), BOARD_TTL = 90000;
-  const cached = async (key, fn) => { const c = boardCache.get(key); if (c && Date.now() - c.at < BOARD_TTL) return c.v; const v = await fn(); boardCache.set(key, { at: Date.now(), v }); return v; };
+  // Firebase's free plan allows 50,000 reads a day, so boards are remembered for 5 minutes (even through a reload)
+  // and only a few rows past what's shown are read. Your own new score is added into the remembered board.
+  const BOARD_TTL = 300000, BOARD_KEY = 'cg-boards';
+  const boardCache = new Map();
+  try { const o = JSON.parse(localStorage.getItem(BOARD_KEY)) || {}; for (const k in o) if (Date.now() - o[k].at < BOARD_TTL) boardCache.set(k, o[k]); } catch (e) {}
+  const storeBoards = () => { try { const o = {}; boardCache.forEach((v, k) => { if (Date.now() - v.at < BOARD_TTL) o[k] = v; }); localStorage.setItem(BOARD_KEY, JSON.stringify(o)); } catch (e) {} };
+  const cached = async (key, fn) => { const c = boardCache.get(key); if (c && Date.now() - c.at < BOARD_TTL) return c.v; const v = await fn(); boardCache.set(key, { at: Date.now(), v }); storeBoards(); return v; };
+  // put your own new score into the remembered copies of a board (so nobody has to download it again to see it)
+  function addToBoards(prefix, row, cmp) {
+    boardCache.forEach((c, k) => {
+      if (!k.startsWith(prefix)) return;
+      const lim = +k.split('|').pop(), old = c.v.find(r => r.pid === row.pid);
+      if (old && cmp(old, row) <= 0) return;
+      c.v = c.v.filter(r => r.pid !== row.pid).concat([row]).sort(cmp).slice(0, lim);
+    });
+    storeBoards();
+  }
   async function fetchBoard(cid, day, limit = 10) { return cached(`b|${cid}|${day || ''}|${limit}`, () => fetchBoardNow(cid, day, limit)); }
   async function fetchBoardNow(cid, day, limit) {
     const snap = await scoresRef(cid, day).orderBy('rel').limit(limit + 3).get();
@@ -4633,20 +4645,27 @@
     rows.sort((a, b) => a.rel - b.rel || a.date - b.date);
     return rows.slice(0, limit);
   }
-  async function postBest(ref, doc, better) {
-    const cur = await ref.get();
-    if (cur.exists && !better(cur.data())) return false;
-    await ref.set(Object.assign(doc, { t: serverTime() }));
-    return true;
+  // Posting skips the "what's your current best" read: the game remembers your best on each board, and the rules
+  // turn down a score that isn't better anyway (that comes back as permission-denied, which just means "not better").
+  function postBest(ref, doc, better, key) {
+    save.posted = save.posted || {};
+    const mine = save.posted[key];
+    if (mine && !better(mine)) return Promise.resolve(false);
+    return ref.set(Object.assign(doc, { t: serverTime() })).then(() => { save.posted[key] = { rel: doc.rel, yd: doc.yd }; return true; },
+      e => { if (e && e.code === 'permission-denied' && !banned()) { save.posted[key] = { rel: doc.rel, yd: doc.yd }; return false; } throw e; });   // (the board already has this or better)
   }
+  // forget remembered bests for daily boards more than 2 days old
+  { const cut = prevDay(prevDay(etDay())); for (const k in save.posted || {}) { const d = k.split('|').pop(); if (/^\d{4}-\d{2}-\d{2}$/.test(d) && d < cut) delete save.posted[k]; } }
   async function postOnline(cid, entry) {
     if (banned()) throw new Error('banned');
     const u = await ensureOnlineUser(), day = etDay(new Date(entry.date)), uid = u.uid, b = myBadge();
     const doc = nb => Object.assign({ name: boardName(), uid, rel: entry.rel, strokes: entry.strokes, date: entry.date, day }, b && !nb ? { badge: b } : {});
-    const send = nb => Promise.all([postBest(scoresRef(cid).doc(uid), doc(nb), o => entry.rel < o.rel), postBest(scoresRef(cid, day).doc(uid), doc(nb), o => entry.rel < o.rel)]);
-    try { await send(false); } catch (e) { if (!b) throw e; await send(true); }   // (older rules didn't know about badges)
-    (save.tourney[day] || (save.tourney[day] = {}))[cid] = true; persist(); tourCache = null; boardCache.clear();
-    const today = await fetchBoard(cid, day, 50);
+    const send = nb => Promise.all([postBest(scoresRef(cid).doc(uid), doc(nb), o => entry.rel < o.rel, `${uid}|${cid}`), postBest(scoresRef(cid, day).doc(uid), doc(nb), o => entry.rel < o.rel, `${uid}|${cid}|${day}`)]);
+    await send(false);
+    (save.tourney[day] || (save.tourney[day] = {}))[cid] = true; persist();
+    const row = { name: boardName(), pid: uid, rel: entry.rel, strokes: entry.strokes, date: entry.date, badge: b || '' }, cmp = (a, c) => a.rel - c.rel || a.date - c.date;
+    addToBoards(`b|${cid}|${day}|`, row, cmp); addToBoards(`b|${cid}||`, row, cmp); tourCache = null;
+    const today = await fetchBoard(cid, day, 10);   // usually already remembered, so this costs nothing
     const i = today.findIndex(r => r.pid === uid);
     return i >= 0 ? i + 1 : 0;
   }
@@ -4660,10 +4679,11 @@
   async function postCtp(yd) {
     if (banned()) throw new Error('banned');
     const u = await ensureOnlineUser(), day = ctpCourse().day, uid = u.uid, b = myBadge();
-    const send = nb => postBest(ctpRef(day).doc(uid), Object.assign({ name: boardName(), uid, yd: Math.round(yd * 1000) / 1000, date: Date.now(), day }, b && !nb ? { badge: b } : {}), o => yd < o.yd);
-    try { await send(false); } catch (e) { if (!b) throw e; await send(true); }
-    (save.tourney[day] || (save.tourney[day] = {})).ctp = true; persist(); tourCache = null; boardCache.clear();
-    const top = await fetchCtp(day, 50), i = top.findIndex(r => r.pid === uid);
+    const ydr = Math.round(yd * 1000) / 1000, now = Date.now();
+    await postBest(ctpRef(day).doc(uid), Object.assign({ name: boardName(), uid, yd: ydr, date: now, day }, b ? { badge: b } : {}), o => yd < o.yd, `${uid}|ctp|${day}`);
+    (save.tourney[day] || (save.tourney[day] = {})).ctp = true; persist();
+    addToBoards(`c|${day}|`, { name: boardName(), pid: uid, yd: ydr, date: now, badge: b || '' }, (a, c) => a.yd - c.yd || a.date - c.date); tourCache = null;
+    const top = await fetchCtp(day, 10), i = top.findIndex(r => r.pid === uid);
     return i >= 0 ? i + 1 : 0;
   }
 
@@ -4692,7 +4712,7 @@
     } catch (e) {}
     if (wins.length) {
       const total = wins.reduce((a, w) => a + w.prize, 0), firsts = wins.some(w => w.place === 0);
-      paid(total); save.coins += total; save.stats.earnedTotal += total;
+      paid(total); save.coins += total; save.stats.earnedTotal += total; setTimeout(cloudSaveSoon, 0);
       if (firsts && !save.badges.champ) { save.badges.champ = 1; regBadges(); }
       const medal = ['🥇 1st', '🥈 2nd', '🥉 3rd'];
       $('prizeBody').innerHTML = wins.map(w => `${medal[w.place]} at ${esc(w.label)} (${w.score}) · ${w.day.slice(5).replace('-', '/')} · <b>+${money(w.prize)}</b>`).join('<br>')
@@ -4727,14 +4747,17 @@
   }
   function signOut() { if (fbAuth) fbAuth.signOut(); }
   const userDoc = () => fbDb.collection('users').doc(fbUser.uid);
-  // Cloud save: batched (one write at most every 6 seconds instead of after every change, to stay well inside
-  // Firebase's free daily write limit), and written right away when the game is closed or put in the background.
-  let cloudDirty = false;
+  // Cloud save (Google sign-in only). To stay inside Firebase's free daily write limit it's only sent at a few moments:
+  // when a round ends, after buying something or collecting winnings, and when the game is closed or put in the background.
+  // Everything is always saved on the device right away, so nothing is lost in between.
+  let cloudDirty = false, cloudCoins = null;
   function pushCloud() {
     if (!fbUser || !cloudReady) return;
     cloudDirty = true;
-    if (!cloudTimer) cloudTimer = setTimeout(flushCloud, 6000);
+    if (cloudCoins != null && save.coins < cloudCoins) cloudSaveSoon();   // money spent: something was bought
+    cloudCoins = save.coins;
   }
+  function cloudSaveSoon() { if (!fbUser || !cloudReady) return; cloudDirty = true; clearTimeout(cloudTimer); cloudTimer = setTimeout(flushCloud, 2000); }
   function flushCloud() {
     clearTimeout(cloudTimer); cloudTimer = null;
     if (!fbUser || !cloudReady || !cloudDirty) return;
@@ -4759,7 +4782,7 @@
     cloudReady = true;
     save.uid = fbUser.uid;
     if (!save.name || save.name === 'Player') save.name = boardName();
-    persist(); pushCloud();
+    persist(); cloudSaveSoon();
   }
   function acctHtml() {
     if (!ONLINE) return '<div class="acctCard"><div class="an">Offline</div><div class="am">Online leaderboards and sign-in couldn\'t load. Check your connection and reload.</div></div>';
@@ -4848,35 +4871,41 @@
 
   // ---- Today's tournaments: one card on the Play tab listing the leader of every daily tournament ----
   let tourCache = null, tourOpen = false, tourDraw = null;
-  async function renderTourCard() {
+  let tourLoading = false;
+  try { const t = JSON.parse(localStorage.getItem('cg-tour')); if (t && t.res) { t.res.ctp = t.ctp; tourCache = { day: t.day, at: t.at, res: t.res }; } } catch (e) {}
+  async function renderTourCard(load) {
     const el = $('tourCard'); if (!el) return;
     if (!ONLINE) { el.innerHTML = ''; return; }
     const day = etDay(), list = COURSES.concat([MINI]);
     const draw = res => {
       const rows = list.map((c, i) => {
         const r = res && res[i], open = c.mini || isUnlocked(c);
-        return `<button class="trow" data-tc="${c.id}"><span class="tc">${c.mini ? '⭐ ' : ''}${esc(c.name)}${open ? '' : ' 🔒'}</span><span class="tl">${!res ? '…' : r ? `${badgeHtml(r.badge)}${esc(r.name)} <b>${fmtRel(r.rel)}</b>` : '<i>No leader yet</i>'}</span></button>`;
+        return `<button class="trow" data-tc="${c.id}"><span class="tc">${c.mini ? '⭐ ' : ''}${esc(c.name)}${open ? '' : ' 🔒'}</span><span class="tl">${!res ? (tourLoading ? '…' : '—') : r ? `${badgeHtml(r.badge)}${esc(r.name)} <b>${fmtRel(r.rel)}</b>` : '<i>No leader yet</i>'}</span></button>`;
       }).join('');
       const cr = res && res.ctp;
-      const ctpRow = `<button class="trow" data-tc="ctp"><span class="tc">🎯 Closest to the Pin</span><span class="tl">${!res ? '…' : cr ? `${badgeHtml(cr.badge)}${esc(cr.name)} <b>${cr.yd === 0 ? 'Ace!' : fmtFt(cr.yd)}</b>` : '<i>No leader yet</i>'}</span></button>`;
+      const ctpRow = `<button class="trow" data-tc="ctp"><span class="tc">🎯 Closest to the Pin</span><span class="tl">${!res ? (tourLoading ? '…' : '—') : cr ? `${badgeHtml(cr.badge)}${esc(cr.name)} <b>${cr.yd === 0 ? 'Ace!' : fmtFt(cr.yd)}</b>` : '<i>No leader yet</i>'}</span></button>`;
       el.innerHTML = `<div class="tour"><div class="ctag">🏆 TODAY'S DAILY TOURNAMENTS · RESETS IN ${resetsIn()}</div>
         <div class="cm">Every course, mini golf and Closest to the Pin has its own tournament today. Top 3 in each win 🥇 <b>${money(DAILY_PRIZES[0])}</b> · 🥈 <b>${money(DAILY_PRIZES[1])}</b> · 🥉 <b>${money(DAILY_PRIZES[2])}</b>.</div>
+        ${res || tourLoading ? '' : '<button class="main sm" data-tload="1" style="margin:4px 0 8px">👀 See today\'s leaders</button>'}
         <div class="trows${tourOpen ? '' : ' shut'}">${ctpRow}${rows}</div><button class="tmore" data-tmore="1">${tourOpen ? 'Show fewer ▴' : `See all ${list.length + 1} tournaments ▾`}</button></div>`;
     };
     tourDraw = draw;
     if (tourCache && tourCache.day === day && Date.now() - tourCache.at < 600000) return draw(tourCache.res);   // 10 minutes (saves Firebase reads)
-    draw(null);
+    if (!load) return draw(null);   // the leaders only load when someone taps "See today's leaders"
+    tourLoading = true; draw(null);
     try {
       const lead = async c => { const s = await scoresRef(c.id, day).orderBy('rel').limit(2).get();
         const rows = s.docs.map(d => Object.assign({ pid: d.id }, d.data())).sort((a, b) => a.rel - b.rel || a.date - b.date); return rows[0] || null; };
       const res = await Promise.all(list.map(lead));
       const cs = await ctpRef(day).orderBy('yd').limit(2).get();
       res.ctp = cs.docs.map(d => d.data()).sort((a, b) => a.yd - b.yd || a.date - b.date)[0] || null;
-      tourCache = { day, at: Date.now(), res };
+      tourCache = { day, at: Date.now(), res }; tourLoading = false;
+      try { localStorage.setItem('cg-tour', JSON.stringify({ day, at: tourCache.at, res, ctp: res.ctp })); } catch (e) {}
       if ($('tourCard') === el) draw(res);
-    } catch (e) { el.innerHTML = ''; }
+    } catch (e) { tourLoading = false; el.innerHTML = ''; }
   }
   document.addEventListener('click', e => {
+    if (e.target.closest('[data-tload]')) { ensureAudio(); sfx.click(); tourOpen = true; renderTourCard(true); return; }
     const m = e.target.closest('[data-tmore]');
     if (m) { ensureAudio(); sfx.click(); tourOpen = !tourOpen; if (tourCache && tourDraw) tourDraw(tourCache.res); else renderTourCard(); return; }
     const b = e.target.closest('[data-tc]'); if (!b || !b.closest('#tourCard')) return;
@@ -4890,8 +4919,9 @@
   async function fetchAces() {
     const day = etDay();
     if (acesCache && acesCache.day === day && Date.now() - acesCache.at < 300000) return acesCache.rows;
-    const snap = await acesRef(day).orderBy('date', 'desc').limit(15).get();
-    const rows = snap.docs.map(d => d.data()).filter(r => inSeason(r) && r.cid !== 'mini');   // mini golf aces aren't real aces
+    const snap = await acesDayRef(day).get();
+    const rows = ((snap.exists && snap.data().list) || []).filter(r => inSeason(r) && r.cid !== 'mini')   // mini golf aces aren't real aces
+      .sort((a, b) => b.date - a.date).slice(0, 15);
     acesCache = { day, at: Date.now(), rows }; return rows;
   }
   async function renderAceBar() {
@@ -4907,41 +4937,23 @@
   }
   // (still called "Player"? the ace waits until you've picked a name, so the banner shows who made it)
   const pendingAces = [];
-  function flushAces() { if (needsName()) return; const q = pendingAces.splice(0); q.forEach(x => acesRef(x.day).add(Object.assign(x.doc, { name: boardName(), t: serverTime() })).then(() => { acesCache = null; }).catch(() => {})); }
+  const addAce = (day, doc) => acesDayRef(day).set({ list: firebase.firestore.FieldValue.arrayUnion(doc) }, { merge: true });
+  function flushAces() { if (needsName()) return; const q = pendingAces.splice(0); q.forEach(x => addAce(x.day, Object.assign(x.doc, { name: boardName() })).then(() => { acesCache = null; }).catch(() => {})); }
   async function postAce(c, i, h) {
     if (!ONLINE || banned()) return;
     try {
       const u = await ensureOnlineUser(), day = etDay(), b = myBadge(), cname = c.ctp ? 'Closest to the Pin' : c.name;
       const doc = Object.assign({ name: boardName(), uid: u.uid, cid: c.id, course: cname, hole: i + 1, yds: h.yds | 0, date: Date.now() }, b ? { badge: b } : {});
-      if (needsName()) pendingAces.push({ day, doc }); else await acesRef(day).add(Object.assign(doc, { t: serverTime() }));
+      if (needsName()) pendingAces.push({ day, doc }); else await addAce(day, doc);
       acesCache = null; bumpDaily({ aces: 1 }); regBadges();
     } catch (e) {}
   }
 
-  // ---- Analytics for the creator: who's playing (a tiny "last seen" note per player) and daily counters ----
-  let presLast = 0, presWhere = 'home';
-  function presence(where) {
-    if (where) presWhere = where;
-    const u = meUser(); if (!u || !fbDb || banned()) return;
-    const now = Date.now(); if (!where && now - presLast < 60000) return; presLast = now;
-    // the creator's stats were reset: only count rounds, aces and money from after the reset
-    if (save.statsVer !== STATS_VER) { save.statsVer = STATS_VER; save.statsBase = { rounds: save.stats.rounds | 0, aces: save.stats.aces | 0, earned: Math.round(save.stats.earnedTotal) || 0 }; persist(); }
-    const sb = save.statsBase || {};
-    const day = etDay();
-    if (!save.firstDay) { save.firstDay = day; persist(); bumpDaily({ newPlayers: 1 }); }
-    fbDb.collection('presence').doc(u.uid).set({ name: boardName(), google: !!fbUser, day, first: save.firstDay, lastMs: now, last: serverTime(), where: String(presWhere).slice(0, 20),
-      coins: Math.round(save.coins) || 0, total: Math.round(save.stats.earnedTotal) || 0, earned: Math.max(0, (Math.round(save.stats.earnedTotal) || 0) - (sb.earned | 0)), rounds: Math.max(0, (save.stats.rounds | 0) - (sb.rounds | 0)), aces: Math.max(0, (save.stats.aces | 0) - (sb.aces | 0)), ver: GAME_VER }).catch(() => {});
-  }
-  let lastUse = Date.now();
-  ['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { lastUse = Date.now(); }, { passive: true, capture: true }));
-  setInterval(() => { if (!document.hidden && Date.now() - lastUse < 5 * 60000) presence(); }, 180000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) presence(); });
-  function bumpDaily(inc) {
-    if (!fbDb || !meUser() || banned()) return;
-    const FV = firebase.firestore.FieldValue, d = {};
-    for (const k in inc) d[k] = FV.increment(inc[k]);
-    fbDb.collection('daily').doc(etDay() + STATS_TAG).set(d, { merge: true }).catch(() => {});
-  }
+  // ---- Analytics: Google Analytics only (free, unlimited, and it doesn't use up Firebase's free daily limits) ----
+  // presence() marks where the golfer is; bumpDaily() counts things (rounds, aces, sign-ins, new players, CTP shots).
+  function presence(where) { if (where && where !== 'home') track('play_course', { course: String(where).slice(0, 20) }); }
+  function bumpDaily(inc) { for (const k in inc) track('cg_' + k, { value: inc[k] }); }
+  if (!save.firstDay) { save.firstDay = etDay(); bumpDaily({ newPlayers: 1 }); }
 
   // ================= Anti-cheat and bans =================
   // What gets caught: editing the save (money, upgrades, unlocks), money or gear the game never paid out,
@@ -4976,7 +4988,7 @@
     } catch (e) {}
     showBanned();
   }
-  setInterval(() => { if (!document.hidden && meUser()) syncBan(); }, 300000);
+  setInterval(() => { if (!document.hidden && meUser()) syncBan(); }, 900000);   // every 15 minutes
   const flagsSent = {};
   function cheatFlag(kind, detail, strong) {
     if (isCreator()) return;
@@ -5126,11 +5138,16 @@
     } catch (e) {}
     if (tab === 'match') renderMatchTab();
   }
+  // Invites are only watched while you're on the home screen with the game open (not during a round or with the game
+  // in the background), and only the newest 10, to save Firebase reads. Coming back to the home screen picks up anything new.
+  const inboxWanted = () => !!fbUser && !document.hidden && !$('home').classList.contains('hidden');
+  function syncInbox() { if (inboxWanted() ? !inboxUnsub : inboxUnsub) listenInbox(); }
+  document.addEventListener('visibilitychange', () => syncInbox());
   function listenInbox() {
     if (inboxUnsub) { inboxUnsub(); inboxUnsub = null; }
-    inbox = [];
-    if (!fbUser) return;
-    inboxUnsub = inboxRef(fbUser.uid).orderBy('at', 'desc').limit(25).onSnapshot(s => {
+    if (!fbUser) inbox = [];
+    if (!inboxWanted()) return;
+    inboxUnsub = inboxRef(fbUser.uid).orderBy('at', 'desc').limit(10).onSnapshot(s => {
       const old = Date.now() - INVITE_HOURS * 3600e3;
       inbox = s.docs.map(d => Object.assign({ id: d.id }, d.data()));
       inbox.filter(x => x.at < old).forEach(x => inboxRef(fbUser.uid).doc(x.id).delete().catch(() => {}));
@@ -5503,6 +5520,7 @@
   $('mpHome').addEventListener('click', () => { ensureAudio(); sfx.click(); closeMatch(); showHome(); setTab('play'); });
 
   function mpFinish(res) {
+    setTimeout(cloudSaveSoon, 0);
     if (MP.over) return;
     MP.over = true; state = 'finished';
     const m = MP.doc, rec = save.mp[MP.id] || (save.mp[MP.id] = { at: Date.now() });
@@ -6317,6 +6335,7 @@
     $('home').classList.remove('hidden'); slidesOn(true);
     rollEgg();
     setTab(tab);
+    syncInbox();
   }
   // ---- Very rare messages on the back of the home screen (each one has a 0.01% chance every time you come home) ----
   const EGGS = ['bro ryz was here', 'Mr gallery is a goat', 'RIP Mr. Pisani', 'Cafeteria Christian is unmatched'];
@@ -6335,13 +6354,14 @@
     if (save.live) delete save.live;
     presence(c.id); track('round_start', { course: c.id });
     $('home').classList.add('hidden'); $('final').classList.add('hidden'); slidesOn(false);
+    syncInbox();
     loadHole(0);
   }
 
   function showFinal() {
     state = 'finished';
     const rel = relTotal(), s = save.stats;
-    track('round_finish', { course: course.id, score: rel, holes: HOLES.length });
+    track('round_finish', { course: course.id, score: rel, holes: HOLES.length }); setTimeout(cloudSaveSoon, 0);
     let tp = 0, ts = 0;
     let rows = '';
     HOLES.forEach((h, i) => { tp += h.par; ts += scores[i]; });
@@ -6431,6 +6451,7 @@
     startRound(ctpCourse());
   }
   function ctpDone(yd) {
+    setTimeout(cloudSaveSoon, 0);
     if (state === 'finished') return;
     state = 'finished'; ball.vx = ball.vy = 0;
     const st = ctpState(), ft = yd == null ? null : yd * 3, old = st.best;
@@ -6549,9 +6570,11 @@
   $('homeBtn').addEventListener('click', () => { showHome(); setTab('course'); });
 
   // ================= Creator tools (only for the creator's Google account; the rules enforce this too) =================
-  let admView = 'live', admCid = 'pines', admMode = 'daily', admQ = '', admPres = null;
+  // Kept small to stay inside Firebase's free plan: cheat flags, bans and the leaderboards (remove a score, ban, Creator's Pick).
+  // Player counts, players online and rounds per day come from Google Analytics instead (free, and it doesn't use Firebase).
+  let admView = 'flags', admCid = 'pines', admMode = 'daily';
   // Creator's Pick for the golfers who helped with the game. The creator's device hands these out on its own:
-  // a golfer whose first name matches gets the badge. If two golfers share a name it waits for the creator to pick (🎁).
+  // a Google-signed-in golfer (they have a friend code) whose first name matches gets the badge.
   const GIFT_TODO = ['Frank', 'Freddy', 'Gilroy', 'Aiden'];
   let giftNote = '', giftBusy = false;
   async function autoGifts() {
@@ -6560,78 +6583,23 @@
     const left = GIFT_TODO.filter(n => !save.giftsGiven[n]); if (!left.length) { giftNote = ''; return; }
     giftBusy = true;
     try {
-      const rows = await admLoadPresence(true), wait = [];
+      const wait = [];
       for (const n of left) {
-        const hits = rows.filter(p => String(p.name || '').trim().split(/\s+/)[0].toLowerCase() === n.toLowerCase());
-        const pick = hits.length === 1 ? hits : hits.filter(p => p.google).length === 1 ? hits.filter(p => p.google) : null;
-        if (!pick) { wait.push(hits.length ? `${n} (${hits.length} golfers with that name: tap 🎁 on the right one)` : `${n} (hasn't played yet)`); continue; }
-        const ref = fbDb.collection('gifts').doc(pick[0].uid);
-        if (!(await ref.get()).exists) await ref.set({ name: pick[0].name || n, at: Date.now() });
-        save.giftsGiven[n] = pick[0].uid;
+        // only reads the friend codes whose name starts with this name (a handful of reads, not the whole list)
+        const snap = await fbDb.collection('codes').where('name', '>=', n).where('name', '<=', n + '').limit(10).get();
+        const hits = snap.docs.map(d => d.data()).filter(p => String(p.name || '').trim().split(/\s+/)[0].toLowerCase() === n.toLowerCase());
+        const uids = [...new Set(hits.map(p => p.uid))];
+        if (uids.length !== 1) { wait.push(uids.length ? `${n} (${uids.length} golfers with that name: tap 🎁 next to the right one on a leaderboard)` : `${n} (not signed in with Google yet)`); continue; }
+        const ref = fbDb.collection('gifts').doc(uids[0]);
+        if (!(await ref.get()).exists) await ref.set({ name: hits[0].name || n, at: Date.now() });
+        save.giftsGiven[n] = uids[0];
       }
       persist();
       giftNote = wait.length ? `🎁 Creator's Pick still waiting for: ${wait.join(' · ')}` : '';
     } catch (e) {}
     giftBusy = false;
   }
-  const admTabs = [['live', '📈 Analytics'], ['players', '👥 Players'], ['flags', '🚩 Cheat flags'], ['bans', '⛔ Bans'], ['boards', '🏆 Leaderboards']];
-  // a few random fun facts from everyone's "last seen" notes
-  function admFunStats(rows) {
-    if (!rows.length) return [['—', 'No players yet']];
-    const top = k => rows.reduce((a, p) => ((p[k] || 0) > (a[k] || 0) ? p : a), rows[0]), sum = k => rows.reduce((a, p) => a + (p[k] || 0), 0);
-    const nm = p => esc((p.name || 'Golfer').slice(0, 14));
-    rows = rows.filter(p => !admBanned.has(p.uid));   // banned golfers don't show up in the money stats
-    if (!rows.length) return [['—', 'No players yet']];
-    const rich = top('coins'), earner = top('earned'), grinder = top('rounds'), acer = top('aces');
-    const hourET = ms => +new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }).format(new Date(ms)) % 24;
-    const owls = rows.filter(p => p.lastMs && (hourET(p.lastMs) >= 23 || hourET(p.lastMs) < 5));
-    const spots = {}; rows.forEach(p => { if (p.where && p.where !== 'home') spots[p.where] = (spots[p.where] || 0) + 1; });
-    const fav = Object.keys(spots).sort((a, b) => spots[b] - spots[a])[0];
-    const out = [
-      [`${nm(rich)} · ${money(rich.coins || 0)}`, '💰 Richest golfer right now'],
-      [`${nm(earner)} · ${money(earner.earned || 0)}`, '🏦 Biggest earner ever'],
-      [`${nm(grinder)} · ${grinder.rounds || 0}`, '🏌️ Most rounds played'],
-      [acer.aces ? `${nm(acer)} · ${acer.aces}` : 'Nobody yet', '🎯 Most holes in one'],
-      [money(sum('earned')), '💵 Money won by everyone'],
-      [sum('rounds').toLocaleString(), '⛳ Rounds played by everyone'],
-      [sum('aces').toLocaleString(), '🌟 Aces made by everyone'],
-      [money(Math.round(sum('coins') / rows.length)), '🏧 Average bank'],
-      [fav ? esc(courseById(fav).name) : '—', '📍 Most popular course right now'],
-      [owls.length ? `${owls.length} · ${nm(owls[0])}` : 'None', '🦉 Night owls (playing 11pm–5am)'],
-    ];
-    return out;
-  }
-  // "last seen" uses the server's clock (a device with its clock set wrong used to look online forever)
-  const seenMs = p => (p.last && p.last.toMillis ? p.last.toMillis() : 0) || Math.min(p.lastMs || 0, Date.now());
-  let admBanned = new Set();
-  async function admLoadPresence(force) {
-    if (admPres && !force && Date.now() - admPres.at < 60000) return admPres.rows;
-    const [s, b] = await Promise.all([fbDb.collection('presence').orderBy('last', 'desc').limit(500).get(), fbDb.collection('bans').limit(500).get().catch(() => null)]);
-    if (b) admBanned = new Set(b.docs.map(d => d.id));
-    const rows = s.docs.map(d => Object.assign({ uid: d.id }, d.data()));
-    rows.forEach(p => { p.lastMs = seenMs(p); });
-    admPres = { at: Date.now(), rows };
-    admMoneySweep(rows);
-    return admPres.rows;
-  }
-  // Money sweep (runs whenever the creator opens the tools): a bank bigger than everything the golfer has ever been paid
-  // (by 5,000+) can only come from adding money outside the game, so they're banned automatically and their scores removed.
-  async function admMoneySweep(rows) {
-    for (const p of rows) {
-      if (admBanned.has(p.uid) || p.total == null) continue;
-      const extra = (p.coins || 0) - (p.total || 0);
-      if (extra >= 5000 || (p.coins || 0) > 3000000) {
-        admBanned.add(p.uid);
-        try { await admBanNow(p.uid, p.name, `Auto-ban: ${money(Math.round(p.coins || 0))} in the bank but only ${money(Math.round(p.total || 0))} ever earned`, true); } catch (e) {}
-      }
-    }
-  }
-  const admPlayerRow = (p, extra = '') => `<div class="mpli"><div class="nm"><b>${esc(p.name || 'Golfer')}</b> ${p.google ? '<span class="pill2">Google</span>' : '<span class="pill2 g">Guest</span>'}
-    <small>${p.lastMs ? 'seen ' + ago(p.lastMs) : ''}${p.where ? ' · ' + esc(courseById(p.where) && p.where !== 'home' ? courseById(p.where).name : p.where) : ''} · ${money(p.coins || 0)} · ${p.rounds || 0} rounds · ${p.aces || 0} aces${p.ver ? ' · v' + esc(p.ver) : ''}</small></div>${extra}</div>`;
-  function admListHtml() {
-    const q = admQ.trim().toLowerCase(), list = (admPres ? admPres.rows : []).filter(p => !q || String(p.name || '').toLowerCase().includes(q)).slice(0, 150);
-    return list.map(p => admPlayerRow(p, `<button class="ghost sm" data-adm-gift="${p.uid}" data-n="${esc(p.name || '')}">🎁</button><button class="main sm" data-adm-ban="${p.uid}" data-n="${esc(p.name || '')}">Ban</button>`)).join('') || '<div class="empty">No players found.</div>';
-  }
+  const admTabs = [['flags', '🚩 Cheat flags'], ['bans', '⛔ Bans'], ['boards', '🏆 Leaderboards']];
   async function renderAdmin() {
     const box = $('adminBody');
     if (!isCreator()) { box.innerHTML = '<div class="empty">Creator only.</div>'; return; }
@@ -6639,43 +6607,29 @@
       <div class="seg wrapseg">${admTabs.map(([k, n]) => `<button data-adm-view="${k}" class="${admView === k ? 'on' : ''}">${n}</button>`).join('')}</div><div id="admView"><div class="empty">Loading…</div></div>`;
     const v = $('admView');
     try {
-      if (admView === 'live') {
-        let today = etDay(), [rows, dT, dY] = await Promise.all([admLoadPresence(), fbDb.collection('daily').doc(today + STATS_TAG).get(), fbDb.collection('daily').doc(prevDay(today) + STATS_TAG).get()]);
-        rows = rows.filter(p => String(p.ver || '') >= STATS_VER);   // stats were reset: only notes from after the reset count
-        const now = Date.now(), online = rows.filter(p => now - (p.lastMs || 0) < 6 * 60000), active = rows.filter(p => p.day === today);
-        const t = dT.exists ? dT.data() : {}, y = dY.exists ? dY.data() : {};
-        const tiles = [[online.length, 'Online now'], [active.length, 'Played today'], [rows.filter(p => p.first === today).length, 'New players today'], [rows.length + (rows.length >= 500 ? '+' : ''), 'Players (all time)'],
-          [rows.filter(p => p.google).length, 'Google accounts'], [rows.filter(p => !p.google).length, 'Guests'], [t.signins || 0, 'Sign-ins today'], [t.rounds || 0, 'Rounds today'],
-          [t.aces || 0, 'Aces today'], [t.ctp || 0, 'CTP shots today'], [y.rounds || 0, 'Rounds yesterday'], [y.signins || 0, 'Sign-ins yesterday']];
-        v.innerHTML = `<div class="tiles">${tiles.map(([n, l]) => `<div class="tile"><div class="v">${n}</div><div class="l">${l}</div></div>`).join('')}</div>
-          <div class="sect">FUN STATS</div><div class="tiles">${admFunStats(rows).map(([n, l]) => `<div class="tile"><div class="v" style="font-size:20px">${n}</div><div class="l">${l}</div></div>`).join('')}</div>
-          <div class="sect">ONLINE NOW (LAST 6 MIN)</div><div class="mplist">${online.length ? online.map(p => admPlayerRow(p)).join('') : '<div class="empty">Nobody online right now.</div>'}</div>
-          <div class="tnote"><button class="linkbtn" data-adm-recount="1">🔢 Recount badge holders</button> (use once after publishing the new Firebase rules)</div>
-          <div class="tnote">🥚 Rare home screen messages (0.01% each): ${EGGS.map((m, i) => `<button class="linkbtn" data-adm-egg="${i}">${esc(m)}</button>`).join(' · ')} (tap to preview)</div>
-          <div class="tnote">"Online" = someone was playing in the last 6 minutes (by the server's clock). Anyone whose bank is $5,000+ more than they've ever earned is banned automatically when you open these tools. All stats were reset on Oct 15, 2026 and count from then.</div>`;
-      } else if (admView === 'players') {
-        await autoGifts();
-        await admLoadPresence();
-        v.innerHTML = `<input class="mpin" id="admQ" placeholder="Search players by name" value="${esc(admQ)}" style="margin-bottom:10px"><div class="mplist" id="admList">${admListHtml()}</div>
-          <div class="tnote">🎁 gives (or takes back) the Creator's Pick badge: it's for golfers who helped make the game or had a suggestion added.</div>
-          ${giftNote ? `<div class="tnote">${giftNote}</div>` : ''}`;
-      } else if (admView === 'flags') {
-        const s = await fbDb.collection('flags').orderBy('at', 'desc').limit(100).get();
-        v.innerHTML = (s.docs.length ? `<button class="ghost sm" data-adm-clearflags="1" style="margin-bottom:10px">🧹 Clear all flags (${s.docs.length}${s.docs.length >= 100 ? '+' : ''})</button>` : '')
+      if (admView === 'flags') {
+        const s = await fbDb.collection('flags').orderBy('at', 'desc').limit(50).get();
+        v.innerHTML = (s.docs.length ? `<button class="ghost sm" data-adm-clearflags="1" style="margin-bottom:10px">🧹 Clear all flags (${s.docs.length}${s.docs.length >= 50 ? '+' : ''})</button>` : '')
           + `<div class="mplist">${s.docs.map(d => { const f = d.data(); return `<div class="mpli"><div class="nm"><b>${esc(f.name || 'Golfer')}</b> ${f.strong ? '<span class="pill2 r">auto-banned</span>' : '<span class="pill2">flagged</span>'}<small>${esc(f.kind || '')}: ${esc(f.detail || '')} · ${f.at ? ago(f.at) : ''}${f.google ? ' · Google' : ' · guest'}</small></div>
-          <button class="ghost sm" data-adm-dismiss="${d.id}">Dismiss</button>${f.strong ? '' : `<button class="main sm" data-adm-ban="${f.uid}" data-n="${esc(f.name || '')}">Ban</button>`}</div>`; }).join('') || '<div class="empty">No cheat flags. 🎉</div>'}</div>`;
+          <button class="ghost sm" data-adm-dismiss="${d.id}">Dismiss</button>${f.strong ? '' : `<button class="main sm" data-adm-ban="${f.uid}" data-n="${esc(f.name || '')}">Ban</button>`}</div>`; }).join('') || '<div class="empty">No cheat flags. 🎉</div>'}</div>
+          <div class="tnote">Players online, players per day and rounds played are in Google Analytics (it's free and doesn't use up Firebase).</div>`;
       } else if (admView === 'bans') {
-        const s = await fbDb.collection('bans').orderBy('at', 'desc').limit(200).get();
+        const s = await fbDb.collection('bans').orderBy('at', 'desc').limit(100).get();
         v.innerHTML = `<div class="mplist">${s.docs.map(d => { const b = d.data(); return `<div class="mpli"><div class="nm"><b>${esc(b.name || 'Golfer')}</b> ${b.auto ? '<span class="pill2 r">auto</span>' : '<span class="pill2">by you</span>'}<small>${esc(b.reason || '')} · ${b.at ? ago(b.at) : ''}</small></div>
           <button class="ghost sm" data-adm-unban="${d.id}">Unban</button></div>`; }).join('') || '<div class="empty">Nobody is banned.</div>'}</div>
-          <div class="tnote">Unbanning lets them play again the next time their game checks in (within about 5 minutes).</div>`;
+          <div class="tnote">Unbanning lets them play again the next time their game checks in (within about 15 minutes).</div>`;
       } else if (admView === 'boards') {
+        await autoGifts();
         const list = COURSES.concat([MINI]);
         const rows = await fetchBoard(admCid, admMode === 'daily' ? etDay() : null, 25);
         v.innerHTML = `<div class="opts" style="flex-wrap:wrap;margin-bottom:8px">${list.map(c => `<button data-adm-cid="${c.id}" class="${admCid === c.id ? 'on' : ''}" style="flex:0 1 auto">${esc(c.name)}</button>`).join('')}</div>
           <div class="seg"><button data-adm-mode="daily" class="${admMode === 'daily' ? 'on' : ''}">TODAY</button><button data-adm-mode="all" class="${admMode === 'all' ? 'on' : ''}">ALL-TIME</button></div>
           <div class="mplist">${rows.map((r, i) => `<div class="mpli"><div class="nm"><b>${i + 1}. ${badgeHtml(r.badge)}${esc(r.name)}</b><small>${fmtRel(r.rel)} (${r.strokes}) · ${fmtDate(r.date)}</small></div>
-            <button class="ghost sm" data-adm-del="${r.pid}">Remove</button><button class="main sm" data-adm-ban="${r.pid}" data-n="${esc(r.name)}">Ban</button></div>`).join('') || '<div class="empty">No scores on this board.</div>'}</div>`;
+            <button class="ghost sm" data-adm-gift="${r.pid}" data-n="${esc(r.name)}" title="Give or take back Creator's Pick">🎁</button><button class="ghost sm" data-adm-del="${r.pid}">Remove</button><button class="main sm" data-adm-ban="${r.pid}" data-n="${esc(r.name)}">Ban</button></div>`).join('') || '<div class="empty">No scores on this board.</div>'}</div>
+          <div class="tnote">🎁 gives (or takes back) the Creator's Pick badge: it's for golfers who helped make the game or had a suggestion added.</div>
+          ${giftNote ? `<div class="tnote">${giftNote}</div>` : ''}
+          <div class="tnote"><button class="linkbtn" data-adm-recount="1">🔢 Recount badge holders</button> (use once after publishing new Firebase rules)</div>
+          <div class="tnote">🥚 Rare home screen messages (0.01% each): ${EGGS.map((m, i) => `<button class="linkbtn" data-adm-egg="${i}">${esc(m)}</button>`).join(' · ')} (tap to preview)</div>`;
       }
     } catch (e) {
       v.innerHTML = `<div class="empty">Couldn't load this (${esc(e.code || e.message || 'error')}). Make sure the newest firestore.rules are published in the Firebase console.</div>`;
@@ -6703,7 +6657,6 @@
       if (d.admBack) return setTab('play');
       if (d.admView) admView = d.admView;
       else if (d.admCid) admCid = d.admCid;
-      else if (d.admQ != null) { admQ = d.admQ; admView = 'players'; }
       else if (d.admEgg != null) { setTab('play'); rollEgg(+d.admEgg); return; }
       else if (d.admRecount) { const g = await recountBadges(); alert(`Badge counts fixed: 🎯 ${g.ace} Hole in One · 🏆 ${g.champ} Daily Champion`); }
       else if (d.admMode) admMode = d.admMode;
@@ -6727,7 +6680,6 @@
     } catch (err) { alert('That didn\'t work: ' + (err.code || err.message)); }
     boardCache.clear(); renderAdmin();
   });
-  $('adminBody').addEventListener('input', e => { if (e.target.id === 'admQ') { admQ = e.target.value; const l = $('admList'); if (l) l.innerHTML = admListHtml(); } });
   $('adminBody').addEventListener('keydown', e => e.stopPropagation());
 
   // ---- Pop-ups: the first-time welcome, "What's new" after an update, and one-time tips ----

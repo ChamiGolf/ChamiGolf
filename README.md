@@ -45,8 +45,8 @@ Play it at https://chamigolf.github.io/
 ## Anti-cheat and creator tools
 
 - The game catches edited saves, money or gear it never paid out, impossible rounds and absurd drives. Strong signs ban the device right away; smaller ones are flagged.
-- Money: every payout goes through the game's ledger. $5,000+ showing up in the bank at once (or in total) that the game didn't pay out is an automatic ban, and so is a bank bigger than everything the golfer has ever earned. The Firebase rules enforce the same limit on the server, and opening the creator tools sweeps the player list for it.
-- The creator's account (🛡️ button on the home screen) has analytics (players online, played today, new players, sign-ins, rounds, aces), a player list, cheat flags, bans/unbans, leaderboard clean-up and Creator's Pick badges.
+- Money: every payout goes through the game's ledger. $5,000+ showing up in the bank at once (or in total) that the game didn't pay out is an automatic ban, and so is a bank bigger than everything the golfer has ever earned. The Firebase rules enforce the same limit on cloud saves.
+- The creator's account (🛡️ button on the home screen) has cheat flags, bans/unbans and the leaderboards (remove a score, ban, give or take back Creator's Pick with 🎁). Player counts, players online and rounds played are in Google Analytics.
 
 ## Updates and pop-ups
 
@@ -55,7 +55,15 @@ Play it at https://chamigolf.github.io/
 
 ## Firebase free plan
 
-The free Spark plan allows 50,000 reads and 20,000 writes a day. Leaderboards are cached (90 seconds, today's tournament card 10 minutes), only a few rows past what's shown are read, and cloud saves are batched, so the game stays well under it. If it ever runs out, leaderboards come back at midnight Pacific.
+The game is built to stay on the free Spark plan (50,000 reads and 20,000 writes a day; on Spark Firebase never charges, it just pauses online features until midnight Pacific if a limit is hit):
+
+- Cloud saves (Google sign-in) go up only when a round ends, after buying something or collecting winnings, and when the game is closed. The device always saves instantly.
+- Leaderboards are remembered for 5 minutes, even through a reload. Your own new score is added to the remembered board instead of downloading it again, and posting skips the "current best" lookup.
+- Today's tournaments card only loads when someone taps "See today's leaders" (then it's remembered for 10 minutes).
+- Today's holes-in-one are one record per day (1 read for the banner).
+- Badge counts load once per visit; the ban check runs every 15 minutes.
+- Play Friends invites are only watched on the home screen (newest 10). Stroke play and best ball send one score per hole; scramble and alt shot send every shot because players take turns.
+- No "last seen" notes or daily counters: those stats come from Google Analytics.
 
 ## Google Analytics (optional)
 
