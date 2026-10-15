@@ -8,7 +8,7 @@ Play it at https://chamigolf.github.io/
 
 - Check PIN at the top for yards to the hole, then pick a club. Tap the club name to open your bag, or use the arrow buttons.
 - Swipe left or right to aim. MAP shows the whole hole, and you can tap it to aim.
-- Press the ball and pull back. The tag next to the ball shows the % and how many yards that pull hits (100% = the club's full distance).
+- Press the ball and pull back. Every shot works like putting: the tag next to the ball shows your swing % (100% = the club's full distance) with a rough distance guide underneath.
 - Let go in the bright gold zone for a perfect strike.
 - Rough cuts distance 15% and sand cuts it 40% (less with the Sand Wedge). Watch the wind arrow.
 - Water and out of bounds cost a stroke. Cart paths are concrete: the ball kicks up and skips off them.
@@ -28,8 +28,10 @@ Play it at https://chamigolf.github.io/
 
 - Daily Tournaments for every course, mini golf and Closest to the Pin. No sign-in needed to post: you just need a name (anyone still called "Player" is asked for one).
 - Sign in with Google to save progress to the cloud and play friends.
-- Badges (Creator, First Ace Ever, Creator's Pick, Daily Champion, Hole in One) show next to your name on the leaderboards.
-- A "Hole-in-ones today" banner on the Play tab.
+- Badges (Creator's Pick, Daily Champion, Hole in One) show next to your name on the leaderboards, and each badge tile shows how many golfers have it. Creator's Pick goes to golfers who helped make the game or had a suggestion added.
+- Unlockable outfits: the Senior Sweater (within 10 feet in the Daily Closest to the Pin) and the Masters Outfit (par or better at Chami Links Black).
+- Reloaded mid-round? Keep playing, finish the round early (paid for the holes you played), or quit.
+- A "Hole-in-ones today" banner on the Play tab (it shows up once someone makes one; mini golf aces don't count).
 
 ## Play Friends
 

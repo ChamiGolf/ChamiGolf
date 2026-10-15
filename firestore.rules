@@ -89,6 +89,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Badge counts: each golfer with a Hole in One or Daily Champion badge leaves a tiny note here (anyone can count them).
+    match /badgeHolders/{bid}/who/{uid} {
+      allow read: if true;
+      allow create, update: if isMe(uid) && notBanned() && bid in ['ace', 'champ']
+        && request.resource.data.keys().hasOnly(['name', 'at']) && request.resource.data.name is string && request.resource.data.name.size() <= 20;
+      allow delete: if isMe(uid) || isAdmin();
+    }
+
     // Feedback from players (the 💬 button). Only the creator can read or clear it.
     match /feedback/{id} {
       allow read, delete: if isAdmin();
