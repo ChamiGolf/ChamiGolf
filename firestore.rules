@@ -140,11 +140,15 @@ service cloud.firestore {
     // Player directory for the creator's "Find a player" search: one tiny record per golfer (name only).
     match /players/{uid} {
       allow read: if isAdmin();
-      allow create, update: if isMe(uid) && notBanned()
+      allow create, update: if (isAdmin() || (isMe(uid) && notBanned()))
         && request.resource.data.keys().hasOnly(['name', 'n', 'g', 'at'])
         && okName(request.resource.data.name) && request.resource.data.n == request.resource.data.name.lower()
         && request.resource.data.g is bool && request.resource.data.at is int;
       allow delete: if isAdmin();
+    }
+    // The old "last seen" notes: no longer written, but the creator can still read them (used once to fill the player list).
+    match /presence/{uid} {
+      allow read: if isAdmin();
     }
 
     // ---- Play Friends ----
